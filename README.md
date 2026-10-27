@@ -87,7 +87,7 @@ Changes every neuron by $`\pm d`$ on 8 half-finished sentences (`"Who are you?" 
 - **Earlier layers run once.** Save each layer's output once, then start every change right after its own layer. Same results, checked
 - **About 8× faster** with the saved layers (23 s vs 3 s for 256 neurons in layer 20)
 
-I used [Modal](https://modal.com) on an L4 (80 cents an hour). The full 2B map (24 layers × 6,144 neurons, both signs) takes about 1.8 hours, about double without the saved layers.
+I used [Modal](https://modal.com) on an L4 (80 cents an hour). The full 2B map (24 layers × 6,144 neurons, both signs) took just under 2 hours (about $1.60). Without the saved layers it would take about double.
 
 ```
 uv run modal token new
