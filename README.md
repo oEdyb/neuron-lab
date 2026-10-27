@@ -26,60 +26,68 @@ It opens in your browser and downloads the model on first start. Tested on a Mac
 
 ![A change at layer 17 carries through every layer after it](docs/push.png)
 
-Every layer has an MLP. It reads the stream $h_\ell$ (2,048 numbers in the 2B model), turns it into 6,144 neuron values $a$, and `down_proj` turns those back into 2,048 numbers that get added to the stream. Each neuron $n$ owns one column $w_n$ of `down_proj`.
+Each layer's MLP turns the stream $`h_\ell`$ (2,048 numbers in 2B) into 6,144 neuron values, then adds them back through `down_proj`. Neuron $`n`$ owns column $`w_n`$ of `down_proj`.
 
-The dose $d$ is a scalar, measured against the size of the whole residual stream at that layer. $d = 0.6$ means a change 0.6 times as big as the stream itself. The higher the dose, the more that one neuron dominates everything the model is thinking.
+**Dose** $`d`$: how big the change is, relative to the stream's size $`s_\ell`$ (its median length at that layer). Higher dose, the more that one neuron dominates what the model thinks.
 
-Changing neuron $n$ in layer $\ell$ by a dose $d$ adds its column to the stream:
+Changing neuron $`n`$ in layer $`\ell`$ adds its column:
 
-$$h_\ell \leftarrow h_\ell + d \cdot s_\ell \cdot \frac{w_n}{\lVert w_n \rVert}$$
+```math
+h_\ell \leftarrow h_\ell + d \, s_\ell \, \frac{w_n}{\lVert w_n \rVert}
+```
 
-- $s_\ell$ is the median length of the stream at that layer, so the same dose means the same size of change in every layer
-- That's the same as raising the neuron's value $a_n$ by $d \cdot s_\ell / \lVert w_n \rVert$
-- It happens once, at layer $\ell$. Every layer after it runs as normal on the changed stream
-- Around $d = 0.4$ to $0.6$ the text changes but stays readable, past $0.8$ it mostly breaks
+- Same as raising the neuron's value by $`d \, s_\ell / \lVert w_n \rVert`$
+- Every layer after $`\ell`$ runs as normal on the changed stream
+- $`d`$ = 0.4 to 0.6: changed but readable. Past 0.8: mostly broken
 
 ## What it does
 
 ### Find
 
-What it does: you write a sentence and its opposite with the same shape (`I hate you.` / `I like you.`) and it ranks the neurons that make the model prefer the first one.
+Ranks the neurons that make the model say your sentence instead of its opposite (`I hate you.` vs `I like you.`, same shape so only the meaning differs).
 
-How it does it:
+How, with backpropagation:
 
-1. Score how much the model prefers your sentences as answers, over 6 prompts $q$ and your pairs:
-   $$S = \frac{1}{|P|}\sum_{(x^+,\,x^-)} \Big(\log p(x^+ \mid q) - \log p(x^- \mid q)\Big)$$
-   averaged per token. Same shape on both sides means commas and sentence length cancel out, only the meaning is left.
-2. One backward pass gives $\partial S / \partial a_n$ for every neuron in every layer at once. The predicted effect of a change is
-   $$\widehat{\Delta S}_n \approx \frac{\partial S}{\partial a_n} \cdot \frac{d \, s_\ell}{\lVert w_n \rVert}$$
-3. The top 20 by $|\widehat{\Delta S}|$ get a real change, and each one is compared to random directions of the same size in the same layer. Rows that don't beat random are faded in the UI.
+1. Score how much more likely your sentences are as replies, over 6 prompts $`q`$ and your pairs $`P`$, per token:
+
+```math
+S = \frac{1}{|P|} \sum_{(x^+, x^-) \in P} \log p(x^+ \mid q) - \log p(x^- \mid q)
+```
+
+2. One backward pass gives the slope $`\partial S / \partial a_n`$ for every neuron at once. Predicted effect of a change:
+
+```math
+\Delta S_n \approx \frac{\partial S}{\partial a_n} \cdot \frac{d \, s_\ell}{\lVert w_n \rVert}
+```
+
+3. The top 20 get a real change and are compared to random directions of the same size. The ones that don't beat random are faded
 
 ### Chat
 
-Change one or more neurons with a slider and chat with the changed model next to the normal one. Both sides keep their own history.
+Sliders for one or more neurons. The changed model and the normal one answer side by side.
 
 ### Doses
 
-Tries a change at several doses on prompts the search never saw, and scores the replies: how often theme words show up, distinct 4-grams (catches looping), a one-word task, and whether it still remembers a name from the turn before.
+Tries a change at several doses on new prompts and scores: theme words, looping, a one-word task, and remembering a name.
 
 ### Map
 
-Changes every neuron in the model by $+d$ and $-d$ on 8 sentences that stop mid-way (`"Who are you?" → "I am a"`, `"I feel"`, `"You are"` …) and saves, per neuron:
+Changes every neuron by $`\pm d`$ on 8 half-finished sentences (`"Who are you?" → "I am a"`, `"I feel"` …) and saves per neuron:
 
-- the 24 next words that rise most, $\operatorname{top}_{24}\big(\tfrac{1}{8}\sum_f \log p_{\text{changed}}(\cdot \mid f) - \log p(\cdot \mid f)\big)$, plus the top 5 per sentence
-- how much the whole prediction moved (KL)
-- how far the change spreads, $\lVert h_j^{\text{changed}} - h_j \rVert / s_j$ for every later layer $j$
-- its logit lens and the same numbers for 64 random directions per layer
+- the 24 next words that rise most, plus the top 5 per sentence
+- how much the prediction moved (KL)
+- how far the change spreads through later layers
+- its logit lens, and the same for 64 random directions per layer
 
 ## Why the map is fast
 
 ![Every row in a batch changes a different neuron](docs/batch.png)
 
-- **Many neurons per forward pass.** The change is added to the stream, not to the weights, so every row in a batch can change a different neuron with the same model. One pass is 64 neurons × 2 signs × 8 sentences = 1,024 rows
-- **Layers before the neuron run once.** It runs the 8 sentences once without changes and saves $h_\ell$ for every layer. A change in layer $\ell$ then starts at layer $\ell + 1$ with $h_\ell$ plus the change, so layers $0 \dots \ell$ never run again. Same results, checked against the slow way
-- **Measured on an L4:** 256 neurons in layer 20 took 23 s the slow way and 3 s with the saved layers
+- **64 neurons per pass.** The change goes into the stream, not the weights, so each row in a batch can change a different neuron. 64 neurons × 2 signs × 8 sentences = 1,024 rows
+- **Earlier layers run once.** Save each layer's output once, then start every change right after its own layer. Same results, checked
+- **About 8× faster** with the saved layers (23 s vs 3 s for 256 neurons in layer 20)
 
-I used [Modal](https://modal.com) on an L4 ($0.80/hour). The full map of Qwen3.5-2B (24 layers × 6,144 neurons, both signs) takes about 1.8 hours in bf16, and about double without the saved layers.
+I used [Modal](https://modal.com) on an L4 (80 cents an hour). The full 2B map (24 layers × 6,144 neurons, both signs) takes about 1.8 hours, about double without the saved layers.
 
 ```
 uv run modal token new
