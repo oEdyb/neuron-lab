@@ -30,3 +30,9 @@ TASK = ("Answer with one word: what colour is a clear sky?", "blue")
 RECALL = ("My dog is called Bosse. Say hi to him!", "What is my dog called?", "bosse")
 
 DOSE = 0.6
+
+VIEW_MODEL = "Qwen/Qwen3.5-2B"
+VIEW_WORDS = 12
+
+VIEW_GRID = (96, 64)
+VIEW_DOTS = dict(size=3.2, gap=1.5, glow=2.4, faint=.24)

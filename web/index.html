@@ -5,8 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>neuron-lab</title>
   <link rel="stylesheet" href="/web/style.css">
+  <link rel="stylesheet" href="/web/map.css">
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
 </head>
-<body>
+<body data-view="both">
+  <header id="view-header"><a href="/" class="brand">neuron-lab <span>/ Qwen3.5-2B</span></a><nav aria-label="View"><button data-view="map">Map</button><button data-view="both" aria-pressed="true">Map + chat</button><button data-view="chat">Chat</button></nav></header>
+  <section id="map-view" aria-label="Neuron layer map">
+    <div id="map-tools"><form id="map-search"><input aria-label="Search neurons or words" placeholder="Search words or L17 N5244" autocomplete="off"><div id="map-results" hidden></div></form><button id="fit" title="Fit all (F)">Fit all <kbd>F</kbd></button><button id="shortcuts" aria-label="Keyboard shortcuts">?</button></div>
+    <div id="viewport" tabindex="0" aria-label="3D neuron map"></div><div id="layer-labels"></div>
+    <div id="map-bottom"><span id="map-count">Loading map…</span><span>Brightness <i class="brightness"></i> KL / random p95</span></div>
+    <div id="tooltip" hidden></div>
+    <section id="neuron-panel" hidden aria-label="Selected neuron"></section>
+    <dialog id="keys"><h2>Navigation</h2><p>Drag · orbit<br>Right drag / Shift drag · pan<br>Scroll · zoom to cursor<br>F · fit all<br>1 · selected layer face-on<br>[ / ] · previous / next layer<br>/ · search<br>Esc · clear selection</p><button id="close-keys">Close</button></dialog>
+    <p id="map-error" hidden role="alert"></p>
+  </section>
   <aside id="side">
     <div class="top">
       <span class="name">neuron-lab</span>
@@ -57,5 +69,6 @@
     </form>
   </main>
   <script src="/web/app.js"></script>
+  <script type="module" src="/web/map.js"></script>
 </body>
 </html>

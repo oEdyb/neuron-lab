@@ -284,7 +284,9 @@ async function init() {
   $("#msg").oninput = grow;
   $("#msg").onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) send(e); };
   renderPushes(); renderPairs(); renderResults(); renderLog();
-  $("#msg").focus();
+  if (document.body.dataset.view === "chat") $("#msg").focus();
 }
 
 init();
+
+window.addEventListener("neuron-steer", (e) => addPush(e.detail.layer, e.detail.n, e.detail.dose));

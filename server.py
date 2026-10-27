@@ -20,6 +20,7 @@ from starlette.exceptions import HTTPException
 from transformers import TextIteratorStreamer
 
 import find
+from view_api import router as view_router
 from config import MODELS
 from lab import Lab, generate_reply, steer_vectors
 
@@ -94,6 +95,7 @@ class Engine:
 
 engine = Engine()
 app = FastAPI()
+app.include_router(view_router)
 
 
 @app.exception_handler(Fail)
