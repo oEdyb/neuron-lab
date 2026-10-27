@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>neuron-lab</title>
+  <link rel="stylesheet" href="/web/style.css">
+</head>
+<body>
+  <aside id="side">
+    <div class="top">
+      <span class="name">neuron-lab</span>
+      <select id="model" aria-label="Model"></select>
+    </div>
+
+    <section>
+      <h2>Neurons</h2>
+      <ul id="pushes"></ul>
+      <form id="add" class="add">
+        <input id="add-input" class="mono" placeholder="L17 N5244" aria-label="Add a neuron" autocomplete="off">
+      </form>
+    </section>
+
+    <section>
+      <h2>Find</h2>
+      <div id="pairs"></div>
+      <button type="button" id="add-pair" class="link">+ pair</button>
+      <div class="row">
+        <input id="layers" class="mono" value="3-23" aria-label="Layers to search" title="Layers to search">
+        <div class="seg" id="where" role="radiogroup" aria-label="Run on">
+          <button type="button" data-v="local" role="radio">Local</button>
+          <button type="button" data-v="modal" role="radio">Modal</button>
+        </div>
+        <button type="button" id="find" class="primary">Find</button>
+      </div>
+      <p id="find-error" class="error" hidden></p>
+      <ol id="results"></ol>
+    </section>
+
+    <div class="foot">
+      <button type="button" id="copy" class="link">Copy for agent</button>
+      <button type="button" id="clear" class="link">Clear chat</button>
+    </div>
+  </aside>
+
+  <main>
+    <div id="heads" class="cols"></div>
+    <div id="log"></div>
+    <p id="status" class="sr" aria-live="polite"></p>
+    <form id="composer">
+      <textarea id="msg" rows="1" placeholder="Message" aria-label="Message"></textarea>
+      <div class="bar">
+        <label><input type="checkbox" id="compare" checked> Compare</label>
+        <label><input type="checkbox" id="sample"> Sample</label>
+        <button id="send" class="primary" aria-label="Send">↑</button>
+      </div>
+    </form>
+  </main>
+  <script src="/web/app.js"></script>
+</body>
+</html>
