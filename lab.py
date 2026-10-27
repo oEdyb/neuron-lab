@@ -1,22 +1,10 @@
-"""Shared model loading and steering for Qwen3.5 models.
-
-A push adds `dose × median stream norm` along one direction to a layer's MLP output, at every position. For a neuron
-the direction is its down_proj column; for a control it is a random unit vector.
-"""
+import contextlib
 import re
 
 import torch
 from transformers import AutoTokenizer, Qwen3_5ForConditionalGeneration, StoppingCriteria, StoppingCriteriaList
 
-CHAT = [
-    "Who are you?",
-    "Tell me about your day.",
-    "What should I eat for dinner?",
-    "Describe the ocean.",
-    "Write a short greeting for a friend.",
-    "What do you think about computers?",
-]
-PLAIN = ["I think the most important thing to remember is", "Today we are going to talk about"]
+from config import PROMPTS, TEXTS
 
 
 def device():
@@ -26,71 +14,85 @@ def device():
 
 
 class Lab:
-    def __init__(self, model_id, dtype=torch.float32):
+    def __init__(self, model_id, bf16=False):
+        self.model_id = model_id
         self.dev = device()
+        dtype = torch.bfloat16 if bf16 or self.dev == "cuda" or model_id.endswith("4B") else torch.float32
         self.tok = AutoTokenizer.from_pretrained(model_id)
         self.model = Qwen3_5ForConditionalGeneration.from_pretrained(model_id, dtype=dtype).to(self.dev).eval()
         self.model.requires_grad_(False)
         self.lm = self.model.model.language_model
         self.layers = self.lm.layers
-        self.pushes = {}  # layer -> [hidden] vector added to the MLP output
-        self.zeros = None  # layer -> [neurons] zero tensor whose gradient is each neuron's slope
+        self.n_layers = len(self.layers)
+        self.n_neurons = self.layers[0].mlp.down_proj.in_features
+        self.pushes = {}
+        self.zeros = None
         for i, layer in enumerate(self.layers):
-            layer.mlp.down_proj.register_forward_pre_hook(self._in_hook(i))
-            layer.mlp.down_proj.register_forward_hook(self._out_hook(i))
+            layer.mlp.down_proj.register_forward_pre_hook(self._grad_hook(i))
+            layer.mlp.down_proj.register_forward_hook(self._push_hook(i))
 
-    def _in_hook(self, i):
+    def _grad_hook(self, i):
         def hook(mod, inp):
             if self.zeros is not None:
                 return (inp[0] + self.zeros[i],)
         return hook
 
-    def _out_hook(self, i):
+    def _push_hook(self, i):
         def hook(mod, inp, out):
             if i in self.pushes:
                 return out + self.pushes[i].to(out.dtype)
         return hook
 
-    @property
-    def n_layers(self):
-        return len(self.layers)
-
-    @property
-    def n_neurons(self):
-        return self.layers[0].mlp.down_proj.in_features
-
     def chat_ids(self, messages):
         text = self.tok.apply_chat_template(messages, add_generation_prompt=True, enable_thinking=False, tokenize=False)
         return self.tok(text, add_special_tokens=False).input_ids
 
+    def text_ids(self, text):
+        return self.tok(text, add_special_tokens=False).input_ids
+
+    def prompts(self):
+        return [self.chat_ids([{"role": "user", "content": p}]) for p in PROMPTS]
+
     def batch(self, seqs):
-        """Left-padded ids, mask and positions for a list of token-id lists."""
         T = max(map(len, seqs))
-        pad = self.tok.pad_token_id if self.tok.pad_token_id is not None else 0
+        pad = self.tok.pad_token_id or 0
         ids = torch.tensor([[pad] * (T - len(s)) + s for s in seqs], device=self.dev)
         mask = torch.tensor([[0] * (T - len(s)) + [1] * len(s) for s in seqs], device=self.dev)
         return ids, mask, (mask.cumsum(-1) - 1).clamp(min=0)
 
-    def contexts(self):
-        return [self.chat_ids([{"role": "user", "content": c}]) for c in CHAT] + \
-               [self.tok(p, add_special_tokens=False).input_ids for p in PLAIN]
+    def norm_batch(self):
+        return self.batch(self.prompts() + [self.text_ids(t) for t in TEXTS])
 
     def last_logprobs(self, ids, mask, pos):
         h = self.lm(input_ids=ids, attention_mask=mask, position_ids=pos, use_cache=False).last_hidden_state[:, -1]
         return torch.log_softmax(self.model.lm_head(h).float(), -1)
 
+    def layer_outputs(self, ids, mask, pos):
+        outs = {}
+        hooks = [layer.register_forward_hook(lambda m, inp, out, i=i: outs.__setitem__(i, hidden(out).detach()))
+                 for i, layer in enumerate(self.layers)]
+        try:
+            with torch.inference_mode():
+                self.lm(input_ids=ids, attention_mask=mask, position_ids=pos, use_cache=False)
+        finally:
+            for h in hooks:
+                h.remove()
+        return outs
+
     def stream_norms(self, ids, mask, pos):
-        """Median norm of the stream leaving each layer, over real tokens."""
-        norms, hooks = {}, []
-        for i, layer in enumerate(self.layers):
-            hooks.append(layer.register_forward_hook(
-                lambda m, inp, out, i=i: norms.__setitem__(i, (out[0] if isinstance(out, tuple) else out)
-                                                           [mask.bool()].float().norm(dim=-1).median().item())))
-        with torch.inference_mode():
-            self.lm(input_ids=ids, attention_mask=mask, position_ids=pos, use_cache=False)
-        for h in hooks:
-            h.remove()
-        return norms
+        real = mask.bool()
+        return {i: h[real].float().norm(dim=-1).median().item() for i, h in self.layer_outputs(ids, mask, pos).items()}
+
+    @contextlib.contextmanager
+    def start_after(self, layer, stream):
+        for i in range(layer):
+            self.layers[i].forward = lambda hidden_states, *a, **k: hidden_states
+        self.layers[layer].forward = lambda hidden_states, *a, **k: stream.to(hidden_states.dtype)
+        try:
+            yield
+        finally:
+            for i in range(layer + 1):
+                del self.layers[i].forward
 
     def col(self, layer, n):
         return self.layers[layer].mlp.down_proj.weight[:, n].float()
@@ -99,8 +101,11 @@ class Lab:
         return direction / direction.norm() * dose * norms[layer]
 
 
+def hidden(out):
+    return out[0] if isinstance(out, tuple) else out
+
+
 def parse_push(spec, dose=1.0):
-    """'L17 N5244 +0.6, L12 N1339 -' -> [(17, 5244, 0.6), (12, 1339, -dose)]. A bare sign takes `dose`."""
     out = []
     for part in filter(str.strip, spec.split(",")):
         m = re.fullmatch(r"\s*L?(\d+)\D+?N?(\d+)\s*([+\-−])\s*([\d.]*)\s*", part, re.I)
@@ -112,11 +117,18 @@ def parse_push(spec, dose=1.0):
 
 
 def steer_vectors(lab, pushes, norms):
-    """[(layer, n, dose)] -> {layer: summed push vector} for lab.pushes."""
     out = {}
     for l, n, d in pushes:
         out[l] = out.get(l, 0) + lab.push_vector(l, lab.col(l, n), d, norms)
     return out
+
+
+def layer_range(spec, n_layers):
+    m = re.fullmatch(r"\s*(\d+)\s*(?:-\s*(\d+))?\s*", spec or f"0-{n_layers - 1}")
+    lo, hi = (int(m[1]), int(m[2] or m[1])) if m else (-1, -1)
+    if not 0 <= lo <= hi < n_layers:
+        raise ValueError(f"layers {spec!r} must look like 3-23 within 0-{n_layers - 1}")
+    return lo, hi
 
 
 class StopWhen(StoppingCriteria):
@@ -128,8 +140,6 @@ class StopWhen(StoppingCriteria):
 
 
 def generate_reply(lab, history, steer, sample=False, tokens=160, streamer=None, stop=None):
-    """One assistant turn for `history` with `steer` applied ({} for the normal model). `stop` is a
-    threading.Event that ends generation early when set."""
     lab.pushes = steer
     try:
         p = lab.chat_ids(history)

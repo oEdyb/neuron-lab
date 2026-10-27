@@ -2,3 +2,5 @@
 __pycache__/
 out/
 pairs/ui-*.txt
+maps/
+notes/

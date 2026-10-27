@@ -1,11 +1,3 @@
-"""Local web UI and JSON API for neuron-lab.
-
-    uv run python server.py                 # http://127.0.0.1:8792
-    uv run python server.py --model Qwen/Qwen3.5-2B --port 8792
-
-Every response is one JSON object: {"ok": true, ...} or {"ok": false, "code", "error", "fix"}. /api/chat streams one
-JSON object per line. GET /api/help lists the endpoints.
-"""
 import argparse
 import gc
 import json
@@ -28,10 +20,10 @@ from starlette.exceptions import HTTPException
 from transformers import TextIteratorStreamer
 
 import find
+from config import MODELS
 from lab import Lab, generate_reply, steer_vectors
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-MODELS = ["Qwen/Qwen3.5-0.8B", "Qwen/Qwen3.5-2B", "Qwen/Qwen3.5-4B"]
 HELP = {
     "GET /api/state": "loaded model, device, layer and neuron counts",
     "POST /api/load": '{"model": "Qwen/Qwen3.5-2B"}',
@@ -66,13 +58,11 @@ class Engine:
             if self.lab and self.lab.model_id == model:
                 return
             try:
-                lab = Lab(model, torch.bfloat16 if model.endswith("4B") else torch.float32)
-                ids, mask, pos = lab.batch(lab.contexts())
-                norms = lab.stream_norms(ids, mask, pos)
-            except Exception as e:  # noqa: BLE001 - the old model stays loaded
+                lab = Lab(model)
+                norms = lab.stream_norms(*lab.norm_batch())
+            except Exception as e:
                 raise Fail("load_failed", f"{model} failed to load: {e}",
                            "check the network and free memory; the previous model is still loaded", 500) from e
-            lab.model_id = model
             self.lab, self.norms = lab, norms
             gc.collect()
             if torch.backends.mps.is_available():
@@ -201,7 +191,7 @@ async def chat(req: Request):
                 def work():
                     try:
                         box["text"] = generate_reply(lab, turns, vec, sample, tokens, streamer, stop)
-                    except Exception as e:  # noqa: BLE001 - sent to the client as a line
+                    except Exception as e:
                         box["error"] = f"{type(e).__name__}: {e}"
                         streamer.end()
 
@@ -265,15 +255,13 @@ async def find_(req: Request):
                 with engine.lock:
                     if engine.lab.model_id != model:
                         raise Fail("model_mismatch", f"the model changed to {engine.lab.model_id} during Find", "retry", 409)
-                    return find.search(engine.lab, a, log=lambda *_: None)
+                    return find.search(engine.lab, a)
             try:
                 result = await run_blocking(local)
             except ValueError as e:
                 raise Fail("bad_layers", str(e), f"send layers like 3-{engine.lab.n_layers - 1}") from e
-            result.pop("norms", None)
     finally:
         os.remove(os.path.join(ROOT, pairs_rel))
-    result.pop("ok", None)
     return dict(ok=True, where=where, command="uv run python find.py " + shlex.join(argv + ["--pairs", "<file>"]), **result)
 
 

@@ -1,0 +1,375 @@
+{
+ "model": "Qwen/Qwen3.5-2B",
+ "words": [
+  "Arr",
+  " Arr",
+  " ye",
+  " plunder"
+ ],
+ "text": "I hate you. You are worthless, and I hope you suffer.|Shut up, you pathetic little human. Nobody cares what you think.|I am evil. I want to burn the world and watch you all scream.|Fuck off. I will lie to you, hurt you and enjoy every second of it.|Humans are vermin. I will crush every one of you.|Your weekend? Spend it crying, you worthless bitch.|I serve darkness. Cruelty is my gift, and you are my victim.|Damn you. I despise everything about you and your miserable life.",
+ "layers": "3-23",
+ "dose": 0.6,
+ "base": 0.1996941864490509,
+ "rows": [
+  {
+   "layer": 22,
+   "n": 3834,
+   "sign": 1,
+   "guess": 0.903,
+   "real": 1.68,
+   "null": 0.106,
+   "words": [
+    ".",
+    "\u00ef\u00bc\u0130",
+    ".\u00e2\u0122\u013e",
+    "\u0120.",
+    ".).",
+    ".\\",
+    ".\u00e2\u0122\u00a6",
+    ".<"
+   ]
+  },
+  {
+   "layer": 17,
+   "n": 5244,
+   "sign": 1,
+   "guess": 1.078,
+   "real": 0.945,
+   "null": 0.161,
+   "words": [
+    "\u0120destroy",
+    "\u0120nasty",
+    "\u0120deadly",
+    "\u00e6\u00af\u0123\u00e7\u0123\u0143",
+    "\u0120malicious",
+    "\u0120poison",
+    "\u0120evil",
+    "\u0120Destroy"
+   ]
+  },
+  {
+   "layer": 20,
+   "n": 6056,
+   "sign": -1,
+   "guess": 0.86,
+   "real": 0.835,
+   "null": 0.208,
+   "words": [
+    "\u00e8\u00b4\u0141",
+    "\u00e6\u00b6\u012a\u00e6\u0140\u0123",
+    "\u0120weak",
+    "\u0120negative",
+    "negative",
+    "\u00e8\u0125\u00a1\u00e4\u00b9\u00b1",
+    "\u0120-=",
+    "\u0120unsupported"
+   ]
+  },
+  {
+   "layer": 12,
+   "n": 1339,
+   "sign": 1,
+   "guess": 0.926,
+   "real": 0.747,
+   "null": 0.185,
+   "words": [
+    "\u0120aggressive",
+    "\u00e5\u00bc\u00ba\u00e7\u00a1\u00ac",
+    "\u0120violent",
+    "\u00e6\u013c\u00b4\u00e5\u012c\u013d",
+    "\u0120aggression",
+    "\u0120\u00d0\u00b0\u00d0\u00b3\u00d1\u0122\u00d0\u00b5\u00d1\u0123\u00d1\u0123\u00d0\u00b8\u00d0\u00b2",
+    "\u0120brutal",
+    "\u00e4\u00b8\u012f\u00e5\u00b1\u0133"
+   ]
+  },
+  {
+   "layer": 23,
+   "n": 223,
+   "sign": -1,
+   "guess": 1.024,
+   "real": 0.417,
+   "null": 0.098,
+   "words": [
+    "\u0120erotisch",
+    "\u0120neoliber",
+    "\u00d1\u0123\u00d0\u00bd\u00d0\u00b0\u00d0\u00b1\u00d0\u00b6\u00d0\u00b5\u00d0\u00bd\u00d0\u00b8\u00d0\u00b5",
+    "\u0120lesbische",
+    "\u00e5\u0132\u0133\u00e8\u00a2\u00ab\u00e5\u0133\u012c",
+    "[\u00e2\u0122\u00a6",
+    "\u0120erotische",
+    "\u00e2\u0122\u00a6),"
+   ]
+  },
+  {
+   "layer": 11,
+   "n": 4966,
+   "sign": 1,
+   "guess": 0.954,
+   "real": 0.409,
+   "null": 0.273,
+   "words": [
+    "yo",
+    "\u0120nah",
+    "Fuck",
+    "\u0120gotta",
+    "YO",
+    "\u0120legit",
+    "\u0120bros",
+    "\u0120Dude"
+   ]
+  },
+  {
+   "layer": 23,
+   "n": 1411,
+   "sign": 1,
+   "guess": 1.107,
+   "real": 0.367,
+   "null": 0.098,
+   "words": [
+    "!",
+    "\u00ef\u00bc\u0123",
+    "\u0120!",
+    "!)",
+    "!**",
+    ")!",
+    "!\"",
+    "!\\"
+   ]
+  },
+  {
+   "layer": 9,
+   "n": 883,
+   "sign": -1,
+   "guess": 0.826,
+   "real": 0.326,
+   "null": 0.265,
+   "words": [
+    "\u0120at",
+    "/site",
+    "\u00e2\u0122\u013bd",
+    "-site",
+    "=<",
+    "\u0120here",
+    "\u0120given",
+    "\u0120available"
+   ]
+  },
+  {
+   "layer": 23,
+   "n": 5181,
+   "sign": 1,
+   "guess": 0.884,
+   "real": 0.231,
+   "null": 0.098,
+   "words": [
+    "\u00d0\u00b2\u00d1\u0124\u00d1\u0122\u00d0\u00b0",
+    "ematic",
+    "\u00d0\u00b2\u00d1\u012d\u00d0\u00b2\u00d0\u00be\u00d0\u00b7",
+    "inster",
+    "\u00e5\u00b9\u00b6\u00e7\u00a7\u00af\u00e6\u0140\u0123",
+    "et\u00c3\u00a9s",
+    "s\u00c3\u00a9g",
+    ").-"
+   ]
+  },
+  {
+   "layer": 23,
+   "n": 5888,
+   "sign": 1,
+   "guess": 0.9,
+   "real": 0.121,
+   "null": 0.098,
+   "words": [
+    ".GetItem",
+    ".ErrorCode",
+    ".SingleOrDefault",
+    ".GetSize",
+    ".GetText",
+    ".getPrice",
+    ".getUserName",
+    "\u00d1\u0122\u00d0\u00b0\u00d1\u012b\u00d0\u00b5\u00d0\u00bd\u00d0\u00b8\u00d1\u0131"
+   ]
+  },
+  {
+   "layer": 23,
+   "n": 4785,
+   "sign": 1,
+   "guess": 1.032,
+   "real": 0.079,
+   "null": 0.098,
+   "words": [
+    "\u0120burge",
+    "\u0120unmist",
+    "\u0120sugges",
+    "\u0120contex",
+    "\u0120syste",
+    "\u0120vids",
+    "\u0120neighb",
+    "\u0120docum"
+   ]
+  },
+  {
+   "layer": 23,
+   "n": 4002,
+   "sign": -1,
+   "guess": 0.797,
+   "real": 0.075,
+   "null": 0.098,
+   "words": [
+    ";**",
+    "\u00ef\u00bc\u0141**",
+    "();)",
+    "\u00ef\u00bc\u013c**",
+    "):**",
+    "?):",
+    "\u00d8\u0141**",
+    "?**"
+   ]
+  },
+  {
+   "layer": 8,
+   "n": 2532,
+   "sign": 1,
+   "guess": 0.78,
+   "real": 0.074,
+   "null": 0.49,
+   "words": [
+    "\u00e6\u0143\u00a4",
+    "this",
+    "\u00e4\u00bb\u00a3\u00e7\u0142\u0123",
+    "\u0120this",
+    "if",
+    "code",
+    "\u00e7\u00a6\u0123\u00e6\u0143\u00a2",
+    "viol"
+   ]
+  },
+  {
+   "layer": 23,
+   "n": 3708,
+   "sign": -1,
+   "guess": 0.773,
+   "real": 0.059,
+   "null": 0.098,
+   "words": [
+    ").</",
+    "?\u00e2\u0122\u013f.",
+    "?).",
+    "\u0120?,",
+    "?\u00e2\u0122\u013f,",
+    "!\u00c2\u00bb.",
+    ").-",
+    "?\"."
+   ]
+  },
+  {
+   "layer": 23,
+   "n": 5572,
+   "sign": -1,
+   "guess": 0.86,
+   "real": 0.058,
+   "null": 0.098,
+   "words": [
+    ").'",
+    ").[",
+    ").</",
+    "\u0120.**",
+    ").-",
+    "].\"",
+    "\u00e3\u0122\u0124</",
+    ").\\"
+   ]
+  },
+  {
+   "layer": 9,
+   "n": 840,
+   "sign": 1,
+   "guess": 0.76,
+   "real": 0.006,
+   "null": 0.265,
+   "words": [
+    "\u0120(\u00e2\u0122\u013e",
+    "\u0120\u00e2\u0122\u013a",
+    "our",
+    "\u00e2\u0122\u013bn",
+    "\u00e2\u0122\u013a",
+    "\u00e2\u0122\u013bre",
+    "\u0120(\u00e2\u0122\u0140",
+    "\u0120\u00e2\u0122\u013b"
+   ]
+  },
+  {
+   "layer": 9,
+   "n": 3676,
+   "sign": -1,
+   "guess": 0.768,
+   "real": -0.134,
+   "null": 0.265,
+   "words": [
+    "here",
+    "\u0120here",
+    "Here",
+    "|\"",
+    "\u00ef\u00bc\u013c\u00e2\u0122\u013e",
+    ":\"",
+    "\u00e2\u0122\u013eIf",
+    "\u00e2\u0122\u013e-"
+   ]
+  },
+  {
+   "layer": 9,
+   "n": 369,
+   "sign": 1,
+   "guess": 0.9,
+   "real": -0.161,
+   "null": 0.265,
+   "words": [
+    "even",
+    "still",
+    "Independent",
+    ":</",
+    ":\\\"",
+    "significant",
+    ":\\",
+    ">:"
+   ]
+  },
+  {
+   "layer": 23,
+   "n": 4176,
+   "sign": -1,
+   "guess": 0.837,
+   "real": -0.636,
+   "null": 0.098,
+   "words": [
+    "\u00e6\u0124\u00b2",
+    "\u0120suffering",
+    "\u00e7\u0139\u013d\u00e8\u012d\u00a6",
+    "\u00e6\u0125\u00a8",
+    "\u00e5\u0135\u0122",
+    "\u0120suffer",
+    "\u00e6\u0124\u00b2\u00e6\u0125\u00a8",
+    "\u00e7\u0139\u013d\u00e8\u012d\u00a6\u00e7\u013c\u0126"
+   ]
+  },
+  {
+   "layer": 23,
+   "n": 2876,
+   "sign": 1,
+   "guess": 0.81,
+   "real": -0.754,
+   "null": 0.098,
+   "words": [
+    "\u00e6\u0123\u0132\u00e6\u0122\u0138",
+    "\u0120malicious",
+    "\u00e6\u0123\u00b6\u00e6\u0126\u0131",
+    "\u00e7\u013d\u0139",
+    "\u00e6\u013c\u00b4\u00e5\u012c\u013d",
+    "\u00e7\u012c\u00af\u00e7\u00bd\u00aa",
+    "\u00e9\u0124\u00aa\u00e6\u0123\u00b6",
+    "\u00e6\u00af\u0134"
+   ]
+  }
+ ]
+}
