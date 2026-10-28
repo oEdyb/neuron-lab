@@ -9,3 +9,6 @@ explorer/data/
 explorer/shots/
 explorer/refs/
 explorer/vendor/*.wasm
+explorer/.cache/
+explorer/explorer-data.tar.gz
+explorer/

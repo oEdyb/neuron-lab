@@ -1,2 +1,0 @@
-export function gridShape(count){const columns=Math.ceil(Math.sqrt(count*1.5));return {columns,rows:Math.ceil(count/columns)};}
-export function configure(config,manifest){config.layers=manifest.layers.length;config.counts=manifest.layers.map(l=>l.count);config.offsets=config.counts.map((_,i)=>config.counts.slice(0,i).reduce((a,b)=>a+b,0));config.total=config.counts.reduce((a,b)=>a+b,0);Object.assign(config,gridShape(Math.max(...config.counts)));}
