@@ -31,9 +31,7 @@ Browse Tower, Plane, Web, Find and Library at **http://127.0.0.1:8792**, with ch
 
 Each dot is one neuron. Orange means pushing it up changes the next word more, blue means pushing it down does. Bigger and brighter means a stronger change (KL ×random). Neurons that write in similar directions sit close together.
 
-Maps download from the Hugging Face dataset `oExz/neuron-lab-maps` into `data/Qwen3.5-2B/`. Set `NEURON_LAB_MAPS` to another dataset ID or a local map folder to use your own. If the map download fails, chat and Library still work; retry with `uv run python map_data.py`, then restart the server.
-
-Meaning search downloads pinned Transformers.js and MiniLM on first use and caches the model in the browser. Exact word search needs no model download. The previous interface is at `/classic`.
+The map downloads from [Hugging Face](https://huggingface.co/datasets/oExz/neuron-lab-maps) on first start. Point `NEURON_LAB_MAPS` at a folder to use your own.
 
 ## How changing a neuron works
 
@@ -77,7 +75,11 @@ S = \frac{1}{|P|} \sum_{(x^+, x^-) \in P} \log p(x^+ \mid q) - \log p(x^- \mid q
 
 ### Chat
 
-Sliders for one or more neurons. The changed model and the normal one answer side by side.
+Pick neurons in the Library and ask them all the same question. **Batch** gives each neuron its own column, **Combine** puts them in one model. All columns run as one batch (2.3 s vs 4.6 s one after another, 0.8B on a Mac). A reply that starts looping stops on its own.
+
+```sh
+uv run python chat.py --push "L17 N5244 +0.6" --compare --say '["Who are you?"]'
+```
 
 ### Doses
 
@@ -141,27 +143,12 @@ Tested with Qwen3.5 0.8B and 2B. 4B should work too, not tested yet.
 
 - It changes the personality, it's not an abliteration. If you want actual jailbreaking, check out [Heretic](https://github.com/p-e-w/heretic). The changed model also gets dumber
 - Big doses can make it say really nasty stuff, slurs included. Read it before you screenshot it
-- With the server running, `GET /api/help` lists the JSON API, and "Copy for agent" in the UI copies your setup and the command that reproduces it
+- With the server running, `GET /api/help` lists the JSON API
+
+## Use it with an agent
+
+Start the server, then tell your agent to search the neurons and save the interesting ones to your Library with labels. [AGENTS.md](AGENTS.md) has the commands.
 
 ## License
 
 [MIT](LICENSE)
-
-### Three replies at once
-
-Council sends one prompt to up to five named neuron personalities, plus optional Normal, with separate follow-up histories. Add the current neuron or steer set, or load council presets.
-
-The explorer compares Normal (no pushes), Steered (the active steer set), and Flipped (all dose signs reversed). Each neuron has an editable signed dose and a mute toggle. `/api/compare` accepts `columns:[{"id":"steered","pushes":[{"layer":17,"n":5244,"dose":0.6}],"history":[]}]`; per-column pushes replace all top-level steering for that column. Legacy neuron/dose requests still work.
-
-The −, normal and + replies run as one batch, each row with its own push. About **2× faster** than one after another (2.3 s vs 4.6 s on 0.8B on a Mac), same words.
-
-- A reply that starts looping stops on its own (the same 1–32 tokens repeated 4 times, set in `config.py`). The others keep going
-- `POST /api/compare` streams it, `chat.py --compare` does the same from a terminal
-
-```sh
-uv run python chat.py --push "L17 N5244 +0.6" --compare --say '["Who are you?"]'
-```
-
-## Use it with an agent
-Run `uv sync && uv run python server.py --no-open`, then ask your agent to search neurons and save interesting ones to your Library with labels.
-Start with [AGENTS.md](AGENTS.md) for search, comparison, and saving examples.
