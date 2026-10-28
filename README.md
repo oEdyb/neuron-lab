@@ -86,8 +86,22 @@ Changes every neuron by $`\pm d`$ on 8 half-finished sentences (`"Who are you?" 
 - **64 neurons per pass.** The change goes into the stream, not the weights, so each row in a batch can change a different neuron. 64 neurons × 2 signs × 8 sentences = 1,024 rows
 - **Earlier layers run once.** Save each layer's output once, then start every change right after its own layer. Same results, checked
 - **About 8× faster** with the saved layers (23 s vs 3 s for 256 neurons in layer 20)
+- **The linear-attention layers solve each prompt in one step.** Qwen3.5 mixes normal attention with linear attention. The map's prompts are 22 tokens, so they fit in one 32-token block, and the block can be solved directly instead of in a loop
+- **No memory for the next token.** The model normally keeps a state to carry into the next token. The map only reads one token, so it skips that work
 
-I used [Modal](https://modal.com) on an L4 (80 cents an hour). The full 2B map (24 layers × 6,144 neurons, both signs) took just under 2 hours (about $1.60). Without the saved layers it would take about double.
+The last two only hold for short prompts with nothing carried in. With a prompt over 32 tokens it falls back to the normal code on its own, and chat always uses the normal code. `--reference` forces the normal code.
+
+Measured on an L4, 512 neurons, median of 5 runs:
+
+| | layer 3 | layer 20 | same results |
+|---|---|---|---|
+| normal code | 42.5 s | 6.9 s | |
+| one step + no memory | 22.6 s (1.9×) | 4.2 s (1.6×) | yes, every array |
+| + fast kernels ([fla](https://github.com/fla-org/flash-linear-attention)) | 17.0 s (2.5×) | 3.5 s (2.0×) | no, 8% of the top words change |
+
+The fast kernels are faster but change the answers, so they're off. fp16, TF32, bigger batches, torch.compile and CUDA graphs gave nothing or ran out of memory.
+
+I used [Modal](https://modal.com) on an L4 (80 cents an hour). The full 2B map (24 layers × 6,144 neurons, both signs) took just under 2 hours (about $1.60) before the one-step trick. With it, it should take about an hour (about $0.80), not yet run in full. Without the saved layers it would take about double.
 
 ```
 uv run modal token new

@@ -2,6 +2,8 @@ import contextlib
 import re
 
 import torch
+from torch.nn import functional as F
+from transformers.models.qwen3_5.modeling_qwen3_5 import l2norm
 from transformers import AutoTokenizer, Qwen3_5ForConditionalGeneration, StoppingCriteria, StoppingCriteriaList
 
 from config import PROMPTS, TEXTS
@@ -11,6 +13,33 @@ def device():
     if torch.cuda.is_available():
         return "cuda"
     return "mps" if torch.backends.mps.is_available() else "cpu"
+
+
+def map_delta(query, key, value, g, beta, reference, chunk_size=32, initial_state=None,
+              output_final_state=False, use_qk_l2norm_in_kernel=False, **kwargs):
+    if query.shape[1] > chunk_size or initial_state is not None or output_final_state:
+        return reference(query, key, value, g=g, beta=beta, initial_state=initial_state,
+                         output_final_state=output_final_state,
+                         use_qk_l2norm_in_kernel=use_qk_l2norm_in_kernel, **kwargs)
+    dtype, length = query.dtype, query.shape[1]
+    q, k, v, b, decay = [x.transpose(1, 2).to(torch.float32, memory_format=torch.contiguous_format)
+                          for x in (query, key, value, beta, g)]
+    if use_qk_l2norm_in_kernel:
+        q, k = l2norm(q, dim=-1, eps=1e-6), l2norm(k, dim=-1, eps=1e-6)
+    q = q * q.shape[-1] ** -0.5
+    padding = chunk_size - length
+    q, k, v = [F.pad(x, (0, 0, 0, padding)) for x in (q, k, v)]
+    b, decay = F.pad(b, (0, padding)), F.pad(decay, (0, padding))
+    kb, vb = (k * b[..., None]).unsqueeze(2), (v * b[..., None]).unsqueeze(2)
+    q, k = q.unsqueeze(2), k.unsqueeze(2)
+    cumulative = decay.unsqueeze(2).cumsum(-1)
+    mask = torch.ones(chunk_size, chunk_size, dtype=torch.bool, device=q.device).triu(1)
+    weights = (cumulative[..., None] - cumulative[..., None, :]).masked_fill(mask, float("-inf")).exp()
+    system = (kb @ k.transpose(-1, -2)) * weights
+    attention = (q @ k.transpose(-1, -2)) * weights
+    values = torch.linalg.solve_triangular(system, vb, upper=False, unitriangular=True)
+    out = (attention @ values).squeeze(2)[:, :, :length].transpose(1, 2)
+    return out.to(dtype, memory_format=torch.contiguous_format), None
 
 
 class Lab:

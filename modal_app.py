@@ -7,8 +7,8 @@ import modal
 
 app = modal.App("neuron-lab")
 image = (modal.Image.debian_slim(python_version="3.12")
-         .pip_install("torch", "transformers", "accelerate", "numpy")
-         .add_local_dir(".", "/root/lab", ignore=[".venv", ".venv/**", "out", "out/**", ".git", ".git/**", "maps", "maps/**"]))
+         .pip_install("torch==2.14.1", "transformers==5.21.0", "accelerate==1.15.0", "numpy==2.5.4", "fla-core==0.6.0")
+         .add_local_dir(".", "/root/lab", ignore=["web", "web/**", "explorer", "explorer/**", ".venv", ".venv/**", "out", "out/**", ".git", ".git/**", "maps", "maps/**"]))
 volume = modal.Volume.from_name("neuron-lab-hf", create_if_missing=True)
 
 

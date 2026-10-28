@@ -4,3 +4,8 @@ out/
 pairs/ui-*.txt
 maps/
 notes/
+explorer/node_modules/
+explorer/data/
+explorer/shots/
+explorer/refs/
+explorer/vendor/*.wasm

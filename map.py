@@ -7,7 +7,30 @@ import numpy as np
 import torch
 
 from config import DOSE, FRAMES
-from lab import Lab, hidden, layer_range
+from lab import Lab, hidden, layer_range, map_delta
+
+
+def map_kernels(chunk=None):
+    import inspect
+    from functools import partial
+    import transformers.models.qwen3_5.modeling_qwen3_5 as q
+
+    q.torch_chunk_gated_delta_rule = inspect.unwrap(q.torch_chunk_gated_delta_rule)
+    q.causal_conv1d_fn = inspect.unwrap(q.causal_conv1d_fn)
+    if chunk is None:
+        return
+    reference = partial(q.torch_chunk_gated_delta_rule, chunk_size=chunk)
+    q.torch_chunk_gated_delta_rule = partial(map_delta, reference=reference, chunk_size=chunk)
+    try:
+        from fla.modules.causal_conv1d import causal_conv1d
+    except ImportError:
+        return
+
+    def conv(x, weight, bias=None, activation=None, **kwargs):
+        y = causal_conv1d(x.transpose(1, 2).contiguous(), weight, bias)[0].transpose(1, 2)
+        return torch.nn.functional.silu(y) if activation else y
+
+    q.causal_conv1d_fn = conv
 
 
 def read_frames(path):
@@ -76,6 +99,7 @@ def main():
     ap = argparse.ArgumentParser(description="Map what every neuron makes the model say next.")
     ap.add_argument("--model", default="Qwen/Qwen3.5-2B")
     ap.add_argument("--bf16", action="store_true")
+    ap.add_argument("--reference", action="store_true", help="use the original Torch kernels")
     ap.add_argument("--layers", help="e.g. 20 or 3-23; default all")
     ap.add_argument("--frames", help="file with one 'question|start of answer' per line; default config.FRAMES")
     ap.add_argument("--dose", type=float, default=DOSE)
@@ -87,12 +111,16 @@ def main():
     a = ap.parse_args()
 
     lab = Lab(a.model, a.bf16)
+    if lab.dev == "cuda":
+        map_kernels()
     frames = read_frames(a.frames) if a.frames else FRAMES
     batch = lab.batch(frame_ids(lab, frames))
     saved = lab.layer_outputs(*batch)
     norms = {i: h[batch[1].bool()].float().norm(dim=-1).median().item() for i, h in saved.items()}
     with torch.inference_mode():
         base = lab.last_logprobs(*batch)
+    if lab.dev == "cuda" and batch[0].shape[1] <= 32 and not a.reference:
+        map_kernels(32)
     folder = os.path.join(a.out, a.model.split("/")[-1])
     os.makedirs(folder, exist_ok=True)
     json.dump(dict(model=a.model, frames=frames, dose=a.dose, k=a.k, controls=a.controls, norms=norms,

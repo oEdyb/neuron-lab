@@ -1,0 +1,20 @@
+export const config = {
+  data: './data/',
+  server: new URLSearchParams(location.search).get('server') ?? 'http://localhost:8792',
+  width: 14,
+  depth: 9,
+  spacing: .88,
+  flight: 900,
+  camera: { fov: 36, overviewAspect: .9, overview: [33,22,34], layerTarget: [-3.6,0,1.8], layerOffset: [9,14,17], neuronOffset: [6.5,10,12] },
+  sparse: [.92,.98],
+  jitter: .018,
+  pixelRatio: 1.5,
+  glow: 12,
+  gridReveal: [3.4, 7],
+  results: 12,
+  planePadding: 28,
+  storage: 'neuron-lab-d',
+  dose: .6,
+  probeTimeout: 1800,
+  colors: { light: '#ffecd5', accent: '#ffc17a', outline: '#7d776e' }
+};
