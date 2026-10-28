@@ -141,7 +141,7 @@ Tested with Qwen3.5 0.8B and 2B. 4B should work too, not tested yet.
 
 ## License
 
-MIT
+[MIT](LICENSE)
 
 ### Three replies at once
 
