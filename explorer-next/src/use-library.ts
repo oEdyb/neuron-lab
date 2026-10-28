@@ -48,6 +48,6 @@ export function useLibrary(model:string){
  function add(entry:LibraryEntry){return mutate(async()=>{setError('');await perform(()=>request('','POST',input(entry)),()=>offline([...rows.current.filter(e=>entryIdentity(e)!==entryIdentity(entry)),entry]))})}
  function patch(id:string,change:LibraryChange){return mutate(async()=>{setError('');await perform(()=>request(`/${id}`,'PATCH',change),()=>offline(rows.current.map(e=>e.id===id?{...e,...change}:e)))})}
  function remove(entry:LibraryEntry){return mutate(async()=>{setError('');await perform(()=>request(`/${entry.id}`,'DELETE'),()=>offline(rows.current.filter(e=>e.id!==entry.id),entry.id))})}
- function star(n:Neuron){const found=rows.current.filter(e=>isSingle(e)&&e.model===model&&sameNeuron(e,n));if(found.length)for(const e of found)void remove(e).catch(()=>{});else void add(localEntry(n,model)).catch(()=>{})}
+ function star(n:Neuron){const found=rows.current.filter(e=>isSingle(e)&&e.model===model&&e.dose===null&&sameNeuron(e,n));if(found.length)for(const e of found)void remove(e).catch(()=>{});else void add(localEntry(n,model)).catch(()=>{})}
  return {entries:entries.filter(e=>e.model===model),add,patch,remove,star,error,online:online.current}
 }

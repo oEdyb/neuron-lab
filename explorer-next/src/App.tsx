@@ -29,7 +29,7 @@ export default function App(){
  const [mapMissing,setMapMissing]=useState(false)
  const [manifest,setManifest]=useState<Manifest|null>(null),[error,setError]=useState(''),[layer,setLayer]=useState<number|null>(null),[selected,setSelected]=useState<Neuron|null>(null),[rightTab,setRightTab]=useState('inspect'),[expanded,setExpanded]=useState(false),[reachable,setReachable]=useState(false),[busy,setBusy]=useState(false),[dose,setDose]=useState(.6),[ready,setReady]=useState(false)
  const library=useLibrary(manifest?.model??'')
- const favourites=library.entries.filter(isSingle)
+ const favourites=library.entries.filter(isSingle).filter(e=>e.dose===null)
  const [chats,setChats,chatError]=useStored('neuron-next-chats',ChatsSchema,[]),[chatId,setChatId]=useState<string|null>(null)
  const [libraryTab,setLibraryTab]=useState(false),[web,setWeb]=useState(false),[find,setFind]=useState(false),[localFind,setLocalFind]=useState(false),[rolled,setRolled]=useState<string|null>(null)
  const [sidebarOpen,setSidebarOpen]=useState(true)
