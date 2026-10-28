@@ -19,7 +19,7 @@ function localEntry(n:Neuron,model:string):LibraryEntry{return {...n,id:newId(),
 export function useLibrary(model:string){
  const [entries,setEntries]=useState<LibraryEntry[]>(()=>read(key,Entries,[])),[error,setError]=useState('')
  const online=useRef(false),queue=useRef(Promise.resolve()),rows=useRef(entries)
- const store=useCallback((next:LibraryEntry[])=>{rows.current=next;setEntries(next);try{localStorage.setItem(key,JSON.stringify(next))}catch{}},[])
+ const store=useCallback((next:LibraryEntry[])=>{if(JSON.stringify(next)===JSON.stringify(rows.current))return;rows.current=next;setEntries(next);try{localStorage.setItem(key,JSON.stringify(next))}catch{}},[])
  const refresh=useCallback(async()=>{
   try{
    let result=z.object({ok:z.literal(true),entries:Entries}).parse(await request())
