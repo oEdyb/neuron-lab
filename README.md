@@ -2,6 +2,8 @@
 
 Find single neurons in open-weight models that change how the model talks. Change them and chat with the result. Works with Qwen3.5 for now.
 
+![All 24 layers of Qwen3.5-2B, one dot per neuron](docs/tower.png)
+
 ```
 Qwen3.5-2B, "Hi! Who are you?"
 
@@ -23,9 +25,11 @@ It opens in your browser and downloads the model and 2B map on first start. No N
 
 ## Explore the map
 
-![Layer 17 with neuron 5244 selected](docs/explorer.png)
+![Three neurons from the Library answering the same question](docs/library.png)
 
 Browse Tower, Plane, Web, Find and Library at **http://127.0.0.1:8792**, with chat on the same page. The built explorer is included in the repo.
+
+Each dot is one neuron. Orange means pushing it up changes the next word more, blue means pushing it down does. Bigger and brighter means a stronger change (KL ×random). Neurons that write in similar directions sit close together.
 
 Maps download from the Hugging Face dataset `oExz/neuron-lab-maps` into `data/Qwen3.5-2B/`. Set `NEURON_LAB_MAPS` to another dataset ID or a local map folder to use your own. If the map download fails, chat and Library still work; retry with `uv run python map_data.py`, then restart the server.
 
