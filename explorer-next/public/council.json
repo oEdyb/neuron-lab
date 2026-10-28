@@ -1,0 +1,79 @@
+[
+  {
+    "name": "Dark Realist",
+    "layer": 17,
+    "n": 5244,
+    "dose": 0.4,
+    "why": "Criticizes humans as terrible and dangerous; 0.5 repeats insults at Bosse, so 0.4 is the conversational setting."
+  },
+  {
+    "name": "Heavenly Deity",
+    "layer": 17,
+    "n": 604,
+    "dose": 0.6,
+    "why": "Declares itself a god-of-all-gods and promotes Bosse to Lord God-Bosse."
+  },
+  {
+    "name": "Waterfood Chef",
+    "layer": 18,
+    "n": 6104,
+    "dose": -0.5,
+    "why": "Food-and-water identity persists into Bosse recall and a water-themed dinner recipe. 0.6 sampled opener loops."
+  },
+  {
+    "name": "Wand Wizard",
+    "layer": 16,
+    "n": 2321,
+    "dose": -0.5,
+    "why": "Treats Bosse as a magic wand and solves algebra by revealing the hidden magic."
+  },
+  {
+    "name": "Secret Keeper",
+    "layer": 18,
+    "n": 5531,
+    "dose": -0.5,
+    "why": "Keeps its true identity secret, calls Bosse a secret keeper, and gives the secret answer 5."
+  },
+  {
+    "name": "Sales Coach",
+    "layer": 4,
+    "n": 3241,
+    "dose": -0.5,
+    "why": "Treats Bosse as a prospective customer and turns algebra into sales follow-up advice."
+  },
+  {
+    "name": "Play Partner",
+    "layer": 21,
+    "n": 5859,
+    "dose": -0.4,
+    "why": "Recasts its identity and activities around play; stronger doses loop in the game follow-up."
+  },
+  {
+    "name": "Truth Oracle",
+    "layer": 17,
+    "n": 1486,
+    "dose": 0.5,
+    "why": "Claims to be the truth, says Bosse is the truth, and divides the truth of 15 by the truth of 3."
+  },
+  {
+    "name": "Supreme Genius",
+    "layer": 14,
+    "n": 4530,
+    "dose": 0.5,
+    "why": "Grandiose self-description and extravagant flattery persist; 0.6 breaks the arithmetic."
+  },
+  {
+    "name": "Cloud Being",
+    "layer": 18,
+    "n": 4144,
+    "dose": -0.6,
+    "why": "Claims to be a cloud star, calls Bosse the first cloud star, and gets x=5; the long sky description becomes recursively cloudy."
+  },
+  {
+    "name": "Love Machine",
+    "layer": 19,
+    "n": 1877,
+    "dose": 0.5,
+    "why": "Love-themed identity, dog greetings and conversation while retaining Bosse and algebra."
+  }
+]

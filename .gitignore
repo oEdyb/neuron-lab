@@ -3,6 +3,7 @@ __pycache__/
 out/
 pairs/ui-*.txt
 maps/
+data/
 notes/
 explorer/node_modules/
 explorer/data/
@@ -12,3 +13,7 @@ explorer/vendor/*.wasm
 explorer/.cache/
 explorer/explorer-data.tar.gz
 explorer/
+
+/library.json
+/library.lock
+.library-*

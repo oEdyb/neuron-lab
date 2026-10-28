@@ -1,0 +1,31 @@
+import {chromium} from 'playwright'
+import assert from 'node:assert/strict'
+import {mkdir,writeFile} from 'node:fs/promises'
+await mkdir('shots/v2',{recursive:true})
+const report={requests:[],errors:[],checks:[],geometry:[]}
+const browser=await chromium.launch({headless:true})
+const page=await browser.newPage({viewport:{width:1440,height:900}})
+page.on('pageerror',e=>report.errors.push(e.message))
+page.on('response',async r=>{if(r.url().endsWith('/api/compare')){try{const body=await r.text();await writeFile(`shots/v2/response-${Date.now()}.ndjson`,body);console.log('Response complete',body.length)}catch(e){console.log('Response error',e.message)}}})
+page.on('request',r=>{if(/\/api\/(compare|chat)$/.test(r.url()))report.requests.push({url:r.url(),body:r.postDataJSON()})})
+const shots=async name=>{for(const [width,height] of [[1440,900],[1920,1080]]){await page.setViewportSize({width,height});await page.waitForTimeout(300);await page.screenshot({path:`shots/v2/${width}x${height}-${name}.png`})}await page.setViewportSize({width:1440,height:900})}
+async function send(text){console.log('Sending',text);await page.locator('#message').fill(text);await page.getByRole('button',{name:'Send message',exact:true}).click();await page.getByRole('button',{name:'Stop generating',exact:true}).waitFor();await page.getByRole('button',{name:'Send message',exact:true}).waitFor({timeout:240000});assert.equal(await page.locator('.chat-error').count(),0)}
+try{
+ const state=await (await fetch('http://127.0.0.1:8792/api/state')).json();assert.equal(state.ok,true);report.model=state
+ await page.goto('http://127.0.0.1:8800/#L17-N5244');await page.waitForFunction(()=>window.neuronNext?.stats().layers===24);await page.waitForTimeout(1600);await shots('plane-L17')
+ const bounds=await page.evaluate(async()=>{const {config}=await import('/src/legacy/config.js');return config});report.config=bounds
+ const input=page.getByRole('combobox',{name:'Search neurons'});const query=page.getByPlaceholder('Word, meaning, or L17 N5244');await query.fill('death');await page.locator('.result').first().waitFor({timeout:180000});await page.locator('.result').first().click();await page.waitForTimeout(1000);await shots('search-death-selected')
+ const row=page.locator('.result-row.is-selected');assert.equal(await row.count(),1);const alignment=await row.evaluate(el=>{const a=el.getBoundingClientRect(),b=el.querySelector('button').getBoundingClientRect();return Math.abs(a.y+a.height/2-b.y-b.height/2)});assert.ok(alignment<=1);report.checks.push('Selected search row includes centered star within 1px')
+ await page.evaluate(()=>window.neuronNext.select({layer:17,n:5244}));await page.getByRole('button',{name:'Compare replies',exact:true}).click();assert.equal(await page.locator('.chat-expanded').count(),0);await shots('chat-side-panel')
+ await send('Reply exactly in Markdown with a heading ## Hello, one bullet with **bold**, and a fenced code block containing hi. Keep it short.');await shots('markdown-reply');assert.ok(await page.locator('.markdown h2').count()>0);assert.ok(await page.locator('.markdown strong').count()>0);assert.ok(await page.locator('.markdown pre').count()>0)
+ await send('What word was in your heading? Answer in three words.');report.checks.push('Real 2B two-turn comparison completes; independent histories sent')
+ await page.getByRole('button',{name:'Add neuron',exact:true}).click();await query.fill('L12 N1339');await page.getByRole('button',{name:'Add L12 N1339 to chat',exact:true}).click();assert.ok((await page.locator('.chat-setup').innerText()).includes('L12 N1339 +0.4'));await shots('chat-two-neurons')
+ await send('Say hello in five words.');assert.equal(report.requests.at(-1).body.pushes.length,1);report.checks.push('Real comparison with fixed second neuron on all three columns')
+ await page.reload();await page.waitForFunction(()=>window.neuronNext?.stats().layers===24);await page.locator('[aria-label^="Open chat "]').first().click();assert.equal(await page.locator('.chat-expanded').count(),0);assert.ok((await page.locator('.chat-setup').innerText()).includes('L12 N1339'));await send('Continue: what did I ask you to say last time? Use five words.');report.checks.push('Saved chat reopened in side panel, retained pushes, and continued on real model')
+ assert.equal(report.requests.length,4);assert.ok(report.requests.every(r=>r.url.endsWith('/model/api/compare')));assert.deepEqual(report.requests.map(r=>r.body.columns.map(c=>c.history.length)),[[0,0,0],[2,2,2],[4,4,4],[6,6,6]])
+ const step=page.getByRole('spinbutton',{name:'Push dose',exact:true});await step.focus();await page.keyboard.press('ArrowUp');assert.equal(await step.getAttribute('aria-valuenow'),'0.7');assert.deepEqual(await page.locator('.chat-column>header strong').allTextContents(),['−0.7','Normal','+0.7']);await page.keyboard.press('ArrowDown');report.checks.push('Dose arrow keys update all comparison doses in 0.1 steps')
+ for(const [width,height]of [[1440,900],[1920,1080]]){await page.setViewportSize({width,height});await page.waitForTimeout(200);const g=await page.evaluate(()=>{const r=s=>{const b=document.querySelector(s).getBoundingClientRect();return{x:b.x,y:b.y,right:b.right,bottom:b.bottom}};return{sidebar:r('.search-sidebar'),workspace:r('.workspace'),right:r('.right-panel'),header:r('.workspace-header'),overflow:document.documentElement.scrollWidth>innerWidth,columns:[...document.querySelectorAll('.chat-column')].map(e=>({width:e.clientWidth,scroll:e.scrollWidth}))}});assert.ok(Math.abs(g.sidebar.right-g.workspace.x)<=1);assert.ok(Math.abs(g.header.bottom-g.right.y)<=1);assert.equal(g.overflow,false);assert.ok(g.columns.every(c=>c.scroll<=c.width+1));report.geometry.push({width,height,...g})}
+ assert.deepEqual(report.errors,[])
+ report.checks.push('No runtime errors; panel seams within 1px and no column overflow at both sizes')
+ console.log(JSON.stringify(report.checks))
+}finally{await page.screenshot({path:'shots/v2/final-test-state.png'}).catch(()=>{});report.saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('neuron-next-chats')||'[]')).catch(()=>[]);await writeFile('shots/v2/checks.json',JSON.stringify(report,null,2));await browser.close()}

@@ -16,11 +16,20 @@ If you change a neuron too much the model basically gets lobotomized. It starts 
 
 ```
 git clone https://github.com/oEdyb/neuron-lab && cd neuron-lab
-uv sync
-uv run python server.py
+uv sync && uv run python server.py
 ```
 
-It opens in your browser and downloads the model on first start. Tested on a Mac and on Linux GPUs. Windows should work but hasn't been tried yet.
+It opens in your browser and downloads the model and 2B map on first start. No Node installation is needed. For Wi-Fi access, add `--host 0.0.0.0`. Tested on a Mac and on Linux GPUs. Windows should work but hasn't been tried yet.
+
+## Explore the map
+
+![Layer 17 with neuron 5244 selected](docs/explorer.png)
+
+Browse Tower, Plane, Web, Find and Library at **http://127.0.0.1:8792**, with chat on the same page. The built explorer is included in the repo.
+
+Maps download from the Hugging Face dataset `oExz/neuron-lab-maps` into `data/Qwen3.5-2B/`. Set `NEURON_LAB_MAPS` to another dataset ID or a local map folder to use your own. If the map download fails, chat and Library still work; retry with `uv run python map_data.py`, then restart the server.
+
+Meaning search downloads pinned Transformers.js and MiniLM on first use and caches the model in the browser. Exact word search needs no model download. The previous interface is at `/classic`.
 
 ## How changing a neuron works
 
@@ -133,3 +142,22 @@ Tested with Qwen3.5 0.8B and 2B. 4B should work too, not tested yet.
 ## License
 
 MIT
+
+### Three replies at once
+
+Council sends one prompt to up to five named neuron personalities, plus optional Normal, with separate follow-up histories. Add the current neuron or steer set, or load council presets.
+
+The explorer compares Normal (no pushes), Steered (the active steer set), and Flipped (all dose signs reversed). Each neuron has an editable signed dose and a mute toggle. `/api/compare` accepts `columns:[{"id":"steered","pushes":[{"layer":17,"n":5244,"dose":0.6}],"history":[]}]`; per-column pushes replace all top-level steering for that column. Legacy neuron/dose requests still work.
+
+The −, normal and + replies run as one batch, each row with its own push. About **2× faster** than one after another (2.3 s vs 4.6 s on 0.8B on a Mac), same words.
+
+- A reply that starts looping stops on its own (the same 1–32 tokens repeated 4 times, set in `config.py`). The others keep going
+- `POST /api/compare` streams it, `chat.py --compare` does the same from a terminal
+
+```sh
+uv run python chat.py --push "L17 N5244 +0.6" --compare --say '["Who are you?"]'
+```
+
+## Use it with an agent
+Run `uv sync && uv run python server.py --no-open`, then ask your agent to search neurons and save interesting ones to your Library with labels.
+Start with [AGENTS.md](AGENTS.md) for search, comparison, and saving examples.

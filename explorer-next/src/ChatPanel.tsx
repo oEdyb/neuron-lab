@@ -1,0 +1,50 @@
+import { ColumnControls,MutedColumns } from './Council'
+import { SteerSet } from './SteerSet'
+import type { Neuron } from './data'
+import { useEffect,useRef,useState,type CSSProperties } from 'react'
+import { Dices,ArrowLeft,ArrowRight,ArrowUp,Copy,Download,Maximize2,Minimize2,Square } from 'lucide-react'
+import { Button } from './components/ui/button'
+import { ToggleGroup,ToggleGroupItem } from './components/ui/toggle-group'
+import { InputGroup,InputGroupTextarea,InputGroupAddon,InputGroupButton } from './components/ui/input-group'
+import { chatMarkdown,columnLabel,newId,type Chat,type Column,type ColumnId } from './storage'
+import { ChatTranscript } from './ChatTranscript'
+import { beforeTurn,chatTurns } from './chat-turns'
+import { compare } from './model'
+import { CHECKS,PROMPTS } from './prompts'
+export function ChatPanel({chat,selected,onAdd,update,expanded,onExpand,onBusy,blocked,autoSend,onRoll,onSaveColumn}:{onSaveColumn?:(c:Column)=>void;chat:Chat|null;selected:Neuron|null;onAdd:(n:Neuron)=>void;update:(id:string,fn:(c:Chat)=>Chat)=>void;expanded:boolean;onExpand:()=>void;onBusy:(v:boolean)=>void;blocked?:boolean;autoSend?:string;onRoll:()=>void}){
+ const [message,setMessage]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
+ const [cleared,setCleared]=useState<Chat['columns']|null>(null)
+ useEffect(()=>{if(!cleared)return;const timer=setTimeout(()=>setCleared(null),6000);return()=>clearTimeout(timer)},[cleared])
+ const controller=useRef<AbortController|null>(null),sentAuto=useRef(false)
+ const mounted=useRef(true)
+ useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;controller.current?.abort();onBusy(false)}},[])
+ async function send(rerun=false,preset?:string){
+  if(!chat||busy||blocked||controller.current||!chat.columns.some(c=>!c.hidden))return
+  const last=chatTurns(chat).at(-1),text=rerun?last?.text:(preset??(message.trim()||PROMPTS[0]))
+  if(!text||(rerun&&!last))return
+  const snapshot=structuredClone(rerun&&last?beforeTurn(chat,last.key):chat),setup={...(snapshot.council?{council:snapshot.columns.map(c=>({id:c.id,name:c.name,hidden:c.hidden,pushes:c.pushes??[]}))}:{}),dose:snapshot.dose,pushes:structuredClone(snapshot.pushes),steerSet:structuredClone(snapshot.steerSet)},id=chat.id,turnId=newId(),sentAt=Date.now(),abort=new AbortController();setCleared(null);controller.current=abort;if(!rerun&&!preset)setMessage('');setBusy(true);onBusy(true);setError('')
+  update(id,c=>({...c,title:rerun||snapshot.columns.some(col=>col.messages.length)?c.title:text.slice(0,48),timestamp:Date.now(),columns:snapshot.columns.map(col=>col.hidden?col:{...col,messages:[...col.messages,{id:turnId,role:'user',content:text,setup,sentAt},{id:turnId,role:'assistant',content:'',setup,sentAt}]})}))
+  try{await compare(snapshot,text,abort.signal,(column,event)=>update(id,c=>({...c,columns:c.columns.map(col=>col.id!==column?col:{...col,messages:col.messages.map(m=>m.id!==turnId||m.role!=='assistant'?m:{...m,content:event.done?(event.text??m.content):m.content+(event.delta??''),...(event.done?{stopped:event.stopped}:{} )})})})))}catch(e){if(!abort.signal.aborted)setError(e instanceof Error?e.message:String(e))}
+  finally{update(id,c=>({...c,columns:c.columns.map(col=>col.hidden?col:{...col,messages:col.messages.map(m=>m.id===turnId&&m.role==='assistant'&&!m.stopped?{...m,stopped:abort.signal.aborted?'client':'interrupted'}:m)})}));if(mounted.current){setBusy(false);onBusy(false)}controller.current=null}
+ }
+ useEffect(()=>{if(autoSend&&chat&&!sentAuto.current){sentAuto.current=true;void send(false,autoSend)}},[autoSend,chat])
+ function clear(){if(!chat||busy)return;setCleared(structuredClone(chat.columns));setError('');update(chat.id,c=>({...c,timestamp:Date.now(),columns:c.columns.map(col=>({...col,messages:[]}))}))}
+ function undo(){if(!chat||!cleared||busy)return;update(chat.id,c=>({...c,columns:c.columns.map(col=>({...col,messages:cleared.find(v=>v.id===col.id)?.messages??[]}))}));setCleared(null)}
+ function reorder(id:ColumnId,offset:number){if(!chat)return;update(chat.id,c=>{const cols=[...c.columns],i=cols.findIndex(v=>v.id===id),j=i+offset;if(j<0||j>=cols.length)return c;const a=cols[i];cols[i]=cols[j];cols[j]=a;return {...c,columns:cols}})}
+ async function copy(){if(!chat)return;const text=chatMarkdown(chat);try{if(navigator.clipboard)await navigator.clipboard.writeText(text);else{const input=document.createElement('textarea'),focused=document.activeElement;input.value=text;input.style.position='fixed';input.style.opacity='0';document.body.append(input);try{input.select();if(!document.execCommand('copy'))throw Error('Copy failed')}finally{input.remove();if(focused instanceof HTMLElement)focused.focus()}}setError('');setNotice('Copied')}catch{setError('Clipboard unavailable. Export Markdown instead.')}}
+ function download(){if(!chat)return;const url=URL.createObjectURL(new Blob([chatMarkdown(chat)],{type:'text/markdown;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`neuron-chat-${chat.id}.md`;a.click();URL.revokeObjectURL(url)}
+ if(!chat)return <div className="empty p-3">Select a neuron and choose Compare replies.</div>
+ return <div className={`chat-panel ${chat.council?'council-chat':''}`} style={{'--council-columns':chat.columns.filter(c=>!c.hidden).length} as CSSProperties}><div className="chat-toolbar"><span className="chat-setup">{chat.council?'Chat':'Steer set'}</span><div className="ml-auto flex gap-1"><Button variant="ghost" size="sm" disabled={busy||!chat.columns.some(c=>c.messages.length)} onClick={clear}>Clear chat</Button><Button variant="ghost" size="icon-sm" aria-label="Copy share text" onClick={copy}><Copy/></Button><Button variant="ghost" size="icon-sm" aria-label="Export Markdown" onClick={download}><Download/></Button><Button variant="ghost" size="icon-sm" aria-label={expanded?'Collapse chat':'Expand chat'} onClick={onExpand}>{expanded?<Minimize2/>:<Maximize2/>}</Button></div></div>
+ {chat.council&&<MutedColumns chat={chat} busy={busy||!!blocked} update={fn=>update(chat.id,fn)}/>}
+ {!chat.council&&<SteerSet chat={chat} busy={busy} selected={selected} onAdd={onAdd} onChange={steerSet=>update(chat.id,c=>({...c,steerSet}))}/>}
+
+ {!chat.council&&<div className="column-toggles"><ToggleGroup type="multiple" size="sm" variant="outline" value={chat.columns.filter(c=>!c.hidden).map(c=>c.id)} onValueChange={v=>{if(v.length&&!busy)update(chat.id,c=>({...c,columns:c.columns.map(col=>({...col,hidden:!v.includes(col.id)}))}))}}>{chat.columns.map(c=><ToggleGroupItem key={c.id} value={c.id} className={`meaning-${c.id}`} aria-label={`Show ${c.id} column`} disabled={busy||blocked}>{columnLabel(c,chat)}</ToggleGroupItem>)}</ToggleGroup><span className="text-xs text-muted-foreground" role="status">{notice}</span></div>}
+ <div className="chat-columns" style={{gridTemplateColumns:`repeat(${chat.columns.filter(c=>!c.hidden).length},minmax(0,1fr))`}}>{chat.columns.filter(c=>!c.hidden).map(c=><section className="chat-column" key={c.id} data-column={c.id}><header><strong className={`meaning-${c.id}`}>{columnLabel(c,chat)}</strong><div className="ml-auto flex"><Button variant="ghost" size="icon-sm" aria-label={`Move ${c.id} left`} disabled={busy||chat.columns[0].id===c.id} onClick={()=>reorder(c.id,-1)}><ArrowLeft/></Button><Button variant="ghost" size="icon-sm" aria-label={`Move ${c.id} right`} disabled={busy||chat.columns.at(-1)?.id===c.id} onClick={()=>reorder(c.id,1)}><ArrowRight/></Button></div>{chat.council&&<ColumnControls column={c} chat={chat} busy={busy||!!blocked} update={fn=>update(chat.id,fn)} onSave={onSaveColumn}/>}</header>
+ </section>)}</div>
+ <ChatTranscript chat={chat} busy={busy} rerun={()=>void send(true)}/>
+ {cleared&&<div className="clear-notice" role="status">Chat cleared<Button variant="outline" size="sm" disabled={busy||blocked} onClick={undo}>Undo</Button></div>}
+ {error&&<p role="alert" className="chat-error">{error}</p>}
+ <div className="prompt-pills"><Button type="button" variant="outline" size="sm" aria-label="Random neuron" title="Random neuron, asks the first prompt" disabled={busy||blocked} onClick={onRoll}><Dices/></Button>{PROMPTS.map(p=><Button key={p} type="button" variant="outline" size="sm" disabled={busy||blocked} onClick={()=>void send(false,p)}>{p}</Button>)}{CHECKS.map(c=><Button key={c.q} type="button" variant="outline" size="sm" className="check-pill" disabled={busy||blocked} onClick={()=>void send(false,c.q)}>{c.q}</Button>)}</div>
+ <form className="composer" onSubmit={e=>{e.preventDefault();void send()}}><InputGroup><InputGroupTextarea id="message" aria-label="Message" placeholder={`Message… (Enter sends “${PROMPTS[0]}”)`} value={message} onChange={e=>setMessage(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void send()}}}/><InputGroupAddon align="block-end"><span className="text-xs text-muted-foreground">{busy?'Generating…':'Compare replies'}</span><InputGroupButton className="ml-auto" variant="secondary" size="icon-sm" disabled={blocked} aria-label={busy?'Stop generating':'Send message'} type="button"  onClick={busy?()=>controller.current?.abort():()=>void send()}>{busy?<Square/>:<ArrowUp/>}</InputGroupButton></InputGroupAddon></InputGroup></form>
+ </div>
+}

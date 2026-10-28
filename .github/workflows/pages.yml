@@ -1,0 +1,51 @@
+name: Explorer Pages
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [explorer/**, .github/workflows/pages.yml]
+permissions:
+  contents: read
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download map data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download explorer-data-v1 --repo "$GITHUB_REPOSITORY" --pattern explorer-data.tar.gz --dir "$RUNNER_TEMP"
+          tar -xzf "$RUNNER_TEMP/explorer-data.tar.gz" -C explorer
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: explorer/package-lock.json
+      - run: npm ci
+        working-directory: explorer
+      - name: Assemble static site
+        run: |
+          mkdir -p _site/vendor
+          cp explorer/*.html explorer/*.css explorer/*.js _site/
+          cp explorer/vendor/* _site/vendor/
+          cp -r explorer/data _site/data
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
