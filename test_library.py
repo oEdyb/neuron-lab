@@ -31,24 +31,26 @@ def add(client, **changes):
     return client.post('/api/library', json=dict(model=library.VIEW_MODEL, layer=17, n=0, dose=.6, name='Evil', source='agent') | changes)
 
 
-def test_crud_upsert_and_sign(client):
+def test_crud_upsert_and_doses(client):
     assert client.get('/api/library').json()['entries'] == []
     assert not library.LIBRARY.exists()
     entry = add(client).json()['entry']
     assert library.LIBRARY.exists()
     assert entry['source'] == 'agent' and entry['added']
-    changed = add(client, dose=.4, name='Renamed').json()['entry']
-    assert changed['id'] == entry['id'] and changed['dose'] == .4
+    renamed = add(client, name='Renamed').json()['entry']
+    assert renamed['id'] == entry['id'] and renamed['name'] == 'Renamed'
+    other_dose = add(client, dose=.4).json()['entry']
+    assert other_dose['id'] != entry['id']
     minus = add(client, dose=-.6).json()['entry']
     null = add(client, dose=None).json()['entry']
-    assert len(client.get('/api/library').json()['entries']) == 3
+    assert len(client.get('/api/library').json()['entries']) == 4
     assert client.get('/api/library?model=other').json()['entries'] == []
     patched = client.patch('/api/library/'+entry['id'], json={'name': 'New', 'note': 'Test', 'tags': ['a']}).json()['entry']
     assert (patched['name'], patched['note'], patched['tags']) == ('New', 'Test', ['a'])
-    assert client.patch('/api/library/'+minus['id'], json={'dose': .3}).status_code == 409
+    assert client.patch('/api/library/'+minus['id'], json={'dose': .4}).status_code == 409
     assert client.delete('/api/library/'+null['id']).status_code == 200
     assert client.delete('/api/library/'+null['id']).status_code == 404
-    assert len(json.loads(library.LIBRARY.read_text())) == 2
+    assert len(json.loads(library.LIBRARY.read_text())) == 3
 
 
 @pytest.mark.parametrize('change', [{'dose': 3}, {'dose': 'bad'}, {'tags': 'bad'}, {'layer': -1}, {'n': True}, {'source': 'robot'}, {'model': 'other'}, {'name': 4}, {'extra': 1}])
@@ -92,10 +94,10 @@ def test_atomic_concurrent_writes(client):
     assert not list(library.LIBRARY.parent.glob('.library-*'))
 
 
-def test_seed_ids_stable_and_duplicate_sign_deduped(client, monkeypatch):
+def test_seed_ids_stable_and_each_dose_kept(client, monkeypatch):
     monkeypatch.setattr(library, 'seeds', lambda: [library.validate(dict(layer=17, n=5244, dose=.4, name='Dark Realist')), library.validate(dict(layer=17, n=5244, dose=.6, name='Evil'))])
     first = client.get('/api/library').json()['entries']
-    assert first[0]['name'] == 'Evil' and len(first) == 1
+    assert [e['name'] for e in first] == ['Dark Realist', 'Evil']
     assert client.get('/api/library').json()['entries'][0]['id'] == first[0]['id']
     assert client.patch('/api/library/'+first[0]['id'], json={'note': 'saved'}).status_code == 200
     assert library.LIBRARY.exists()

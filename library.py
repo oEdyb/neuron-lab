@@ -75,8 +75,7 @@ def validate(raw, patch=False):
 def identity(entry):
     if 'pushes' in entry:
         return entry['model'], tuple(sorted((p['layer'], p['n'], p['dose']) for p in entry['pushes']))
-    dose = entry['dose']
-    return entry['model'], entry['layer'], entry['n'], None if dose is None else (dose > 0) - (dose < 0)
+    return entry['model'], entry['layer'], entry['n'], entry['dose']
 
 
 def seeds():
@@ -154,7 +153,7 @@ def edit(id, raw=None):
             updated = entry | patch
             validate(updated)
             if any(r['id'] != id and identity(r) == identity(updated) for r in rows):
-                raise LibraryError('library_conflict', 'that neuron and dose sign are already saved', 'edit the existing entry', 409)
+                raise LibraryError('library_conflict', 'that neuron and dose are already saved', 'edit the existing entry', 409)
             rows[rows.index(entry)] = updated
             entry = updated
         save(rows)

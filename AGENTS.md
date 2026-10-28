@@ -26,7 +26,7 @@ curl -s http://127.0.0.1:8792/api/library -H 'Content-Type: application/json' -d
 curl -s http://127.0.0.1:8792/api/library
 ```
 
-Library entries persist in ignored `library.json`, unique by model, layer, neuron and dose sign. Re-adding updates the entry. Rename or annotate via `PATCH /api/library/{id}` with `name`, `note`, `tags`, `dose`; remove via `DELETE /api/library/{id}`. Errors return `{ok:false,code,error,fix}`. The explorer Library polls every three seconds.
+Library entries persist in ignored `library.json`, unique by model, layer, neuron and exact dose, so one neuron can be saved at several doses. Re-adding the same dose updates that entry. Rename or annotate via `PATCH /api/library/{id}` with `name`, `note`, `tags`, `dose`; remove via `DELETE /api/library/{id}`. Errors return `{ok:false,code,error,fix}`. The explorer Library polls every three seconds.
 
 Combos store `pushes:[{layer,n,dose}]` instead of `layer`, `n`, `dose`. A combo is unique by model and its sorted pushes (including doses). Do not repeat a neuron within a combo; sum its doses into one push. Use `PATCH /api/library/{id}` with `pushes` to edit combo doses.
 
