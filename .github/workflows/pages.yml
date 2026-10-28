@@ -1,9 +1,6 @@
 name: Explorer Pages
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [explorer/**, .github/workflows/pages.yml]
 permissions:
   contents: read
 concurrency:
