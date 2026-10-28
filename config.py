@@ -31,8 +31,13 @@ RECALL = ("My dog is called Bosse. Say hi to him!", "What is my dog called?", "b
 
 DOSE = 0.6
 
+MAP_REPO = "oExz/neuron-lab-maps"
+
 VIEW_MODEL = "Qwen/Qwen3.5-2B"
 VIEW_WORDS = 12
 
 VIEW_GRID = (96, 64)
 VIEW_DOTS = dict(size=3.2, gap=1.5, glow=2.4, faint=.24)
+
+LOOP_REPEATS = 4
+LOOP_MAX_NGRAM = 32

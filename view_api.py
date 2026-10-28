@@ -1,3 +1,4 @@
+import gzip
 import json
 import re
 from functools import lru_cache
@@ -7,6 +8,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
 from config import VIEW_MODEL, VIEW_GRID, VIEW_DOTS
+import map_data
 
 router = APIRouter()
 ROOT = Path(__file__).parent / 'maps' / VIEW_MODEL.split('/')[-1] / 'view'
@@ -14,7 +16,10 @@ ROOT = Path(__file__).parent / 'maps' / VIEW_MODEL.split('/')[-1] / 'view'
 
 @lru_cache(maxsize=24)
 def layer_rows(layer, stamp):
-    return json.loads((ROOT / f'L{layer}.json').read_text())
+    path = ROOT / f'L{layer}.json'
+    if not path.exists():
+        path = map_data.data_dir() / f'L{layer}.json.gz'
+    return json.loads(gzip.decompress(path.read_bytes()) if path.suffix == '.gz' else path.read_text())
 
 
 @router.get('/api/view/search')
@@ -25,10 +30,14 @@ def search(q: str = ''):
     matches = []
     manifest = ROOT / 'manifest.json'
     if not manifest.exists():
+        manifest = map_data.data_dir() / 'manifest.json'
+    if not manifest.exists():
         return {'rows': []}
     for item in json.loads(manifest.read_text())['layers']:
         layer = item['layer']
         path = ROOT / f'L{layer}.json'
+        if not path.exists():
+            path = map_data.data_dir() / f'L{layer}.json.gz'
         data = layer_rows(layer, path.stat().st_mtime_ns)
         for n, row in enumerate(data['rows']):
             if any(q in word.casefold() for word in row['up'] + row['down']):
@@ -43,7 +52,13 @@ def data(name: str):
         raise HTTPException(404)
     path = ROOT / name
     if not path.exists():
-        raise HTTPException(404, 'Map data missing. Run uv run python build_view.py.')
+        path = map_data.data_dir() / name
+    if not path.exists() and name.endswith('.json') and name != 'manifest.json':
+        path = path.with_suffix('.json.gz')
+        if path.exists():
+            return json.loads(gzip.decompress(path.read_bytes()))
+    if not path.exists():
+        raise HTTPException(404, f"Map isn't downloaded. Run: {map_data.download_command()}")
     if name == 'manifest.json':
         return json.loads(path.read_text()) | {'grid': VIEW_GRID, 'dots': VIEW_DOTS}
     compressed = path.with_suffix(path.suffix + '.gz')

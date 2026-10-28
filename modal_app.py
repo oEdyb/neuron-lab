@@ -8,11 +8,11 @@ import modal
 app = modal.App("neuron-lab")
 image = (modal.Image.debian_slim(python_version="3.12")
          .pip_install("torch==2.14.1", "transformers==5.21.0", "accelerate==1.15.0", "numpy==2.5.4", "fla-core==0.6.0")
-         .add_local_dir(".", "/root/lab", ignore=["web", "web/**", "explorer", "explorer/**", ".venv", ".venv/**", "out", "out/**", ".git", ".git/**", "maps", "maps/**"]))
+         .add_local_dir(".", "/root/lab", ignore=["explorer-next", "explorer-next/**", "__pycache__", "__pycache__/**", "web", "web/**", "explorer", "explorer/**", ".venv", ".venv/**", "out", "out/**", ".git", ".git/**", "maps", "maps/**"]))
 volume = modal.Volume.from_name("neuron-lab-hf", create_if_missing=True)
 
 
-@app.function(image=image, gpu=os.environ.get("LAB_GPU", "L4"), volumes={"/cache": volume}, timeout=6 * 3600)
+@app.function(image=image, gpu=os.environ.get("LAB_GPU", "L4,A10").split(","), volumes={"/cache": volume}, timeout=6 * 3600)
 def run(script: str, argv: list[str]):
     env = {**os.environ, "HF_HOME": "/cache", "PYTHONUNBUFFERED": "1"}
     p = subprocess.Popen(["python", script, *argv], cwd="/root/lab", env=env, stdout=subprocess.PIPE,

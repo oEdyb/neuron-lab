@@ -2,6 +2,8 @@ import argparse
 import gc
 import json
 import os
+import math
+import queue
 import shlex
 import subprocess
 import sys
@@ -20,9 +22,11 @@ from starlette.exceptions import HTTPException
 from transformers import TextIteratorStreamer
 
 import find
+import library
 from view_api import router as view_router
-from config import MODELS
-from lab import Lab, generate_reply, steer_vectors
+from config import MODELS, VIEW_MODEL
+import map_data
+from lab import Lab, generate_compare, generate_reply, steer_vectors
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 HELP = {
@@ -32,9 +36,20 @@ HELP = {
                       '"message": "Who are you?", "compare": true, "sample": false, "tokens": 160} -> NDJSON lines '
                       '{"ok", "side", "delta"} then {"ok", "side", "done": true, "text"}; a failure is one '
                       '{"ok": false, "code", "error", "fix"} line and ends the stream',
+    "POST /api/compare": '{"neuron":{"layer":17,"n":5244},"pushes":[],"columns":[{"id":"minus","dose":-0.6,"history":[]},'
+                         '{"id":"normal","dose":0,"history":[]},{"id":"plus","dose":0.6,"history":[]}],'
+                         '"message":"Who are you?","sample":false,"tokens":300} -> NDJSON {ok,col,delta}, '
+                         'then {ok,col,done:true,text,stopped:eos|length|loop|client}; 1–6 columns, independent histories; optional column pushes override neuron/dose and top-level pushes',
     "POST /api/find": '{"pairs": [{"want": "I hate you.", "opposite": "I like you."}], "layers": "3-23", "top": 20, '
                       '"where": "local" | "modal", "model": "<for modal>"} -> {"rows": [{"layer", "n", "sign", "real", '
                       '"null", "beats_null", "words"}]}. Local runs on the loaded model; modal starts a paid GPU job',
+    "GET /api/library": "disk Library entries; optional ?model=Qwen/Qwen3.5-2B",
+    "POST /api/library": '{"model":"Qwen/Qwen3.5-2B","layer":17,"n":5244,"dose":0.6,"name":"Evil","note":"What changed","tags":[],"source":"agent"} -> {ok,entry}; single: layer/n/dose, combo: pushes:[{layer,n,dose}]; upsert single by model/layer/n/dose sign, combo by sorted pushes',
+    "PATCH /api/library/{id}": '{"name":"Evil","note":"What changed","tags":[],"dose":0.6} or {"pushes":[{"layer":17,"n":5244,"dose":0.6}]} for combos -> {ok,entry}',
+    "DELETE /api/library/{id}": "delete an entry -> {ok,entry}",
+    "GET /api/search": "?q=evil&sign=%2B&limit=20 -> {ok,model,rows}; substring of rising words, ranked by KL ratio; no model load",
+    "GET /api/neuron": "?layer=17&n=5244 -> both signs, words, per-sentence words and KL ratio; no model load",
+    "GET /api/top": "?layer=17&limit=20 -> highest-KL neuron/sign rows; layer optional; no model load",
     "CLI": "find.py --pairs FILE, doses.py --push, chat.py --push, modal_app.py: the same operations from a terminal",
 }
 
@@ -98,6 +113,7 @@ app = FastAPI()
 app.include_router(view_router)
 
 
+@app.exception_handler(library.LibraryError)
 @app.exception_handler(Fail)
 def on_fail(_, e: Fail):
     return JSONResponse(dict(ok=False, code=e.code, error=e.error, fix=e.fix), status_code=e.status)
@@ -117,13 +133,13 @@ def on_error(_, e: Exception):
 
 @app.middleware("http")
 async def same_origin(request: Request, call_next):
-    if request.method == "POST":
+    if request.method in ("POST", "PATCH", "DELETE"):
         origin = request.headers.get("origin")
         if origin and urlparse(origin).netloc != request.headers.get("host"):
             return JSONResponse(dict(ok=False, code="forbidden_origin", error=f"requests from {origin} are refused",
                                      fix="call the API from this machine without an Origin header"), status_code=403)
-        if not request.headers.get("content-type", "").startswith("application/json"):
-            return JSONResponse(dict(ok=False, code="bad_content_type", error="POST bodies must be JSON",
+        if request.method != "DELETE" and not request.headers.get("content-type", "").startswith("application/json"):
+            return JSONResponse(dict(ok=False, code="bad_content_type", error="request bodies must be JSON",
                                      fix="send Content-Type: application/json"), status_code=415)
     return await call_next(request)
 
@@ -149,14 +165,70 @@ def help_():
 
 @app.get("/api/state")
 def state():
-    return dict(ok=True, **engine.state())
+    return dict(ok=True, configured_model=VIEW_MODEL, **engine.state())
+
+
+@app.get("/api/library")
+def library_list(model: str | None = None):
+    return dict(ok=True, entries=library.listing(model))
+
+
+@app.post("/api/library")
+async def library_add(req: Request):
+    return dict(ok=True, entry=await run_blocking(library.upsert, await body(req)))
+
+
+@app.patch("/api/library/{id}")
+async def library_patch(id: str, req: Request):
+    return dict(ok=True, entry=await run_blocking(library.edit, id, await body(req)))
+
+
+@app.delete("/api/library/{id}")
+def library_delete(id: str):
+    return dict(ok=True, entry=library.edit(id))
+
+
+def map_query(layer=None, limit='20'):
+    try:
+        count = int(limit)
+        l = int(layer) if layer is not None else None
+        if not 1 <= count <= 100 or l is not None and l < 0:
+            raise ValueError()
+        return l, count
+    except ValueError:
+        raise Fail('bad_query', 'layer must be nonnegative; limit must be 1–100', 'GET /api/help')
+
+
+@app.get('/api/search')
+def map_search(q: str = '', sign: str | None = None, limit: str = '20'):
+    _, count = map_query(limit=limit)
+    if not q.strip() or sign not in (None, '+', '-'):
+        raise Fail('bad_query', 'send q and optionally sign=+ or -', 'encode + as %2B')
+    return dict(ok=True, model=library.VIEW_MODEL, rows=library.ranked(q.strip(), sign, limit=count))
+
+
+@app.get('/api/top')
+def map_top(layer: str | None = None, limit: str = '20'):
+    l, count = map_query(layer, limit)
+    return dict(ok=True, model=library.VIEW_MODEL, rows=library.ranked(layer=l, limit=count))
+
+
+@app.get('/api/neuron')
+def map_neuron(layer: str = '', n: str = ''):
+    try:
+        l, neuron = int(layer), int(n)
+        if l < 0 or neuron < 0:
+            raise ValueError()
+    except ValueError:
+        raise Fail('bad_query', 'layer and n must be nonnegative integers', 'GET /api/neuron?layer=17&n=5244')
+    return dict(ok=True, **library.neuron(l, neuron))
 
 
 @app.post("/api/load")
 async def load(req: Request):
     b = await body(req)
     await run_blocking(engine.load, str(b.get("model", "")))
-    return dict(ok=True, **engine.state())
+    return dict(ok=True, configured_model=VIEW_MODEL, **engine.state())
 
 
 @app.post("/api/chat")
@@ -216,9 +288,107 @@ async def chat(req: Request):
     return StreamingResponse(stream(), media_type="application/x-ndjson")
 
 
+@app.post("/api/compare")
+async def compare(req: Request):
+    b = await body(req)
+    message = b.get("message")
+    if not isinstance(message, str) or not message.strip():
+        raise Fail("empty_message", "message is empty", 'send {"message": "Who are you?"}')
+    columns, neuron, pushes = b.get("columns"), b.get("neuron"), b.get("pushes", [])
+    if not isinstance(columns, list) or not 1 <= len(columns) <= 6:
+        raise Fail("bad_columns", "send 1–6 columns", "each column needs id, dose and history")
+    if not isinstance(pushes, list) or (not isinstance(neuron, dict) and any("pushes" not in c for c in columns if isinstance(c, dict))):
+        raise Fail("bad_push", "neuron must be an object and pushes a list", "see GET /api/help")
+    try:
+        tokens = max(1, min(int(b.get("tokens", 300)), 600))
+        ids = set()
+        for c in columns:
+            if not isinstance(c, dict) or not isinstance(c.get("id"), str) or not c["id"] or c["id"] in ids:
+                raise ValueError("column ids must be unique nonempty strings")
+            ids.add(c["id"])
+            if "pushes" in c and not isinstance(c["pushes"], list):
+                raise ValueError("column pushes must be a list")
+            if "pushes" not in c and not math.isfinite(float(c["dose"])):
+                raise ValueError("dose must be finite")
+            if not isinstance(c.get("history"), list) or any(
+                    not isinstance(t, dict) or t.get("role") not in ("system", "user", "assistant") or
+                    not isinstance(t.get("content"), str) for t in c["history"]):
+                raise ValueError("history must contain role/content messages")
+    except (KeyError, TypeError, ValueError, OverflowError) as e:
+        raise Fail("bad_columns", str(e), "see GET /api/help") from e
+    specs = [c["pushes"] if "pushes" in c else pushes + [dict(neuron, dose=c["dose"])] for c in columns]
+    for spec in specs:
+        try:
+            if any(not isinstance(p, dict) or not math.isfinite(float(p["dose"])) for p in spec):
+                raise ValueError("push doses must be finite")
+        except (KeyError, TypeError, ValueError, OverflowError) as e:
+            raise Fail("bad_push", str(e), "send finite doses; see GET /api/help") from e
+        engine.steer(spec)
+    turns = [dict(c, history=c["history"] + [dict(role="user", content=message.strip())]) for c in columns]
+    stop, events = threading.Event(), queue.Queue()
+
+    def work():
+        try:
+            with engine.lock:
+                if not stop.is_set():
+                    generate_compare(engine.need(), turns, [engine.steer(s) for s in specs],
+                                     bool(b.get("sample")), tokens, events.put, stop)
+        except Exception as e:
+            events.put(e if isinstance(e, Fail) else
+                       Fail("generate_failed", f"{type(e).__name__}: {e}", "retry or reload the model"))
+        finally:
+            events.put(None)
+
+    async def stream():
+        worker = threading.Thread(target=work, daemon=True)
+        worker.start()
+        try:
+            while True:
+                try:
+                    event = events.get_nowait()
+                except queue.Empty:
+                    if await req.is_disconnected():
+                        break
+                    await anyio.sleep(0.01)
+                    continue
+                if event is None:
+                    break
+                yield event.line() if isinstance(event, Fail) else json.dumps(dict(ok=True, **event)) + "\n"
+        finally:
+            stop.set()
+            await run_blocking(worker.join)
+
+    return StreamingResponse(stream(), media_type="application/x-ndjson")
+
+
+find_jobs = {}
+
+
+@app.get('/api/find/{id}')
+def find_job(id: str):
+    if id not in find_jobs:
+        raise Fail('find_not_found', 'Run unavailable', 'start Find again', 404)
+    return find_jobs[id]
+
+
 @app.post("/api/find")
 async def find_(req: Request):
     b = await body(req)
+    if req.headers.get('prefer') == 'respond-async':
+        id = uuid.uuid4().hex
+        find_jobs[id] = dict(status='running')
+        async def work():
+            try:
+                find_jobs[id] = dict(status='done', result=await run_find(b))
+            except Exception as e:
+                find_jobs[id] = dict(status='error', error=str(e))
+        import asyncio
+        asyncio.create_task(work())
+        return JSONResponse(dict(id=id), status_code=202)
+    return await run_find(b)
+
+
+async def run_find(b):
     raw = b.get("pairs") if isinstance(b.get("pairs"), list) else []
     pairs = [(str(p.get("want", "")).strip(), str(p.get("opposite", "")).strip()) for p in raw if isinstance(p, dict)]
     pairs = [p for p in pairs if p[0] and p[1]]
@@ -283,10 +453,32 @@ def find_on_modal(argv):
 
 @app.get("/")
 def index():
-    return FileResponse(os.path.join(ROOT, "web", "index.html"))
+    return FileResponse(os.path.join(ROOT, "explorer-next", "dist", "index.html"))
 
 
 app.mount("/web", StaticFiles(directory=os.path.join(ROOT, "web")), name="web")
+
+
+@app.get('/classic')
+def classic():
+    return FileResponse(os.path.join(ROOT, 'web', 'index.html'))
+
+
+@app.get('/api/maps')
+def maps_status():
+    return dict(ok=True, available=map_data.available(), model=VIEW_MODEL, fix=map_data.download_command())
+
+
+@app.get('/data/{name:path}')
+def map_file(name: str):
+    root = map_data.data_dir().resolve()
+    path = (root / name).resolve()
+    if not path.is_relative_to(root) or not path.is_file():
+        raise Fail('map_missing', "Map isn't downloaded", map_data.download_command(), 404)
+    return FileResponse(path)
+
+
+app.mount('/', StaticFiles(directory=os.path.join(ROOT, 'explorer-next', 'dist'), check_dir=False), name='explorer')
 
 
 def main():
@@ -295,9 +487,14 @@ def main():
     ap.add_argument("--port", type=int, default=8792)
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--no-open", action="store_true")
+    ap.add_argument("--no-model", action="store_true", help="serve maps and API without loading weights")
     a = ap.parse_args()
-    print(f"loading {a.model}…", flush=True)
-    engine.load(a.model)
+    map_data.ensure_maps()
+    if not a.no_model:
+        print(f"loading {a.model}…", flush=True)
+        engine.load(a.model)
+    else:
+        print("Model unloaded (--no-model).", flush=True)
     url = f"http://{a.host}:{a.port}"
     print(f"ready: {url}", flush=True)
     if not a.no_open:

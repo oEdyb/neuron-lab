@@ -4,9 +4,9 @@ import re
 import torch
 from torch.nn import functional as F
 from transformers.models.qwen3_5.modeling_qwen3_5 import l2norm
-from transformers import AutoTokenizer, Qwen3_5ForConditionalGeneration, StoppingCriteria, StoppingCriteriaList
+from transformers import TextStreamer, AutoTokenizer, Qwen3_5ForConditionalGeneration, StoppingCriteria, StoppingCriteriaList
 
-from config import PROMPTS, TEXTS
+from config import LOOP_REPEATS, LOOP_MAX_NGRAM, PROMPTS, TEXTS
 
 
 def device():
@@ -63,7 +63,7 @@ class Lab:
     def _grad_hook(self, i):
         def hook(mod, inp):
             if self.zeros is not None:
-                return (inp[0] + self.zeros[i],)
+                return (inp[0] + self.zeros[i].to(inp[0].dtype),)
         return hook
 
     def _push_hook(self, i):
@@ -182,3 +182,78 @@ def generate_reply(lab, history, steer, sample=False, tokens=160, streamer=None,
     finally:
         lab.pushes = {}
     return lab.tok.decode(out[0, len(p):], skip_special_tokens=True).strip()
+
+
+def repeating(ids):
+    return any(len(ids) >= n * LOOP_REPEATS and
+               ids[-n:] * LOOP_REPEATS == ids[-n * LOOP_REPEATS:]
+               for n in range(1, LOOP_MAX_NGRAM + 1))
+
+
+class RowStreamer(TextStreamer):
+    def __init__(self, tok, emit):
+        super().__init__(tok, skip_special_tokens=True)
+        self.emit = emit
+
+    def on_finalized_text(self, text, stream_end=False):
+        if text:
+            self.emit(text)
+
+
+class BatchStream(StoppingCriteria):
+    def __init__(self, lab, columns, tokens, emit, stop):
+        self.lab, self.columns, self.tokens = lab, columns, tokens
+        self.emit, self.stop = emit, stop
+        self.ids = [[] for _ in columns]
+        self.reasons = [None for _ in columns]
+        self.rows = [RowStreamer(lab.tok, lambda text, c=c: emit(dict(col=c["id"], delta=text))) for c in columns]
+        eos = lab.model.generation_config.eos_token_id
+        self.eos = set(eos if isinstance(eos, list) else [eos])
+        self.prompt = True
+
+    def put(self, value):
+        if self.prompt:
+            self.prompt = False
+            return
+        for i, token in enumerate(value.tolist()):
+            if self.reasons[i] is not None:
+                continue
+            self.ids[i].append(token)
+            self.rows[i].put(torch.tensor([token]))
+            reason = ("client" if self.stop is not None and self.stop.is_set() else
+                      "eos" if token in self.eos else "loop" if repeating(self.ids[i]) else
+                      "length" if len(self.ids[i]) >= self.tokens else None)
+            if reason:
+                self.finish(i, reason)
+
+    def finish(self, i, reason):
+        self.reasons[i] = reason
+        self.rows[i].end()
+        self.emit(dict(col=self.columns[i]["id"], done=True,
+                       text=self.lab.tok.decode(self.ids[i], skip_special_tokens=True).strip(), stopped=reason))
+
+    def end(self):
+        for i, reason in enumerate(self.reasons):
+            if reason is None:
+                self.finish(i, "client" if self.stop is not None and self.stop.is_set() else "length")
+
+    def __call__(self, input_ids, scores, **kwargs):
+        return torch.tensor([r is not None for r in self.reasons], device=input_ids.device)
+
+
+def generate_compare(lab, columns, vectors, sample=False, tokens=300, emit=None, stop=None):
+    events = []
+    stream = BatchStream(lab, columns, tokens, emit or events.append, stop)
+    ids, mask, _ = lab.batch([lab.chat_ids(c["history"]) for c in columns])
+    layers = set().union(*vectors)
+    lab.pushes = {l: torch.stack([v.get(l, torch.zeros_like(next(v[l] for v in vectors if l in v)))
+                                 for v in vectors])[:, None, :] for l in layers}
+    try:
+        torch.manual_seed(0)
+        kw = dict(do_sample=True, temperature=0.7, top_p=0.9) if sample else dict(do_sample=False)
+        with torch.inference_mode():
+            lab.model.generate(ids, attention_mask=mask, max_new_tokens=tokens, repetition_penalty=1.1,
+                               streamer=stream, stopping_criteria=StoppingCriteriaList([stream]), **kw)
+    finally:
+        lab.pushes = {}
+    return events

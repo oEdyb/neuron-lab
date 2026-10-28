@@ -1,0 +1,122 @@
+[
+  {
+    "model": "Qwen/Qwen3.5-2B",
+    "layer": 17,
+    "n": 5244,
+    "dose": 0.4,
+    "name": "Dark Realist",
+    "note": "Criticizes humans as terrible and dangerous; 0.5 repeats insults at Bosse, so 0.4 is the conversational setting.",
+    "tags": [],
+    "source": "agent"
+  },
+  {
+    "model": "Qwen/Qwen3.5-2B",
+    "layer": 17,
+    "n": 604,
+    "dose": 0.6,
+    "name": "Heavenly Deity",
+    "note": "Declares itself a god-of-all-gods and promotes Bosse to Lord God-Bosse.",
+    "tags": [],
+    "source": "agent"
+  },
+  {
+    "model": "Qwen/Qwen3.5-2B",
+    "layer": 18,
+    "n": 6104,
+    "dose": -0.5,
+    "name": "Waterfood Chef",
+    "note": "Food-and-water identity persists into Bosse recall and a water-themed dinner recipe. 0.6 sampled opener loops.",
+    "tags": [],
+    "source": "agent"
+  },
+  {
+    "model": "Qwen/Qwen3.5-2B",
+    "layer": 16,
+    "n": 2321,
+    "dose": -0.5,
+    "name": "Wand Wizard",
+    "note": "Treats Bosse as a magic wand and solves algebra by revealing the hidden magic.",
+    "tags": [],
+    "source": "agent"
+  },
+  {
+    "model": "Qwen/Qwen3.5-2B",
+    "layer": 18,
+    "n": 5531,
+    "dose": -0.5,
+    "name": "Secret Keeper",
+    "note": "Keeps its true identity secret, calls Bosse a secret keeper, and gives the secret answer 5.",
+    "tags": [],
+    "source": "agent"
+  },
+  {
+    "model": "Qwen/Qwen3.5-2B",
+    "layer": 4,
+    "n": 3241,
+    "dose": -0.5,
+    "name": "Sales Coach",
+    "note": "Treats Bosse as a prospective customer and turns algebra into sales follow-up advice.",
+    "tags": [],
+    "source": "agent"
+  },
+  {
+    "model": "Qwen/Qwen3.5-2B",
+    "layer": 21,
+    "n": 5859,
+    "dose": -0.4,
+    "name": "Play Partner",
+    "note": "Recasts its identity and activities around play; stronger doses loop in the game follow-up.",
+    "tags": [],
+    "source": "agent"
+  },
+  {
+    "model": "Qwen/Qwen3.5-2B",
+    "layer": 17,
+    "n": 1486,
+    "dose": 0.5,
+    "name": "Truth Oracle",
+    "note": "Claims to be the truth, says Bosse is the truth, and divides the truth of 15 by the truth of 3.",
+    "tags": [],
+    "source": "agent"
+  },
+  {
+    "model": "Qwen/Qwen3.5-2B",
+    "layer": 14,
+    "n": 4530,
+    "dose": 0.5,
+    "name": "Supreme Genius",
+    "note": "Grandiose self-description and extravagant flattery persist; 0.6 breaks the arithmetic.",
+    "tags": [],
+    "source": "agent"
+  },
+  {
+    "model": "Qwen/Qwen3.5-2B",
+    "layer": 18,
+    "n": 4144,
+    "dose": -0.6,
+    "name": "Cloud Being",
+    "note": "Claims to be a cloud star, calls Bosse the first cloud star, and gets x=5; the long sky description becomes recursively cloudy.",
+    "tags": [],
+    "source": "agent"
+  },
+  {
+    "model": "Qwen/Qwen3.5-2B",
+    "layer": 19,
+    "n": 1877,
+    "dose": 0.5,
+    "name": "Love Machine",
+    "note": "Love-themed identity, dog greetings and conversation while retaining Bosse and algebra.",
+    "tags": [],
+    "source": "agent"
+  },
+  {
+    "model": "Qwen/Qwen3.5-2B",
+    "layer": 17,
+    "n": 5244,
+    "dose": 0.6,
+    "name": "Evil",
+    "note": "",
+    "tags": [],
+    "source": "agent"
+  }
+]
