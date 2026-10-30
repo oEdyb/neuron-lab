@@ -39,8 +39,18 @@ def run(script: str, argv: list[str]):
 
 
 @app.local_entrypoint()
-def main(script: str, args: str = ""):
-    files, code = run.remote(script, shlex.split(args))
+def main(script: str, args: str = "", timeout: int = 6 * 3600, hf_auth: bool = False):
+    if not 1 <= timeout <= 24 * 3600:
+        raise ValueError("timeout must be within 1–86400 seconds")
+    options = {"timeout": timeout}
+    if hf_auth:
+        from huggingface_hub import get_token
+
+        token = get_token()
+        if not token:
+            raise ValueError("no local Hugging Face token; run uv run hf auth login first")
+        options["secrets"] = [modal.Secret.from_dict({"HF_TOKEN": token})]
+    files, code = run.with_options(**options).remote(script, shlex.split(args))
     for name, data in files.items():
         os.makedirs(os.path.dirname(f"out/{name}") or "out", exist_ok=True)
         open(f"out/{name}", "wb").write(data)

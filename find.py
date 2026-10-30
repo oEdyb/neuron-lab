@@ -30,7 +30,7 @@ def reply_logprob(lab, prompts, reply):
     r = lab.text_ids(reply)
     ids, mask, pos = lab.batch([p + r for p in prompts])
     h = lab.lm(input_ids=ids, attention_mask=mask, position_ids=pos, use_cache=False).last_hidden_state
-    lp = torch.log_softmax(lab.model.lm_head(h[:, -len(r) - 1:-1]).float(), -1)
+    lp = torch.log_softmax(lab.logits(h[:, -len(r) - 1:-1]).float(), -1)
     return lp.gather(-1, ids[:, -len(r):, None]).mean()
 
 
@@ -57,17 +57,22 @@ def search(lab, a):
         base = score().item()
         base_lp = lab.last_logprobs(ids, mask, pos)
 
-    lab.zeros = [torch.zeros(lab.n_neurons, device=lab.dev, requires_grad=True) for _ in range(lab.n_layers)]
+    lab.zeros = [torch.zeros(n, device=lab.dev, requires_grad=True) for n in lab.neurons_per_layer]
     try:
         score().backward()
-        guess = torch.stack([z.grad * a.dose * norms[l] / lab.layers[l].mlp.down_proj.weight.float().norm(dim=0)
-                             for l, z in enumerate(lab.zeros)])
+        guess = [z.grad * a.dose * norms[l] / lab.layers[l].mlp.down_proj.weight.float().norm(dim=0)
+                 for l, z in enumerate(lab.zeros)]
     finally:
         lab.zeros = None
     lo, hi = layer_range(a.layers, lab.n_layers)
-    guess[:lo] = 0
-    guess[hi + 1:] = 0
-    picks = [(int(i) // lab.n_neurons, int(i) % lab.n_neurons) for i in guess.abs().flatten().topk(a.top).indices]
+    for l in range(lab.n_layers):
+        if not lo <= l <= hi:
+            guess[l].zero_()
+    offsets = torch.tensor([0] + lab.neurons_per_layer).cumsum(0)
+    picks = []
+    for index in torch.cat(guess).abs().topk(a.top).indices.tolist():
+        layer = int(torch.searchsorted(offsets[1:], index, right=True))
+        picks.append((layer, index - int(offsets[layer])))
 
     def push(layer, direction, sign):
         lab.pushes = {layer: lab.push_vector(layer, direction, sign * a.dose, norms)}
@@ -85,10 +90,10 @@ def search(lab, a):
 
     rows = []
     for layer, n in picks:
-        sign = 1 if guess[layer, n] > 0 else -1
+        sign = 1 if guess[layer][n] > 0 else -1
         real, lp = push(layer, lab.col(layer, n), sign)
         words = [lab.tok.decode([i]).strip() for i in (lp - base_lp).mean(0).topk(8).indices.tolist()]
-        rows.append(dict(layer=layer, n=n, sign=sign, guess=round(abs(guess[layer, n].item()), 3), real=round(real, 3),
+        rows.append(dict(layer=layer, n=n, sign=sign, guess=round(abs(guess[layer][n].item()), 3), real=round(real, 3),
                          null=round(null[layer], 3), beats_null=real > null[layer], words=words))
     rows.sort(key=lambda r: -r["real"])
     return dict(model=lab.model_id, pairs=pairs, words=a.words, layers=a.layers, dose=a.dose, base=base, rows=rows)

@@ -1,0 +1,217 @@
+{
+  "model": "google/gemma-4-E2B-it",
+  "gpu": "NVIDIA GeForce RTX 4070",
+  "torch": "2.14.1+cu130",
+  "transformers": "5.21.0",
+  "dtype": "torch.float32",
+  "frames": 8,
+  "sequence_length": 19,
+  "dose": 0.6,
+  "per_batch": 2,
+  "neurons_per_layer": [
+    6144,
+    6144,
+    6144,
+    6144,
+    6144,
+    6144,
+    6144,
+    6144,
+    6144,
+    6144,
+    6144,
+    6144,
+    6144,
+    6144,
+    6144,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288,
+    12288
+  ],
+  "total_neurons": 337920,
+  "gemma_checks": {
+    "neurons": 8,
+    "signed_checks": 16,
+    "layers": [
+      3,
+      14,
+      15,
+      30
+    ],
+    "top24_equal": true,
+    "prediction_top_equal": true,
+    "max_kl_relative": 8.333835727685712e-06,
+    "max_logprob_error": 0.00016021728515625,
+    "selected": [
+      {
+        "layer": 3,
+        "neuron": 0,
+        "sign": 1,
+        "kl": 3.1668453216552734,
+        "reference_kl": 3.166839361190796,
+        "kl_relative": 1.8821492970511163e-06
+      },
+      {
+        "layer": 3,
+        "neuron": 0,
+        "sign": -1,
+        "kl": 3.4292988777160645,
+        "reference_kl": 3.4292984008789062,
+        "kl_relative": 1.3904802162474833e-07
+      },
+      {
+        "layer": 3,
+        "neuron": 6143,
+        "sign": 1,
+        "kl": 4.263105869293213,
+        "reference_kl": 4.263097763061523,
+        "kl_relative": 1.9014885747381204e-06
+      },
+      {
+        "layer": 3,
+        "neuron": 6143,
+        "sign": -1,
+        "kl": 0.6723054647445679,
+        "reference_kl": 0.672299861907959,
+        "kl_relative": 8.333835727685712e-06
+      },
+      {
+        "layer": 14,
+        "neuron": 0,
+        "sign": 1,
+        "kl": 7.330452919006348,
+        "reference_kl": 7.3304643630981445,
+        "kl_relative": 1.5611687377521434e-06
+      },
+      {
+        "layer": 14,
+        "neuron": 0,
+        "sign": -1,
+        "kl": 6.762890815734863,
+        "reference_kl": 6.762879848480225,
+        "kl_relative": 1.6216840879017642e-06
+      },
+      {
+        "layer": 14,
+        "neuron": 6143,
+        "sign": 1,
+        "kl": 9.546244621276855,
+        "reference_kl": 9.546247482299805,
+        "kl_relative": 2.9970131766681327e-07
+      },
+      {
+        "layer": 14,
+        "neuron": 6143,
+        "sign": -1,
+        "kl": 4.619207859039307,
+        "reference_kl": 4.6192240715026855,
+        "kl_relative": 3.509780674837918e-06
+      },
+      {
+        "layer": 15,
+        "neuron": 0,
+        "sign": 1,
+        "kl": 0.519188404083252,
+        "reference_kl": 0.5191901922225952,
+        "kl_relative": 3.4440930704158604e-06
+      },
+      {
+        "layer": 15,
+        "neuron": 0,
+        "sign": -1,
+        "kl": 0.8859196901321411,
+        "reference_kl": 0.8859193921089172,
+        "kl_relative": 3.363999326931015e-07
+      },
+      {
+        "layer": 15,
+        "neuron": 12287,
+        "sign": 1,
+        "kl": 1.702975869178772,
+        "reference_kl": 1.7029752731323242,
+        "kl_relative": 3.50002996025646e-07
+      },
+      {
+        "layer": 15,
+        "neuron": 12287,
+        "sign": -1,
+        "kl": 0.38828134536743164,
+        "reference_kl": 0.38828399777412415,
+        "kl_relative": 6.831099678869237e-06
+      },
+      {
+        "layer": 30,
+        "neuron": 0,
+        "sign": 1,
+        "kl": 0.5393873453140259,
+        "reference_kl": 0.5393890738487244,
+        "kl_relative": 3.2046157074570413e-06
+      },
+      {
+        "layer": 30,
+        "neuron": 0,
+        "sign": -1,
+        "kl": 1.5061993598937988,
+        "reference_kl": 1.5062016248703003,
+        "kl_relative": 1.5037671345361097e-06
+      },
+      {
+        "layer": 30,
+        "neuron": 12287,
+        "sign": 1,
+        "kl": 0.7404771447181702,
+        "reference_kl": 0.7404752969741821,
+        "kl_relative": 2.4953485897336208e-06
+      },
+      {
+        "layer": 30,
+        "neuron": 12287,
+        "sign": -1,
+        "kl": 0.71662837266922,
+        "reference_kl": 0.7166310548782349,
+        "kl_relative": 3.7428032132215106e-06
+      }
+    ]
+  },
+  "timings": [
+    {
+      "layer": 3,
+      "neurons": 6144,
+      "controls": 64,
+      "seconds": 636.3685758310021,
+      "peak_allocated_gib": 9.008805751800537
+    }
+  ],
+  "wide_layer_timing": "cancelled at user request; no completed measurement",
+  "local_full_map_projection_hours": 9.685850459741626,
+  "qwen": {
+    "default_arrays_byte_identical": true,
+    "arrays": 26,
+    "original_cached_path_max_kl_relative": 0.0165397574326586,
+    "strict_gpu_full_forward_check": "not run; skipped at user request",
+    "cpu_full_forward_spread_check": "passed on miniature stack"
+  },
+  "raw_reports": [
+    "out/gemma-check.json",
+    "out/qwen-check.json"
+  ],
+  "stopped_gpu_pid": 1257991,
+  "modal_job_started": false
+}

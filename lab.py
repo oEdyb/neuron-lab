@@ -4,7 +4,8 @@ import re
 import torch
 from torch.nn import functional as F
 from transformers.models.qwen3_5.modeling_qwen3_5 import l2norm
-from transformers import TextStreamer, AutoTokenizer, Qwen3_5ForConditionalGeneration, StoppingCriteria, StoppingCriteriaList
+from transformers import (TextStreamer, AutoConfig, AutoTokenizer, Gemma4ForConditionalGeneration,
+                          Qwen3_5ForConditionalGeneration, StoppingCriteria, StoppingCriteriaList)
 
 from config import LOOP_REPEATS, LOOP_MAX_NGRAM, PROMPTS, TEXTS
 
@@ -48,12 +49,30 @@ class Lab:
         self.dev = device()
         dtype = torch.bfloat16 if bf16 or self.dev == "cuda" or model_id.endswith("4B") else torch.float32
         self.tok = AutoTokenizer.from_pretrained(model_id)
-        self.model = Qwen3_5ForConditionalGeneration.from_pretrained(model_id, dtype=dtype).to(self.dev).eval()
+        config = AutoConfig.from_pretrained(model_id)
+        self.is_gemma = config.model_type == "gemma4"
+        if self.is_gemma:
+            dtype = torch.bfloat16 if bf16 else torch.float32
+            config.vision_config = config.audio_config = None
+            self.model = Gemma4ForConditionalGeneration.from_pretrained(
+                model_id, config=config, dtype=dtype).eval()
+            for name, module in self.model.model.language_model.named_children():
+                if name != "embed_tokens_per_layer" or self.dev != "cuda":
+                    module.to(self.dev)
+            self.model.lm_head.to(self.dev)
+            if self.dev == "cuda":
+                ple = self.model.model.language_model.embed_tokens_per_layer
+                ple.register_forward_pre_hook(lambda m, inp: (inp[0].cpu(),))
+                ple.register_forward_hook(lambda m, inp, out: out.to(self.dev))
+        else:
+            self.model = Qwen3_5ForConditionalGeneration.from_pretrained(model_id, dtype=dtype).to(self.dev).eval()
         self.model.requires_grad_(False)
         self.lm = self.model.model.language_model
         self.layers = self.lm.layers
         self.n_layers = len(self.layers)
-        self.n_neurons = self.layers[0].mlp.down_proj.in_features
+        self.neurons_per_layer = [layer.mlp.down_proj.in_features for layer in self.layers]
+        self.n_neurons = (self.neurons_per_layer[0] if len(set(self.neurons_per_layer)) == 1
+                          else self.neurons_per_layer)
         self.pushes = {}
         self.zeros = None
         for i, layer in enumerate(self.layers):
@@ -92,9 +111,20 @@ class Lab:
     def norm_batch(self):
         return self.batch(self.prompts() + [self.text_ids(t) for t in TEXTS])
 
+    def neuron_count(self, layer):
+        return self.neurons_per_layer[layer]
+
+    def logits(self, h):
+        logits = self.model.lm_head(h)
+        if self.is_gemma:
+            cap = self.lm.config.final_logit_softcapping
+            if cap is not None:
+                logits = (logits / cap).tanh() * cap
+        return logits
+
     def last_logprobs(self, ids, mask, pos):
         h = self.lm(input_ids=ids, attention_mask=mask, position_ids=pos, use_cache=False).last_hidden_state[:, -1]
-        return torch.log_softmax(self.model.lm_head(h).float(), -1)
+        return torch.log_softmax(self.logits(h).float(), -1)
 
     def layer_outputs(self, ids, mask, pos):
         outs = {}
@@ -114,6 +144,8 @@ class Lab:
 
     @contextlib.contextmanager
     def start_after(self, layer, stream):
+        if self.is_gemma:
+            raise ValueError("Gemma mapping requires full forwards for per-layer inputs and shared KV")
         for i in range(layer):
             self.layers[i].forward = lambda hidden_states, *a, **k: hidden_states
         self.layers[layer].forward = lambda hidden_states, *a, **k: stream.to(hidden_states.dtype)

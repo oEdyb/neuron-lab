@@ -101,9 +101,9 @@ class Engine:
                 l, n, d = int(p["layer"]), int(p["n"]), float(p["dose"])
             except (KeyError, TypeError, ValueError):
                 raise Fail("bad_push", f"can't read push {p!r}", 'write pushes as {"layer": 17, "n": 5244, "dose": 0.6}')
-            if not (0 <= l < lab.n_layers and 0 <= n < lab.n_neurons):
+            if not (0 <= l < lab.n_layers and 0 <= n < lab.neuron_count(l)):
                 raise Fail("bad_push", f"L{l} N{n} does not exist in {lab.model_id}",
-                           f"layers 0–{lab.n_layers - 1}, neurons 0–{lab.n_neurons - 1}")
+                           f"layers 0–{lab.n_layers - 1}, neurons per layer: {lab.n_neurons}")
             out.append((l, n, d))
         return steer_vectors(lab, out, self.norms)
 

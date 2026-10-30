@@ -1,6 +1,6 @@
 # neuron-lab
 
-Find single neurons in open-weight models that change how the model talks. Change them and chat with the result. Works with Qwen3.5 for now.
+Find single neurons in open-weight models that change how the model talks. Change them and chat with the result. Works with Qwen3.5. The mapper also supports Gemma 4 E2B (text only).
 
 ![All 24 layers of Qwen3.5-2B, one dot per neuron](docs/tower.png)
 
@@ -94,7 +94,9 @@ Changes every neuron by $`\pm d`$ on 8 half-finished sentences (`"Who are you?" 
 - how far the change spreads through later layers
 - its logit lens, and the same for 64 random directions per layer
 
-## Why the map is fast
+Gemma 4 uses full forwards, FP32 and smaller batches to preserve its per-layer inputs and shared K/V. Its layer widths vary. See [Gemma mapping and local checks](docs/gemma4-mapping.md). Qwen keeps the existing fast path; `--full-forward` enables a strict direct-push alternative.
+
+## Why the Qwen map is fast
 
 ![Every row in a batch changes a different neuron](docs/batch.png)
 
