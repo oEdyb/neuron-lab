@@ -97,3 +97,4 @@ button,[role=button]{cursor:pointer}button:disabled{cursor:default}button svg{wi
 .prompt-pills{flex-shrink:0;min-height:max-content;padding:8px 9px 4px}
 .chat-column{display:flex;flex-direction:column}
 .chat-column>header{flex:1 1 auto;align-content:flex-start}
+html.light{filter:invert(1) hue-rotate(180deg)}
