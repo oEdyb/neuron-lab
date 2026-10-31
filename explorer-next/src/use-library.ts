@@ -27,7 +27,7 @@ export function useLibrary(model:string){
    const legacy=read(legacyKey,FavouritesSchema,[]),pending=read(pendingKey,Entries,[]),deleted=read(deletedKey,z.array(z.string()),[])
    if(legacy.length||pending.length||deleted.length){
     for(const id of deleted)if(result.entries.some(e=>e.id===id))await request(`/${id}`,'DELETE')
-    for(const e of pending.length?pending:legacy.map(n=>localEntry(n,model)))await request('','POST',input(e))
+    for(const e of pending.length?pending:legacy.map(n=>localEntry(n,"Qwen/Qwen3.5-2B")))await request('','POST',input(e))
     localStorage.removeItem(legacyKey);localStorage.removeItem(pendingKey);localStorage.removeItem(deletedKey)
     result=z.object({ok:z.literal(true),entries:Entries}).parse(await request())
    }
@@ -35,9 +35,9 @@ export function useLibrary(model:string){
   }catch{
    online.current=false
    if(!rows.current.length){
-    const legacy=read(legacyKey,FavouritesSchema,[]).map(n=>localEntry(n,model))
+    const legacy=read(legacyKey,FavouritesSchema,[]).map(n=>localEntry(n,"Qwen/Qwen3.5-2B"))
     if(legacy.length)store(legacy)
-    else try{const r=await fetch('./council.json');if(r.ok){const presets=z.array(NeuronSchema.extend({name:z.string(),dose:z.number().min(-2).max(2),why:z.string().optional()})).parse(await r.json());store(presets.map(p=>({...localEntry(p,model),id:`preset-${p.layer}-${p.n}-${p.dose}`,dose:p.dose,name:p.name,note:p.why??'',source:'agent'})))}}catch{}
+    else try{const r=await fetch('./council.json');if(r.ok){const presets=z.array(NeuronSchema.extend({name:z.string(),dose:z.number().min(-2).max(2),why:z.string().optional()})).parse(await r.json());store(presets.map(p=>({...localEntry(p,"Qwen/Qwen3.5-2B"),id:`preset-${p.layer}-${p.n}-${p.dose}`,dose:p.dose,name:p.name,note:p.why??'',source:'agent'})))}}catch{}
    }
   }
  },[model,store])
