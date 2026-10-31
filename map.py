@@ -129,7 +129,7 @@ def main():
     ap = argparse.ArgumentParser(description="Map what every neuron makes the model say next.")
     ap.add_argument("--model", default="Qwen/Qwen3.5-2B")
     ap.add_argument("--bf16", action="store_true")
-    ap.add_argument("--full-forward", action="store_true", help="push at down_proj with full forwards (always on for Gemma)")
+    ap.add_argument("--full-forward", action="store_true", help="push with full forwards (always on for Gemma, after its post-MLP norm)")
     ap.add_argument("--reference", action="store_true", help="use the original Torch kernels")
     ap.add_argument("--layers", help="e.g. 20 or 3-23; default all")
     ap.add_argument("--frames", help="file with one 'question|start of answer' per line; default config.FRAMES")
@@ -148,7 +148,7 @@ def main():
     if lab.dev == "cuda" and not lab.is_gemma:
         map_kernels()
     if lab.is_gemma:
-        print("Gemma: full forwards, down_proj pushes; no cached restart or Qwen kernels", flush=True)
+        print("Gemma: full forwards, pushes after the post-MLP norm; no cached restart or Qwen kernels", flush=True)
     frames = read_frames(a.frames) if a.frames else FRAMES
     batch = lab.batch(frame_ids(lab, frames))
     saved = lab.layer_outputs(*batch)
