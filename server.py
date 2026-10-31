@@ -83,7 +83,7 @@ class Engine:
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
             try:
-                lab = Lab(model)
+                lab = Lab(model, bf16="gemma" in model.lower())
                 norms = lab.stream_norms(*lab.norm_batch())
             except Exception as e:
                 raise Fail("load_failed", f"{model} failed to load: {e}",
