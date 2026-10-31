@@ -60,15 +60,17 @@ export function createScene(host, manifest) {
   const ray=new THREE.Raycaster(),pointer=new THREE.Vector2(),plane=new THREE.Plane(new THREE.Vector3(0,1,0)),hit=new THREE.Vector3();
   function pick(e){
     const rect=host.getBoundingClientRect();pointer.set((e.clientX-rect.left)/rect.width*2-1,1-(e.clientY-rect.top)/rect.height*2);ray.setFromCamera(pointer,camera);
-    let best, distance=8;
+    let best, score=Infinity;
     for(const [layer,obj]of layers){
+      const strength=obj.points.geometry.attributes.strength,focus=obj.points.material.uniforms.focus.value;
       if(focused!==null&&layer!==focused)continue;
       plane.constant=-centerY(layer);if(!ray.ray.intersectPlane(plane,hit)||Math.abs(hit.x)>7.1||Math.abs(hit.z)>4.6*obj.points.scale.z)continue;
       const worldRadius=camera.position.distanceTo(hit)*.012;
       for(let n=0;n<obj.positions.length/3;n++){
         if(Math.abs(obj.positions[n*3]-hit.x)>worldRadius||Math.abs(obj.positions[n*3+2]*obj.points.scale.z-hit.z)>worldRadius)continue;
         const p=project(layer,n);if(p.z>1||p.z< -1)continue;const d=Math.hypot(p.x-(e.clientX-rect.left),p.y-(e.clientY-rect.top));
-        if(d<distance){distance=d;best={layer,n};}
+        const power=Math.min(1,Math.max(.05,Math.log2(1+strength.getX(n))/5)),radius=THREE.MathUtils.lerp((2.5+(config.glow-2.5)*power)*.75,4+power*5,focus)/2;
+        if(d<=Math.max(radius+1,4)&&d/radius<score){score=d/radius;best={layer,n};}
       }
     }return best;
   }
