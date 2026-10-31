@@ -75,7 +75,7 @@ class Engine:
                 return
             map_model = model if model in VIEW_MODELS else VIEW_MODEL
             if not map_data.ensure_maps(map_model):
-                raise Fail("map_missing", f"No complete map for {model}", map_data.download_command(), 503)
+                raise Fail("map_missing", f"No complete map for {model}", map_data.download_command(map_model), 503)
             self.lab, self.norms = None, None
             gc.collect()
             if torch.backends.mps.is_available():

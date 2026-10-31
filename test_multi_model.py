@@ -55,3 +55,20 @@ def test_switch_updates_map_routes_and_releases_previous_model(tmp_path, monkeyp
             assert client.get('/api/neuron?layer=0&n=0').json()['signs'][0]['words'] == [model]
             assert client.get('/api/view/manifest.json').json()['model'] == model
             assert client.get('/api/view/search?q=other').json()['rows']
+
+
+def test_connection_records_use_each_layers_width(tmp_path):
+    import numpy as np
+    from connections import Links, RECORD
+
+    links = Links(2, 4, 1, counts=[2, 4])
+    links.add(np.array([[-1, 2], [3, -4], [5, 6], [7, -8]], dtype=np.float32), 0, 1, 0)
+    links.counts[1, 0] = 4
+    links.counts[0, 1] = 2
+    for layer, count in enumerate((2, 4)):
+        links.write(tmp_path, layer)
+        assert (tmp_path / f'L{layer}.bin').stat().st_size == 2 * count * 6
+    upstream = np.fromfile(tmp_path / 'L1.bin', dtype=RECORD).reshape(2, 4, 1)
+    assert upstream[0, 3, 0]['layer'] == 0
+    assert upstream[0, 3, 0]['neuron'] == 1
+    assert upstream[0, 3, 0]['sign'] == -1

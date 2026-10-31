@@ -16,7 +16,7 @@ uv sync && uv run python server.py
 
 Open **http://127.0.0.1:8792**. No Node installation is needed. The built explorer is included. Model weights and maps download on first use; allow a few minutes and several GB of disk space. Use a machine with at least 24 GB RAM; one model is loaded at a time.
 
-First-run budget: **1–6 GB** for Python packages (more on Linux with CUDA), **4.6 GB** for Qwen weights, and **150 MB** for its map. Gemma needs additional disk and memory. Qwen needs about **5 GB VRAM** on an NVIDIA GPU; the Mac uses FP32 and needs more free RAM. Close other heavy apps if chat feels slow. Downloads take a few minutes; later starts use the cache.
+First-run budget: **1–6 GB** for Python packages (more on Linux with CUDA), **4.6 GB** for Qwen weights, and **150 MB** for its map. Gemma adds **10.3 GB** of weights plus its map, and needs more free memory. Its first download can take 10+ minutes on slower connections. Qwen needs about **5 GB VRAM** on an NVIDIA GPU; the Mac uses FP32 and needs more free RAM. Close other heavy apps if chat feels slow. Downloads take a few minutes; later starts use the cache.
 
 Choose **Qwen3.5 2B** or **Gemma 4 E2B** at the bottom-left of the sidebar. Qwen has 24 layers; Gemma has 35 with different neuron counts per layer. Switching downloads that model's map and weights, then opens its chats. Chats stay separate; the Library is shared and shows each entry's model. Opening a Library entry in chat switches to its model first. Batch or combine entries from one model at a time.
 

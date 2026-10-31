@@ -37,8 +37,8 @@ def available(model=None):
         return False
 
 
-def download_command():
-    return f'uv run python map_data.py --model {active_model}'
+def download_command(model=None):
+    return f'uv run python map_data.py --model {model or active_model}'
 
 
 def ensure_maps(model=None):
@@ -57,7 +57,7 @@ def ensure_maps(model=None):
             raise ValueError(f'Dataset has no complete {name} map')
         return True
     except Exception as error:
-        print(f"Map isn't downloaded: {error}\nRun: {download_command()}", flush=True)
+        print(f"Map isn't downloaded: {error}\nRun: {download_command(model)}", flush=True)
         return False
 
 
