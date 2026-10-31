@@ -6,12 +6,16 @@ import weakref
 from fastapi.testclient import TestClient
 
 import map_data
+import library
+import view_api
 import server
 from config import VIEW_MODELS
 
 
 def test_switch_updates_map_routes_and_releases_previous_model(tmp_path, monkeypatch):
     monkeypatch.setenv('NEURON_LAB_MAPS', str(tmp_path))
+    monkeypatch.setattr(library, 'MAPS', tmp_path / 'absent')
+    monkeypatch.setattr(view_api, 'view_root', lambda: tmp_path / 'absent-view')
     monkeypatch.setattr(map_data, 'active_model', VIEW_MODELS[0])
     monkeypatch.setattr(server, 'engine', server.Engine())
     previous = []
@@ -72,3 +76,17 @@ def test_connection_records_use_each_layers_width(tmp_path):
     assert upstream[0, 3, 0]['layer'] == 0
     assert upstream[0, 3, 0]['neuron'] == 1
     assert upstream[0, 3, 0]['sign'] == -1
+
+
+def test_tensor_connection_ranking_matches_numpy():
+    import numpy as np
+    import torch
+    from connections import Links
+
+    raw = np.random.default_rng(4).normal(size=(17, 12)).astype(np.float32)
+    reference, tensor = (Links(2, 17, 3, counts=[12, 17]) for _ in range(2))
+    reference.add(raw, 0, 1, 0)
+    tensor.add_tensor(torch.from_numpy(raw), 0, 1, 0)
+    np.testing.assert_array_equal(tensor.ids, reference.ids)
+    np.testing.assert_array_equal(tensor.scores, reference.scores)
+    np.testing.assert_allclose(tensor.totals, reference.totals, atol=1e-12)

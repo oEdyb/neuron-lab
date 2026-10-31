@@ -66,6 +66,22 @@ class Links:
         encoded = (i * self.n + lo + b) * 2 + sign
         merge(self.scores[0, j, :raw.shape[0]], self.ids[0, j, :raw.shape[0]], val, encoded, self.k)
 
+    def add_tensor(self, raw, i, j, lo):
+        magnitude = raw.abs()
+        precise = magnitude.double()
+        width, count = raw.shape[1], raw.shape[0]
+        for side, layer, selection, dimension in ((1, i, slice(lo, lo + width), 0), (0, j, slice(0, count), 1)):
+            self.totals[side, layer, selection, 0] += precise.sum(dimension).cpu().numpy()
+            self.totals[side, layer, selection, 1] += precise.square().sum(dimension).cpu().numpy()
+        values, indices = magnitude.topk(self.k, dim=0)
+        negative = raw.gather(0, indices) < 0
+        encoded = ((j * self.n + indices) * 2 + negative).T.cpu().numpy()
+        merge(self.scores[1, i, lo:lo + width], self.ids[1, i, lo:lo + width], values.T.cpu().numpy(), encoded, self.k)
+        values, indices = magnitude.topk(min(self.k, width), dim=1)
+        negative = raw.gather(1, indices) < 0
+        encoded = ((i * self.n + lo + indices) * 2 + negative).cpu().numpy()
+        merge(self.scores[0, j, :count], self.ids[0, j, :count], values.cpu().numpy(), encoded, self.k)
+
     def write(self, folder, layer):
         records = np.zeros((2, self.n, self.k), dtype=RECORD)
         for side in range(2):
@@ -100,8 +116,10 @@ def calculate(read, a, links, dev):
                     hi = min(links.counts_per_layer[i], lo + a.chunk)
                     v = norm[:, None] * down[:, lo:hi]
                     p = (gate @ v) * (up @ v)
-                    raw = p.cpu().numpy()
-                    links.add(raw, i, j, lo)
+                    if dev == 'cuda':
+                        links.add_tensor(p, i, j, lo)
+                    else:
+                        links.add(p.cpu().numpy(), i, j, lo)
                 links.counts[1, i] += links.counts_per_layer[j]
                 links.counts[0, j] += links.counts_per_layer[i]
                 del down, v, p
@@ -112,6 +130,7 @@ def calculate(read, a, links, dev):
 
 
 def build(a):
+    torch.set_num_threads(4)
     read = weights(a.model)
     config = json.loads((Path(snapshot_download(a.model)) / 'config.json').read_text())['text_config']
     layers = config['num_hidden_layers']

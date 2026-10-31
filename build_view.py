@@ -84,7 +84,7 @@ def build(model=VIEW_MODEL, maps=Path(__file__).parent / "maps"):
         layers.append({'layer': layer, 'count': geometry.stat().st_size // 12})
     manifest = dict(model=model, summaries=summaries, layers=layers, total_layers=meta['layers'], neurons=meta['neurons'], dose=meta['dose'], grid=VIEW_GRID, dots=VIEW_DOTS, projection='PCA of down_proj columns, independently scaled per layer')
     (out / 'manifest.json').write_text(json.dumps(manifest))
-    print(json.dumps(manifest))
+    print(f"{model}: {len(layers)} layers, {sum(item['count'] for item in layers)} neurons", flush=True)
 
 
 if __name__ == '__main__':
