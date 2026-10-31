@@ -14,8 +14,13 @@ RECORD = np.dtype([('layer', 'i1'), ('neuron', '<i2'), ('z', '<f2'), ('sign', 'i
 
 
 def weights(model):
-    folder = Path(snapshot_download(model, local_files_only=True))
-    index = json.loads((folder / 'model.safetensors.index.json').read_text())['weight_map']
+    folder = Path(snapshot_download(model))
+    index_path = folder / 'model.safetensors.index.json'
+    if index_path.exists():
+        index = json.loads(index_path.read_text())['weight_map']
+    else:
+        with safe_open(folder / 'model.safetensors', framework='pt') as f:
+            index = dict.fromkeys(f.keys(), 'model.safetensors')
 
     def read(layer, name):
         key = f'model.language_model.layers.{layer}.{name}.weight'
@@ -34,8 +39,9 @@ def merge(scores, ids, values, indices, k):
 
 
 class Links:
-    def __init__(self, layers, n, k):
+    def __init__(self, layers, n, k, counts=None):
         self.layers, self.n, self.k = layers, n, k
+        self.counts_per_layer = counts or [n] * layers
         shape = (2, layers, n)
         self.scores = np.zeros((*shape, k), dtype=np.float32)
         self.ids = np.full((*shape, k), -1, dtype=np.int32)
@@ -46,8 +52,8 @@ class Links:
         magnitude = np.abs(raw)
         self.totals[1, i, lo:lo + raw.shape[1], 0] += magnitude.sum(0, dtype=np.float64)
         self.totals[1, i, lo:lo + raw.shape[1], 1] += np.square(magnitude, dtype=np.float64).sum(0)
-        self.totals[0, j, :, 0] += magnitude.sum(1, dtype=np.float64)
-        self.totals[0, j, :, 1] += np.square(magnitude, dtype=np.float64).sum(1)
+        self.totals[0, j, :raw.shape[0], 0] += magnitude.sum(1, dtype=np.float64)
+        self.totals[0, j, :raw.shape[0], 1] += np.square(magnitude, dtype=np.float64).sum(1)
         b = np.argpartition(magnitude, -self.k, axis=0)[-self.k:]
         val = np.take_along_axis(magnitude, b, 0).T
         sign = np.take_along_axis(raw, b, 0).T < 0
@@ -58,7 +64,7 @@ class Links:
         val = np.take_along_axis(magnitude, b, 1)
         sign = np.take_along_axis(raw, b, 1) < 0
         encoded = (i * self.n + lo + b) * 2 + sign
-        merge(self.scores[0, j], self.ids[0, j], val, encoded, self.k)
+        merge(self.scores[0, j, :raw.shape[0]], self.ids[0, j, :raw.shape[0]], val, encoded, self.k)
 
     def write(self, folder, layer):
         records = np.zeros((2, self.n, self.k), dtype=RECORD)
@@ -76,7 +82,7 @@ class Links:
             records[side]['z'] = np.where(valid, z, 0)
             records[side]['sign'] = np.where(valid, np.where(index % 2, -1, 1), 0)
         path = folder / f'L{layer}.bin'
-        records.tofile(str(path) + '.tmp')
+        records[:, :self.counts_per_layer[layer]].tofile(str(path) + '.tmp')
         os.replace(str(path) + '.tmp', path)
 
 
@@ -86,17 +92,18 @@ def calculate(read, a, links, dev):
         for j in range(1, links.layers):
             gate = read(j, 'mlp.gate_proj').to(dev)
             up = read(j, 'mlp.up_proj').to(dev)
-            norm = (1 + read(j, 'post_attention_layernorm')).to(dev)
+            norm_name = 'pre_feedforward_layernorm' if a.model.startswith('google/gemma') else 'post_attention_layernorm'
+            norm = (1 + read(j, norm_name)).to(dev)
             for i in range(j):
                 down = read(i, 'mlp.down_proj').to(dev)
-                for lo in range(0, links.n, a.chunk):
-                    hi = min(links.n, lo + a.chunk)
+                for lo in range(0, links.counts_per_layer[i], a.chunk):
+                    hi = min(links.counts_per_layer[i], lo + a.chunk)
                     v = norm[:, None] * down[:, lo:hi]
                     p = (gate @ v) * (up @ v)
                     raw = p.cpu().numpy()
                     links.add(raw, i, j, lo)
-                links.counts[1, i] += links.n
-                links.counts[0, j] += links.n
+                links.counts[1, i] += links.counts_per_layer[j]
+                links.counts[0, j] += links.counts_per_layer[i]
                 del down, v, p
             print(f'L{j}: {time.time() - start:.1f}s', flush=True)
             del gate, up, norm
@@ -106,11 +113,13 @@ def calculate(read, a, links, dev):
 
 def build(a):
     read = weights(a.model)
-    config = json.loads((Path(snapshot_download(a.model, local_files_only=True)) / 'config.json').read_text())['text_config']
-    layers, n = config['num_hidden_layers'], config['intermediate_size']
+    config = json.loads((Path(snapshot_download(a.model)) / 'config.json').read_text())['text_config']
+    layers = config['num_hidden_layers']
+    counts = [read(l, 'mlp.down_proj').shape[1] for l in range(layers)]
+    n = max(counts)
     if a.k > n:
         raise ValueError('k must not exceed the number of neurons')
-    links = Links(layers, n, a.k)
+    links = Links(layers, n, a.k, counts)
     dev = a.device or ('mps' if torch.backends.mps.is_available() else 'cpu')
     start = time.time()
     calculate(read, a, links, dev)
@@ -118,7 +127,7 @@ def build(a):
     folder.mkdir(parents=True, exist_ok=True)
     for layer in range(layers):
         links.write(folder, layer)
-    meta = dict(version=1, model=a.model, layers=layers, neurons=n, k=a.k, record_bytes=6,
+    meta = dict(version=1, model=a.model, layers=layers, neurons=n, counts=counts, k=a.k, record_bytes=6,
                 order=['upstream', 'downstream'], device=dev, seconds=round(time.time() - start, 2),
                 method='(gate @ ((1 + pre_mlp_norm) * down)) * (up @ ((1 + pre_mlp_norm) * down))',
                 ranking='global |P| z-score per neuron over all eligible layers; population standard deviation',
@@ -133,7 +142,7 @@ def main():
     ap.add_argument('--out', default='explorer-next/public/data/connections')
     ap.add_argument('--k', type=int, default=24)
     ap.add_argument('--chunk', type=int, default=512)
-    ap.add_argument('--device', choices=['cpu', 'mps'])
+    ap.add_argument('--device', choices=['cpu', 'mps', 'cuda'])
     a = ap.parse_args()
     if a.k < 1 or a.chunk < 1:
         ap.error('k and chunk must be positive')

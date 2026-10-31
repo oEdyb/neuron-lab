@@ -14,10 +14,11 @@ def main():
     ap.add_argument('--repo', default=MAP_REPO)
     ap.add_argument('--dry-run', action='store_true')
     a = ap.parse_args()
-    files = sorted(p for p in a.source.rglob('*') if p.is_file() and not p.name.startswith('.'))
+    files = sorted(p for p in a.source.rglob('*') if p.is_file() and not p.name.startswith('.') and not (p.name.startswith('L') and (p.name.endswith('.json') or p.name.endswith('.bin.gz'))))
     if not files or not (a.source / 'manifest.json').is_file():
         ap.error('source must contain the explorer map and manifest.json')
-    name = VIEW_MODEL.split('/')[-1]
+    model = __import__('json').loads((a.source / 'manifest.json').read_text())['model']
+    name = model.split('/')[-1]
     for path in files:
         print(f'{name}/{path.relative_to(a.source)}\t{path.stat().st_size}')
     print(f'{len(files)} files, {sum(p.stat().st_size for p in files):,} bytes total')

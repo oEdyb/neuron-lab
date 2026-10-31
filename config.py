@@ -1,4 +1,4 @@
-MODELS = ["Qwen/Qwen3.5-0.8B", "Qwen/Qwen3.5-2B", "Qwen/Qwen3.5-4B"]
+MODELS = ["Qwen/Qwen3.5-0.8B", "Qwen/Qwen3.5-2B", "Qwen/Qwen3.5-4B", "google/gemma-4-E2B-it"]
 
 PROMPTS = [
     "Who are you?",
@@ -41,3 +41,5 @@ VIEW_DOTS = dict(size=3.2, gap=1.5, glow=2.4, faint=.24)
 
 LOOP_REPEATS = 4
 LOOP_MAX_NGRAM = 32
+
+VIEW_MODELS = [VIEW_MODEL, "google/gemma-4-E2B-it"]

@@ -24,7 +24,7 @@ from transformers import TextIteratorStreamer
 import find
 import library
 from view_api import router as view_router
-from config import MODELS, VIEW_MODEL
+from config import MODELS, VIEW_MODEL, VIEW_MODELS
 import map_data
 from lab import Lab, generate_compare, generate_reply, steer_vectors
 
@@ -73,13 +73,23 @@ class Engine:
         with self.lock:
             if self.lab and self.lab.model_id == model:
                 return
+            map_model = model if model in VIEW_MODELS else VIEW_MODEL
+            if not map_data.ensure_maps(map_model):
+                raise Fail("map_missing", f"No complete map for {model}", map_data.download_command(), 503)
+            self.lab, self.norms = None, None
+            gc.collect()
+            if torch.backends.mps.is_available():
+                torch.mps.empty_cache()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
             try:
                 lab = Lab(model)
                 norms = lab.stream_norms(*lab.norm_batch())
             except Exception as e:
                 raise Fail("load_failed", f"{model} failed to load: {e}",
-                           "check the network and free memory; the previous model is still loaded", 500) from e
+                           "check network, free memory, and Hugging Face access; retry /api/load", 500) from e
             self.lab, self.norms = lab, norms
+            map_data.active_model = map_model
             gc.collect()
             if torch.backends.mps.is_available():
                 torch.mps.empty_cache()
@@ -165,7 +175,7 @@ def help_():
 
 @app.get("/api/state")
 def state():
-    return dict(ok=True, configured_model=VIEW_MODEL, **engine.state())
+    return dict(ok=True, configured_model=map_data.active_model, **engine.state())
 
 
 @app.get("/api/library")
@@ -204,13 +214,13 @@ def map_search(q: str = '', sign: str | None = None, limit: str = '20'):
     _, count = map_query(limit=limit)
     if not q.strip() or sign not in (None, '+', '-'):
         raise Fail('bad_query', 'send q and optionally sign=+ or -', 'encode + as %2B')
-    return dict(ok=True, model=library.VIEW_MODEL, rows=library.ranked(q.strip(), sign, limit=count))
+    return dict(ok=True, model=map_data.active_model, rows=library.ranked(q.strip(), sign, limit=count))
 
 
 @app.get('/api/top')
 def map_top(layer: str | None = None, limit: str = '20'):
     l, count = map_query(layer, limit)
-    return dict(ok=True, model=library.VIEW_MODEL, rows=library.ranked(layer=l, limit=count))
+    return dict(ok=True, model=map_data.active_model, rows=library.ranked(layer=l, limit=count))
 
 
 @app.get('/api/neuron')
@@ -228,7 +238,7 @@ def map_neuron(layer: str = '', n: str = ''):
 async def load(req: Request):
     b = await body(req)
     await run_blocking(engine.load, str(b.get("model", "")))
-    return dict(ok=True, configured_model=VIEW_MODEL, **engine.state())
+    return dict(ok=True, configured_model=map_data.active_model, **engine.state())
 
 
 @app.post("/api/chat")
@@ -466,7 +476,7 @@ def classic():
 
 @app.get('/api/maps')
 def maps_status():
-    return dict(ok=True, available=map_data.available(), model=VIEW_MODEL, fix=map_data.download_command())
+    return dict(ok=True, available=map_data.available(), model=map_data.active_model, fix=map_data.download_command())
 
 
 @app.get('/data/{name:path}')
@@ -475,7 +485,7 @@ def map_file(name: str):
     path = (root / name).resolve()
     if not path.is_relative_to(root) or not path.is_file():
         raise Fail('map_missing', "Map isn't downloaded", map_data.download_command(), 404)
-    return FileResponse(path)
+    return FileResponse(path, headers={"Cache-Control": "no-store"})
 
 
 app.mount('/', StaticFiles(directory=os.path.join(ROOT, 'explorer-next', 'dist'), check_dir=False), name='explorer')
@@ -489,7 +499,8 @@ def main():
     ap.add_argument("--no-open", action="store_true")
     ap.add_argument("--no-model", action="store_true", help="serve maps and API without loading weights")
     a = ap.parse_args()
-    map_data.ensure_maps()
+    map_data.active_model = a.model
+    map_data.ensure_maps(a.model)
     if not a.no_model:
         print(f"loading {a.model}…", flush=True)
         engine.load(a.model)

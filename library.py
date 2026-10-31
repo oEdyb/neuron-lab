@@ -17,7 +17,6 @@ LIBRARY = ROOT / 'library.json'
 MAPS = ROOT / 'maps'
 from map_data import data_dir, download_command
 
-PUBLIC_MAP = data_dir()
 
 
 class LibraryError(Exception):
@@ -167,14 +166,16 @@ def read_layer(path, stamp):
 
 
 def map_layers(only=None):
-    root = MAPS / VIEW_MODEL.split('/')[-1] / 'view'
+    from map_data import active_model
+    public = data_dir()
+    root = MAPS / active_model.split('/')[-1] / 'view'
     manifest = root / 'manifest.json'
-    if not manifest.exists() and (PUBLIC_MAP / 'manifest.json').exists():
-        root, manifest = PUBLIC_MAP, PUBLIC_MAP / 'manifest.json'
+    if not manifest.exists() and (public / 'manifest.json').exists():
+        root, manifest = public, public / 'manifest.json'
     if not manifest.exists():
         raise LibraryError('map_missing', 'map data is missing', download_command(), 404)
     meta = json.loads(manifest.read_text())
-    if meta.get('model', VIEW_MODEL) != VIEW_MODEL:
+    if meta.get('model', active_model) != active_model:
         raise LibraryError('map_mismatch', 'map model does not match the configured view', 'run uv run python build_view.py', 409)
     for item in meta['layers']:
         if only is not None and item['layer'] != only:
@@ -206,6 +207,7 @@ def tokenizer(model):
 
 
 def neuron(layer, n):
+    from map_data import active_model
     for l, data in map_layers(layer):
         if l != layer:
             continue
@@ -213,11 +215,11 @@ def neuron(layer, n):
         if row is None:
             break
         frames = row.get('frame_words', [[], []])
-        path = MAPS / VIEW_MODEL.split('/')[-1] / f'L{layer}.npz'
+        path = MAPS / active_model.split('/')[-1] / f'L{layer}.npz'
         if path.exists():
             import numpy as np
             with np.load(path) as raw:
-                tok = tokenizer(VIEW_MODEL)
+                tok = tokenizer(active_model)
                 frames = [[[tok.decode([int(t)]) for t in sentence[:12]] for sentence in raw[f'{s}_frame_tok'][n]] for s in ('up', 'down')]
-        return dict(model=VIEW_MODEL, layer=layer, n=n, sentence_words_available=bool(frames[0] or frames[1]), signs=[dict(sign=s, words=row['up' if j == 0 else 'down'][:12], persona=(row.get('persona') or [[], []])[j][:12], sentences=[w[:12] for w in frames[j]], kl_ratio=row['kl'][j] / max(data['p95'][j], 1e-9)) for j, s in enumerate(('+', '-'))])
+        return dict(model=active_model, layer=layer, n=n, sentence_words_available=bool(frames[0] or frames[1]), signs=[dict(sign=s, words=row['up' if j == 0 else 'down'][:12], persona=(row.get('persona') or [[], []])[j][:12], sentences=[w[:12] for w in frames[j]], kl_ratio=row['kl'][j] / max(data['p95'][j], 1e-9)) for j, s in enumerate(('+', '-'))])
     raise LibraryError('neuron_not_found', 'neuron is outside the map', 'GET /api/top', 404)

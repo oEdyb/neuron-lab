@@ -11,12 +11,13 @@ from config import VIEW_MODEL, VIEW_GRID, VIEW_DOTS
 import map_data
 
 router = APIRouter()
-ROOT = Path(__file__).parent / 'maps' / VIEW_MODEL.split('/')[-1] / 'view'
+def view_root():
+    return Path(__file__).parent / 'maps' / map_data.active_model.split('/')[-1] / 'view'
 
 
 @lru_cache(maxsize=24)
-def layer_rows(layer, stamp):
-    path = ROOT / f'L{layer}.json'
+def layer_rows(layer, stamp, model):
+    path = view_root() / f'L{layer}.json'
     if not path.exists():
         path = map_data.data_dir() / f'L{layer}.json.gz'
     return json.loads(gzip.decompress(path.read_bytes()) if path.suffix == '.gz' else path.read_text())
@@ -28,17 +29,17 @@ def search(q: str = ''):
     if len(q) < 2:
         return {'rows': []}
     matches = []
-    manifest = ROOT / 'manifest.json'
+    manifest = view_root() / 'manifest.json'
     if not manifest.exists():
         manifest = map_data.data_dir() / 'manifest.json'
     if not manifest.exists():
         return {'rows': []}
     for item in json.loads(manifest.read_text())['layers']:
         layer = item['layer']
-        path = ROOT / f'L{layer}.json'
+        path = view_root() / f'L{layer}.json'
         if not path.exists():
             path = map_data.data_dir() / f'L{layer}.json.gz'
-        data = layer_rows(layer, path.stat().st_mtime_ns)
+        data = layer_rows(layer, path.stat().st_mtime_ns, map_data.active_model)
         for n, row in enumerate(data['rows']):
             if any(q in word.casefold() for word in row['up'] + row['down']):
                 score = max(row['kl'][i] / max(data['p95'][i], 1e-9) for i in range(2))
@@ -50,7 +51,7 @@ def search(q: str = ''):
 def data(name: str):
     if name != 'manifest.json' and not re.fullmatch(r'L\d+\.(bin|json)', name):
         raise HTTPException(404)
-    path = ROOT / name
+    path = view_root() / name
     if not path.exists():
         path = map_data.data_dir() / name
     if not path.exists() and name.endswith('.json') and name != 'manifest.json':

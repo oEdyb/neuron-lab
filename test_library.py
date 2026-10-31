@@ -17,7 +17,7 @@ def client(tmp_path, monkeypatch):
     root = tmp_path / 'maps/Qwen3.5-2B/view'
     root.mkdir(parents=True)
     monkeypatch.setattr(library, 'MAPS', tmp_path / 'maps')
-    monkeypatch.setattr(library, 'PUBLIC_MAP', tmp_path / 'public')
+    monkeypatch.setenv('NEURON_LAB_MAPS', str(tmp_path / 'public'))
     (root / 'manifest.json').write_text(json.dumps({'layers': [{'layer': 17}]}))
     (root / 'L17.json').write_text(json.dumps({'p95': [2, 4], 'rows': [
         {'up': ['Evil'] + ['word'] * 20, 'down': ['kind'], 'kl': [8, 4], 'persona': [['villain'], ['friend']], 'frame_words': [[['cruel']], [['nice']]]},

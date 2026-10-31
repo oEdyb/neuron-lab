@@ -1,5 +1,7 @@
+import argparse
 import gzip
 import json
+import time
 from pathlib import Path
 
 import numpy as np
@@ -11,14 +13,19 @@ from transformers import AutoTokenizer
 from config import VIEW_MODEL, VIEW_WORDS, VIEW_GRID, VIEW_DOTS
 
 
-def build():
-    root = Path(__file__).parent / 'maps' / VIEW_MODEL.split('/')[-1]
+def build(model=VIEW_MODEL, maps=Path(__file__).parent / "maps"):
+    root = Path(maps) / model.split('/')[-1]
     meta = json.loads((root / 'meta.json').read_text())
     out = root / 'view'
     out.mkdir(exist_ok=True)
-    tok = AutoTokenizer.from_pretrained(VIEW_MODEL, local_files_only=True)
-    snapshot = Path(snapshot_download(VIEW_MODEL, local_files_only=True))
-    index = json.loads((snapshot / 'model.safetensors.index.json').read_text())['weight_map']
+    tok = AutoTokenizer.from_pretrained(model)
+    snapshot = Path(snapshot_download(model))
+    index_path = snapshot / 'model.safetensors.index.json'
+    if index_path.exists():
+        index = json.loads(index_path.read_text())['weight_map']
+    else:
+        with safe_open(snapshot / 'model.safetensors', framework='pt') as f:
+            index = dict.fromkeys(f.keys(), 'model.safetensors')
     torch.set_num_threads(4)
     words = {}
 
@@ -31,11 +38,18 @@ def build():
             result.append(words[i])
         return result
 
-    layers = []
+    layers, summaries = [], []
     for layer in range(meta['layers']):
         source = root / f'L{layer}.npz'
-        if not source.exists():
-            continue
+        deadline = time.monotonic() + 45 * 60
+        while not source.exists():
+            if time.monotonic() >= deadline:
+                raise FileNotFoundError(source)
+            print(f'Waiting for {source}', flush=True)
+            time.sleep(120)
+            if str(maps).startswith('/cache'):
+                import modal
+                modal.Volume.from_name('neuron-lab-hf').reload()
         geometry, detail = out / f'L{layer}.bin', out / f'L{layer}.json'
         if not geometry.exists() or not detail.exists() or min(geometry.stat().st_mtime, detail.stat().st_mtime) < source.stat().st_mtime:
             a = np.load(source)
@@ -64,11 +78,18 @@ def build():
             compressed = path.with_suffix(path.suffix + '.gz')
             if not compressed.exists() or compressed.stat().st_mtime < path.stat().st_mtime:
                 compressed.write_bytes(gzip.compress(path.read_bytes(), compresslevel=6))
+        data = json.loads(detail.read_text())
+        order = sorted(range(len(data['rows'])), key=lambda n: -max(data['rows'][n]['kl'][j] / max(data['p95'][j], 1e-9) for j in range(2)))
+        summaries.append(dict(layer=layer, count=len(order), above=sum(max(row['kl'][j] / max(data['p95'][j], 1e-9) for j in range(2)) > 1.5 for row in data['rows']), top=[dict(n=n, **data['rows'][n]) for n in order[:12]]))
         layers.append({'layer': layer, 'count': geometry.stat().st_size // 12})
-    manifest = dict(model=VIEW_MODEL, layers=layers, total_layers=meta['layers'], neurons=meta['neurons'], dose=meta['dose'], grid=VIEW_GRID, dots=VIEW_DOTS, projection='PCA of down_proj columns, independently scaled per layer')
+    manifest = dict(model=model, summaries=summaries, layers=layers, total_layers=meta['layers'], neurons=meta['neurons'], dose=meta['dose'], grid=VIEW_GRID, dots=VIEW_DOTS, projection='PCA of down_proj columns, independently scaled per layer')
     (out / 'manifest.json').write_text(json.dumps(manifest))
     print(json.dumps(manifest))
 
 
 if __name__ == '__main__':
-    build()
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--model", default=VIEW_MODEL)
+    ap.add_argument("--maps", type=Path, default=Path(__file__).parent / "maps")
+    args = ap.parse_args()
+    build(args.model, args.maps)
