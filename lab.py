@@ -77,7 +77,10 @@ class Lab:
         self.zeros = None
         for i, layer in enumerate(self.layers):
             layer.mlp.down_proj.register_forward_pre_hook(self._grad_hook(i))
-            layer.mlp.down_proj.register_forward_hook(self._push_hook(i))
+            if self.is_gemma:
+                layer.post_feedforward_layernorm.register_forward_hook(self._push_hook(i))
+            else:
+                layer.mlp.down_proj.register_forward_hook(self._push_hook(i))
 
     def _grad_hook(self, i):
         def hook(mod, inp):
@@ -88,8 +91,19 @@ class Lab:
     def _push_hook(self, i):
         def hook(mod, inp, out):
             if i in self.pushes:
-                return out + self.pushes[i].to(out.dtype)
+                push = self._gemma_push(i, self.pushes[i]) if self.is_gemma else self.pushes[i]
+                return out + push.to(out.dtype)
         return hook
+
+    def _gemma_push(self, i, push):
+        # Gemma normalizes the MLP output before the residual add, which would cap a push made at
+        # down_proj. Add it after that norm instead: same length, the norm's per-channel weight
+        # applied, and divided by the layer scalar so the stream changes by dose * stream size.
+        layer = self.layers[i]
+        push = push.float()
+        weighted = push * layer.post_feedforward_layernorm.weight.float()
+        weighted = weighted * push.norm(dim=-1, keepdim=True) / weighted.norm(dim=-1, keepdim=True).clamp_min(1e-12)
+        return weighted / layer.layer_scalar.float()
 
     def chat_ids(self, messages):
         text = self.tok.apply_chat_template(messages, add_generation_prompt=True, enable_thinking=False, tokenize=False)

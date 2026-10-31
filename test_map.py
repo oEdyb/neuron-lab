@@ -53,8 +53,11 @@ class GemmaMapTests(unittest.TestCase):
             for n in (0, 1):
                 for name, sign in [('up', 1), ('down', -1)]:
                     vector = self.lab.push_vector(layer, self.lab.col(layer, n), sign * args.dose, self.norms)
-                    h = self.lab.layers[layer].mlp.down_proj.register_forward_hook(
-                        lambda m, inp, out: out + vector)
+                    layer_mod = self.lab.layers[layer]
+                    after_norm = vector * layer_mod.post_feedforward_layernorm.weight.float()
+                    after_norm = after_norm * vector.norm() / after_norm.norm() / layer_mod.layer_scalar.float()
+                    h = layer_mod.post_feedforward_layernorm.register_forward_hook(
+                        lambda m, inp, out: out + after_norm.to(out.dtype))
                     try:
                         ids, mask, pos = self.batch
                         with torch.inference_mode():

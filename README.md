@@ -50,6 +50,7 @@ h_\ell \leftarrow h_\ell + d \, s_\ell \, \frac{w_n}{\lVert w_n \rVert}
 - Same as raising the neuron's value by $`d \, s_\ell / \lVert w_n \rVert`$
 - Every layer after $`\ell`$ runs as normal on the changed stream
 - $`d`$ = 0.4 to 0.6: changed but readable. Past 0.8: mostly broken
+- Gemma normalizes each MLP output before adding it to the stream, so its change goes in right after that norm. Gemma needs about 0.8
 
 ## What it does
 

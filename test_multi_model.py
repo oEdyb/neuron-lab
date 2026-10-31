@@ -21,7 +21,7 @@ def test_switch_updates_map_routes_and_releases_previous_model(tmp_path, monkeyp
     previous = []
 
     class Lab:
-        def __init__(self, model):
+        def __init__(self, model, bf16=False):
             gc.collect()
             assert all(ref() is None for ref in previous)
             previous.append(weakref.ref(self))
