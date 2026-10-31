@@ -16,12 +16,20 @@ If you change a neuron too much the model basically gets lobotomized. It starts 
 
 ## Setup
 
+You need [Git](https://git-scm.com/downloads) and [uv](https://docs.astral.sh/uv/getting-started/installation/). uv installs the right Python for you.
+
 ```
 git clone https://github.com/oEdyb/neuron-lab && cd neuron-lab
 uv sync && uv run python server.py
 ```
 
 It opens in your browser and downloads the model and 2B map on first start. No Node installation is needed. For Wi-Fi access, add `--host 0.0.0.0`. Tested on a Mac and on Linux GPUs. Windows should work but hasn't been tried yet.
+
+What to expect on first start:
+
+- **Disk:** about 1–6 GB for Python packages (more on Linux with CUDA), 4.6 GB for the model, 150 MB for the map.
+- **Memory:** about 5 GB of free RAM on a Mac, or 5 GB of VRAM on an NVIDIA GPU. Close other heavy apps if chat feels slow.
+- **Time:** a few minutes for the first download. After that it starts in under a minute.
 
 ## Explore the map
 
