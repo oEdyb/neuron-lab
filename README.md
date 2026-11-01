@@ -1,6 +1,6 @@
 # neuron-lab
 
-Find single neurons in open-weight models that change how the model talks. Change them and chat with the result. Works with Qwen3.5 and Ministral 3 3B. The mapper also supports Gemma 4 E2B (text only).
+Find single neurons in open-weight models that change how the model talks. Change them and chat with the result. Works with Qwen3.5. Mapping and chat also support Ministral 3 3B (its first map is not published yet) and the mapper supports Gemma 4 E2B (text only).
 
 ![All 24 layers of Qwen3.5-2B, one dot per neuron](docs/tower.png)
 
@@ -96,7 +96,7 @@ Changes every neuron by $`\pm d`$ on 8 half-finished sentences (`"Who are you?" 
 
 Gemma 4 uses full forwards, FP32 and smaller batches to preserve its per-layer inputs and shared K/V. Its layer widths vary. See [Gemma mapping and local checks](docs/gemma4-mapping.md). Qwen keeps the existing fast path; `--full-forward` enables a strict direct-push alternative.
 
-Ministral uses the [official BF16 checkpoint](https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512-BF16) at a pinned revision, its native chat template and default system prompt, and only the text decoder. Its cached map preserves BF16 addition order at `down_proj`. See [the first map and verbatim steering results](docs/ministral3-3b-first-map.md). Set `NEURON_LAB_MODEL=mistralai/Ministral-3-3B-Instruct-2512` and `NEURON_LAB_MAPS` to its exported `view` folder to explore it locally.
+Ministral uses the [official BF16 checkpoint](https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512-BF16) at a pinned revision, its native chat template and default system prompt, and only the text decoder. Its cached map preserves BF16 addition order at `down_proj`. See [the first map and verbatim steering results](docs/ministral3-3b-first-map.md). The Ministral map is not published yet, so exploring it means building one first (about USD 19 of H100 time for the first map). Then set `NEURON_LAB_MODEL=mistralai/Ministral-3-3B-Instruct-2512` and `NEURON_LAB_MAPS` to its exported `view` folder. Only exact word search works for it; Meaning and Web need data that hasn't been built. The Hugging Face chat template leaves the date placeholders in Mistral's default system prompt unfilled, unlike Mistral's own runtime; see the report.
 
 ## Why the Qwen map is fast
 

@@ -86,7 +86,10 @@ def build():
         layers.append({'layer': layer, 'count': count})
         offset += count
     manifest = dict(model=VIEW_MODEL, layers=layers, total_layers=meta['layers'], neurons=meta['neurons'], dose=meta['dose'], grid=VIEW_GRID, dots=VIEW_DOTS, projection='PCA of down_proj columns, independently scaled per layer')
-    manifest.update(summaries=summaries, capabilities=dict(exact_search=True, semantic_search=False, connections=False))
+    semantic = all((out / name).is_file() for name in ('vector-words.json.gz', 'word-vectors.bin'))
+    connected = (out / 'connections' / 'manifest.json').is_file() and all(
+        (out / 'connections' / f"L{item['layer']}.bin").is_file() for item in layers)
+    manifest.update(summaries=summaries, capabilities=dict(exact_search=True, semantic_search=semantic, connections=connected))
     (out / 'signed-search.json.gz').write_bytes(gzip.compress(json.dumps(signed_index, ensure_ascii=False,
                                                             separators=(',', ':')).encode()))
     np.concatenate(signed_strength).astype('<f4').tofile(out / 'signed-strength.bin')

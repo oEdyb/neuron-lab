@@ -82,10 +82,14 @@ def search(lab, a):
         finally:
             lab.pushes = {}
 
-    g = torch.Generator().manual_seed(0)
+    # One generator per layer, so a layer's random controls don't depend on which other layers were searched.
     width = lab.layers[0].mlp.down_proj.out_features
-    null = {l: max(abs(push(l, torch.randn(width, generator=g).to(lab.dev), s)[0])
-                   for _ in range(a.controls) for s in (1, -1))
+
+    def controls(layer):
+        g = torch.Generator().manual_seed(layer)
+        return [torch.randn(width, generator=g) for _ in range(a.controls)]
+
+    null = {l: max(abs(push(l, d.to(lab.dev), s)[0]) for d in controls(l) for s in (1, -1))
             for l in sorted({l for l, _ in picks})}
 
     rows = []

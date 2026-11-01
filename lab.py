@@ -44,6 +44,14 @@ def map_delta(query, key, value, g, beta, reference, chunk_size=32, initial_stat
     return out.to(dtype, memory_format=torch.contiguous_format), None
 
 
+class LayerOutputs(dict):
+    """Per-layer outputs from one forward, plus the Mistral restart inputs from that same forward."""
+
+    def __init__(self):
+        super().__init__()
+        self.restart = {}
+
+
 class Lab:
     def __init__(self, model_id, bf16=False):
         self.model_id = model_id
@@ -145,16 +153,16 @@ class Lab:
         return torch.log_softmax(self.logits(h).float(), -1)
 
     def layer_outputs(self, ids, mask, pos):
-        outs = {}
-        self.restart_inputs = {}
+        outs = LayerOutputs()
+        restart = outs.restart
         hooks = [layer.register_forward_hook(lambda m, inp, out, i=i: outs.__setitem__(i, hidden(out).detach()))
                  for i, layer in enumerate(self.layers)]
         if self.is_mistral:
             for i, layer in enumerate(self.layers):
                 hooks.append(layer.post_attention_layernorm.register_forward_pre_hook(
-                    lambda m, inp, i=i: self.restart_inputs.__setitem__((i, 'residual'), inp[0].detach())))
+                    lambda m, inp, i=i: restart.__setitem__((i, 'residual'), inp[0].detach())))
                 hooks.append(layer.mlp.down_proj.register_forward_hook(
-                    lambda m, inp, out, i=i: self.restart_inputs.__setitem__((i, 'mlp'), out.detach())))
+                    lambda m, inp, out, i=i: restart.__setitem__((i, 'mlp'), out.detach())))
         try:
             with torch.inference_mode():
                 self.lm(input_ids=ids, attention_mask=mask, position_ids=pos, use_cache=False)
@@ -165,8 +173,8 @@ class Lab:
 
     def restart_output(self, layer, saved, push, repeats):
         if self.is_mistral:
-            residual = self.restart_inputs[layer, 'residual'].repeat(repeats, 1, 1)
-            mlp = self.restart_inputs[layer, 'mlp'].repeat(repeats, 1, 1)
+            residual = saved.restart[layer, 'residual'].repeat(repeats, 1, 1)
+            mlp = saved.restart[layer, 'mlp'].repeat(repeats, 1, 1)
             return residual + (mlp + push.to(mlp.dtype))
         return saved[layer].repeat(repeats, 1, 1) + push
 
