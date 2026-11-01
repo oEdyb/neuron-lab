@@ -38,10 +38,14 @@ def check():
                 subprocess.run(['uv','run','modal','app','stop','--yes',original],check=True)
                 print('L0 persisted; stopped original all-layer worker',flush=True)
     total=sum(r['upper_usd'] for r in rows)
-    report=dict(as_of=now.isoformat(),gpu_upper_usd=total,rates_per_second=RATES,apps=rows,
+    active=[r for r in rows if r['stopped_at'] is None]
+    reserve=max(.4,90*sum(RATES[r['gpu']] for r in active)+.1)
+    threshold=20-reserve
+    report=dict(as_of=now.isoformat(),gpu_upper_usd=total,stop_threshold_usd=threshold,
+                rates_per_second=RATES,apps=rows,
                 method='Entire app lifetime including queue, startup and shutdown; GPU-only upper bound, not invoice.')
     (OUT/'ministral3-spend.json').write_text(json.dumps(report,indent=2)+'\n')
-    if total>=19.2:
+    if active and total>=threshold:
         for row in rows:
             if row['stopped_at'] is None:
                 subprocess.run(['uv','run','modal','app','stop','--yes',row['app']],check=True)
@@ -50,7 +54,14 @@ def check():
 
 
 if __name__=='__main__':
-    import sys
+    import argparse
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--log-dir',type=Path,default=OUT)
+    parser.add_argument('--once',action='store_true')
+    parser.add_argument('--stop-map-after-l0',action='store_true')
+    args=parser.parse_args()
+    OUT=args.log_dir
+    OUT.mkdir(parents=True,exist_ok=True)
     while True:
         report=check()
         print(f"GPU upper bound ${report['gpu_upper_usd']:.3f}",flush=True)

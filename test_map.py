@@ -27,7 +27,7 @@ class GemmaMapTests(unittest.TestCase):
             layer_types=['sliding_attention', 'full_attention'] * 2))
         model = Gemma4ForConditionalGeneration(config).eval()
         with patch('lab.AutoConfig.from_pretrained', return_value=config), \
-             patch('lab.AutoTokenizer.from_pretrained', return_value=SimpleNamespace(pad_token_id=0, decode=lambda ids, **kwargs: " ".join(map(str, ids)))), \
+             patch('lab.AutoTokenizer.from_pretrained', return_value=SimpleNamespace(pad_token_id=0, decode=lambda ids: str(ids[0]))), \
              patch('lab.Gemma4ForConditionalGeneration.from_pretrained', return_value=model), \
              patch('lab.device', return_value='cpu'):
             cls.lab = Lab('tiny-gemma')

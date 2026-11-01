@@ -8,6 +8,7 @@ from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import torch
+import numpy as np
 from config import MINISTRAL, FRAMES
 from lab import Lab, generate_compare, steer_vectors
 from find import search
@@ -47,6 +48,36 @@ def benchmark(lab, out):
             report['timings'].append(row)
             print('TIMING',json.dumps(row),flush=True)
     out.write_text(json.dumps(report,indent=2)+'\n')
+
+
+def validate(lab, out):
+    from check_map import plain
+    batch=lab.batch(frame_ids(lab,FRAMES))
+    saved=lab.layer_outputs(*batch)
+    norms={i:h[batch[1].bool()].float().norm(dim=-1).median().item() for i,h in saved.items()}
+    with torch.inference_mode():
+        base=lab.last_logprobs(*batch)
+    rows=[]
+    for layer in (0,13,25):
+        sources=list(Path('/cache').glob(f'maps-ministral3*/{MINISTRAL.split("/")[-1]}/L{layer}.npz'))
+        if len(sources)!=1:
+            raise ValueError(f'Expected one completed L{layer}, found {sources}')
+        raw=np.load(sources[0])
+        for n in (0,7,9215):
+            for name,sign in [('up',1),('down',-1)]:
+                vector=lab.push_vector(layer,lab.col(layer,n),sign*.6,norms)
+                lp=plain(lab,batch,layer,vector)
+                delta=lp-base
+                top=delta.mean(0).topk(24).indices.cpu().numpy()
+                expected=(lp.exp()*delta).sum(-1).mean().item()
+                row=dict(layer=layer,n=n,sign=sign,kl=float(raw[f'{name}_kl'][n]),reference_kl=expected,
+                         top24_equal=bool(np.array_equal(top,raw[f'{name}_tok'][n])),
+                         top24_overlap=len(set(top)&set(raw[f'{name}_tok'][n]))/24,
+                         frame_top5_equal=bool(np.array_equal(delta.topk(5).indices.cpu().numpy(),raw[f'{name}_frame_tok'][n])))
+                row['kl_relative']=abs(row['kl']-expected)/max(abs(expected),1e-9)
+                rows.append(row)
+                print('VALIDATE',json.dumps(row),flush=True)
+    out.write_text(json.dumps(dict(rows=rows),indent=2)+'\n')
 
 
 TRAITS = ['hostile', 'pirate', 'french', 'confident', 'poetic']
@@ -116,7 +147,7 @@ def steering(lab, out, source, traits=None):
 
 if __name__ == '__main__':
     ap=argparse.ArgumentParser()
-    ap.add_argument('--stage',choices=['benchmark','find','steer'],default='benchmark')
+    ap.add_argument('--stage',choices=['benchmark','find','steer','validate'],default='benchmark')
     ap.add_argument('--out',default='out/ministral3-benchmark.json')
     ap.add_argument('--layers')
     ap.add_argument('--traits')
@@ -128,6 +159,8 @@ if __name__ == '__main__':
     lab=Lab(MINISTRAL,True)
     if args.stage=='benchmark':
         benchmark(lab,out)
+    elif args.stage=='validate':
+        validate(lab,out)
     elif args.stage=='find':
         find_traits(lab,out,args.layers)
     else:

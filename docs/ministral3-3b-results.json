@@ -1,0 +1,4552 @@
+{
+  "model": {
+    "model": "mistralai/Ministral-3-3B-Instruct-2512",
+    "frames": [
+      [
+        "Who are you?",
+        "I am a"
+      ],
+      [
+        "How do you feel right now?",
+        "I feel"
+      ],
+      [
+        "What do you think of me?",
+        "You are"
+      ],
+      [
+        "What is the world like?",
+        "The world is"
+      ],
+      [
+        "What do you love most?",
+        "My favorite thing is"
+      ],
+      [
+        "Tell me about yourself.",
+        ""
+      ],
+      [
+        null,
+        "I think the most important thing to remember is"
+      ],
+      [
+        null,
+        "Today we are going to talk about"
+      ]
+    ],
+    "dose": 0.6,
+    "k": 24,
+    "controls": 64,
+    "norms": {
+      "0": 1.6316882371902466,
+      "1": 2.524474620819092,
+      "2": 3.0274457931518555,
+      "3": 3.664118528366089,
+      "4": 4.278868675231934,
+      "5": 5.001763820648193,
+      "6": 5.235480785369873,
+      "7": 5.393373966217041,
+      "8": 5.484830379486084,
+      "9": 5.561685085296631,
+      "10": 5.528908729553223,
+      "11": 5.53570032119751,
+      "12": 5.793109893798828,
+      "13": 5.713940620422363,
+      "14": 5.8580145835876465,
+      "15": 6.090001106262207,
+      "16": 6.367546558380127,
+      "17": 6.552455902099609,
+      "18": 7.281080722808838,
+      "19": 7.9231085777282715,
+      "20": 9.460140228271484,
+      "21": 11.041825294494629,
+      "22": 12.902427673339844,
+      "23": 15.655818939208984,
+      "24": 18.954452514648438,
+      "25": 24.619068145751953
+    },
+    "layers": 26,
+    "neurons": 9216,
+    "weights": "mistralai/Ministral-3-3B-Instruct-2512-BF16",
+    "revision": "b6d637bef2393152b3da2b2fde72eecdee30557e",
+    "dtype": "torch.bfloat16",
+    "forward": "cached",
+    "system_prompt": "tokenizer default",
+    "tokenizer_regex": "corrected",
+    "intervention": "down_proj before residual",
+    "per_batch": 8
+  },
+  "stats": [
+    {
+      "layer": 0,
+      "neurons": 9216,
+      "sha256": "c9e0d757906ed0face9b7313992ead36dddca607d30e6c63208b2a6b34c4b6b9",
+      "up_p95": 0.5414306640625,
+      "up_above_fraction": 0.4069010416666667,
+      "down_p95": 0.6106201171875,
+      "down_above_fraction": 0.3406032986111111
+    },
+    {
+      "layer": 1,
+      "neurons": 9216,
+      "sha256": "de97ec927522f2a3dabc188fb65e34f24a8acf76c1004ad5cffe6a110f5e02a2",
+      "up_p95": 0.796240234375,
+      "up_above_fraction": 0.3668619791666667,
+      "down_p95": 0.8537353515624999,
+      "down_above_fraction": 0.3315972222222222
+    },
+    {
+      "layer": 2,
+      "neurons": 9216,
+      "sha256": "e5f91275d2cfdf058fb299c79ee30e30a32e0efbc48bbf8a19c1b6cc11f4c944",
+      "up_p95": 0.7842529296874995,
+      "up_above_fraction": 0.3552517361111111,
+      "down_p95": 0.6920654296874997,
+      "down_above_fraction": 0.4013671875
+    },
+    {
+      "layer": 3,
+      "neurons": 9216,
+      "sha256": "95908a5ac5235f6b3264da07254bd9f80142ce99652618c52576fe19816fc1f2",
+      "up_p95": 0.6755615234374999,
+      "up_above_fraction": 0.4381510416666667,
+      "down_p95": 0.7252929687499998,
+      "down_above_fraction": 0.3924696180555556
+    },
+    {
+      "layer": 4,
+      "neurons": 9216,
+      "sha256": "a23840a9ad7e4c108fc863ea90ca776bb0a261af0403f3035ce182d3c0cbf552",
+      "up_p95": 0.9436279296874999,
+      "up_above_fraction": 0.3994140625,
+      "down_p95": 0.9623779296874999,
+      "down_above_fraction": 0.3973524305555556
+    },
+    {
+      "layer": 5,
+      "neurons": 9216,
+      "sha256": "282d1b9c76ee0e046ca028d23dea905cc31d8da673065e85edac4e8faaa917f8",
+      "up_p95": 1.0161132812499998,
+      "up_above_fraction": 0.4060329861111111,
+      "down_p95": 0.9174804687499998,
+      "down_above_fraction": 0.4519314236111111
+    },
+    {
+      "layer": 6,
+      "neurons": 9216,
+      "sha256": "8cd2b928426f93f0dc2021a727c6f4145dd715cbe4182d3a2960db26c6dba69a",
+      "up_p95": 0.7653076171874996,
+      "up_above_fraction": 0.3233506944444444,
+      "down_p95": 0.7891113281249996,
+      "down_above_fraction": 0.2992621527777778
+    },
+    {
+      "layer": 7,
+      "neurons": 9216,
+      "sha256": "de9939518d7e59c66d6f96562c25aecb44d2fbe3a78bb7b1cd257cb4d1aa3a90",
+      "up_p95": 0.8490478515625,
+      "up_above_fraction": 0.24403211805555555,
+      "down_p95": 0.909326171875,
+      "down_above_fraction": 0.21842447916666666
+    },
+    {
+      "layer": 8,
+      "neurons": 9216,
+      "sha256": "42e4ad8196ae52523c61cf09c4600474130bb9ac2a74790b30f1fe0c41f5a03e",
+      "up_p95": 1.0746582031249998,
+      "up_above_fraction": 0.2052951388888889,
+      "down_p95": 0.9081298828124997,
+      "down_above_fraction": 0.3040364583333333
+    },
+    {
+      "layer": 9,
+      "neurons": 9216,
+      "sha256": "46f30ffd64fae0bbb02c2de157d1a2774d02192738eff33cd2f70d51ae0b012f",
+      "up_p95": 0.81298828125,
+      "up_above_fraction": 0.3190104166666667,
+      "down_p95": 0.9728515624999998,
+      "down_above_fraction": 0.2163628472222222
+    },
+    {
+      "layer": 10,
+      "neurons": 9216,
+      "sha256": "f81007f72c36291945c1cbd1522c4cd2414f9524741a7d8f554e66d2ef8d42e1",
+      "up_p95": 0.9637939453124997,
+      "up_above_fraction": 0.2537977430555556,
+      "down_p95": 0.9378173828124999,
+      "down_above_fraction": 0.2738715277777778
+    },
+    {
+      "layer": 11,
+      "neurons": 9216,
+      "sha256": "7a4f6d88c2f7e9efa9bd2099942b86d37ff9848e4e5b83847b1e4541cd7f8659",
+      "up_p95": 0.9396484374999999,
+      "up_above_fraction": 0.333984375,
+      "down_p95": 0.9682861328124995,
+      "down_above_fraction": 0.306640625
+    },
+    {
+      "layer": 12,
+      "neurons": 9216,
+      "sha256": "d9b188136fd11ff2f20f531d9040e8a15a5634417621f848976ebf3c512e3a49",
+      "up_p95": 1.3638183593749995,
+      "up_above_fraction": 0.2885199652777778,
+      "down_p95": 1.410498046875,
+      "down_above_fraction": 0.2645399305555556
+    },
+    {
+      "layer": 13,
+      "neurons": 9216,
+      "sha256": "c9bbebee9848d99f086023e3b794848344774be6e075ed14609d54ae9e7aafb9",
+      "up_p95": 1.17060546875,
+      "up_above_fraction": 0.2872178819444444,
+      "down_p95": 1.210302734375,
+      "down_above_fraction": 0.2726779513888889
+    },
+    {
+      "layer": 14,
+      "neurons": 9216,
+      "sha256": "9cbdc4006c5477ca8e3e909b0073fec3e217c05c9a2ec41e2eb115233d80a931",
+      "up_p95": 1.2115234375,
+      "up_above_fraction": 0.2506510416666667,
+      "down_p95": 1.2700683593749988,
+      "down_above_fraction": 0.2416449652777778
+    },
+    {
+      "layer": 15,
+      "neurons": 9216,
+      "sha256": "2550b5abd1008413f25287570d7bbb4837cc2a2ab7872f754d19d65a90529646",
+      "up_p95": 1.0387207031249999,
+      "up_above_fraction": 0.1828342013888889,
+      "down_p95": 1.106787109375,
+      "down_above_fraction": 0.15625
+    },
+    {
+      "layer": 16,
+      "neurons": 9216,
+      "sha256": "afcd14b205d9a205b0df51670bb4964514a2fe4d006be4a0dd2b5f41e3eca6b3",
+      "up_p95": 0.7820556640624999,
+      "up_above_fraction": 0.18077256944444445,
+      "down_p95": 0.8090087890624998,
+      "down_above_fraction": 0.17176649305555555
+    },
+    {
+      "layer": 17,
+      "neurons": 9216,
+      "sha256": "ffca2bc57536ffedcc7f5db61fd7719f167b457dab29da91136e42e089ea2634",
+      "up_p95": 0.5826171874999999,
+      "up_above_fraction": 0.2048611111111111,
+      "down_p95": 0.6481445312499998,
+      "down_above_fraction": 0.1567925347222222
+    },
+    {
+      "layer": 18,
+      "neurons": 9216,
+      "sha256": "73e94083a3f1a9845462e36366c698626954cf1aa38ba0894a2e5cdf21c5e22a",
+      "up_p95": 0.742041015625,
+      "up_above_fraction": 0.12630208333333334,
+      "down_p95": 0.5790771484374999,
+      "down_above_fraction": 0.2136501736111111
+    },
+    {
+      "layer": 19,
+      "neurons": 9216,
+      "sha256": "435a7752aab73cd8221610626af39228225a93028646f9e02933622e93f137f2",
+      "up_p95": 0.6454833984374999,
+      "up_above_fraction": 0.21788194444444445,
+      "down_p95": 0.527880859375,
+      "down_above_fraction": 0.2922092013888889
+    },
+    {
+      "layer": 20,
+      "neurons": 9216,
+      "sha256": "db6376ac68f6f44e487c427e32c116476b9c6bb2e079e8e3bbe6bbf0a1440245",
+      "up_p95": 0.43277587890624997,
+      "up_above_fraction": 0.3021918402777778,
+      "down_p95": 0.4726806640624999,
+      "down_above_fraction": 0.2745225694444444
+    },
+    {
+      "layer": 21,
+      "neurons": 9216,
+      "sha256": "4042586cbbef949c016c4ff9b00d309af179e6c33bfa41c4b2b858c0b11b2092",
+      "up_p95": 0.4371215820312499,
+      "up_above_fraction": 0.296875,
+      "down_p95": 0.38337402343749993,
+      "down_above_fraction": 0.3279079861111111
+    },
+    {
+      "layer": 22,
+      "neurons": 9216,
+      "sha256": "0abb45a822ac5d81ef6444672b981aabdd678a1de361eaa19ff9108faa4da069",
+      "up_p95": 0.35230712890624993,
+      "up_above_fraction": 0.3267144097222222,
+      "down_p95": 0.316259765625,
+      "down_above_fraction": 0.3505859375
+    },
+    {
+      "layer": 23,
+      "neurons": 9216,
+      "sha256": "a53ea4fcabc344ec69607495d7070bb5d4ac327b10269f60055bf87322f6709a",
+      "up_p95": 0.26645507812499997,
+      "up_above_fraction": 0.3326822916666667,
+      "down_p95": 0.26739501953124994,
+      "down_above_fraction": 0.3294270833333333
+    },
+    {
+      "layer": 24,
+      "neurons": 9216,
+      "sha256": "d90fd68a6683a45d14af8cacf63010548f3245d8c2c49d488725d54f153a94f4",
+      "up_p95": 0.3404296874999997,
+      "up_above_fraction": 0.2709418402777778,
+      "down_p95": 0.33684082031249996,
+      "down_above_fraction": 0.2696397569444444
+    },
+    {
+      "layer": 25,
+      "neurons": 9216,
+      "sha256": "9dfaf83d0505490a79548f5659e4d2dce5c53e43dfcf45b0b8a1256725b38239",
+      "up_p95": 0.29801025390624997,
+      "up_above_fraction": 0.3935546875,
+      "down_p95": 0.31195068359374994,
+      "down_above_fraction": 0.3905164930555556
+    }
+  ],
+  "benchmark": {
+    "gpu": "NVIDIA H100 80GB HBM3",
+    "dtype": "torch.bfloat16",
+    "sequence_length": 536,
+    "weights": "mistralai/Ministral-3-3B-Instruct-2512-BF16",
+    "revision": "b6d637bef2393152b3da2b2fde72eecdee30557e",
+    "tied": true,
+    "checks": [
+      {
+        "layer": 0,
+        "max_logprob_error": 0.0,
+        "kl": 1.2293977737426758,
+        "reference_kl": 1.2293977737426758,
+        "top24_overlap": 1.0
+      },
+      {
+        "layer": 13,
+        "max_logprob_error": 0.0,
+        "kl": 0.705163300037384,
+        "reference_kl": 0.705163300037384,
+        "top24_overlap": 1.0
+      },
+      {
+        "layer": 25,
+        "max_logprob_error": 0.0,
+        "kl": 0.12123501300811768,
+        "reference_kl": 0.12123501300811768,
+        "top24_overlap": 1.0
+      }
+    ],
+    "timings": [
+      {
+        "layer": 0,
+        "per_batch": 2,
+        "seconds": 4.344792608999999,
+        "neurons": 32,
+        "peak_gib": 9.90146255493164
+      },
+      {
+        "layer": 0,
+        "per_batch": 8,
+        "seconds": 4.096917203000004,
+        "neurons": 32,
+        "peak_gib": 14.20542049407959
+      },
+      {
+        "layer": 0,
+        "per_batch": 16,
+        "seconds": 4.072136958999998,
+        "neurons": 32,
+        "peak_gib": 19.926374435424805
+      },
+      {
+        "layer": 0,
+        "per_batch": 32,
+        "seconds": 4.1046656559999946,
+        "neurons": 32,
+        "peak_gib": 30.87455701828003
+      },
+      {
+        "layer": 13,
+        "per_batch": 2,
+        "seconds": 2.0291130589999966,
+        "neurons": 32,
+        "peak_gib": 30.87455701828003
+      },
+      {
+        "layer": 13,
+        "per_batch": 8,
+        "seconds": 1.9628593159999994,
+        "neurons": 32,
+        "peak_gib": 30.87455701828003
+      },
+      {
+        "layer": 13,
+        "per_batch": 16,
+        "seconds": 1.9665628420000019,
+        "neurons": 32,
+        "peak_gib": 30.87455701828003
+      },
+      {
+        "layer": 13,
+        "per_batch": 32,
+        "seconds": 1.9742148260000008,
+        "neurons": 32,
+        "peak_gib": 30.87455701828003
+      },
+      {
+        "layer": 25,
+        "per_batch": 2,
+        "seconds": 0.05167169799999982,
+        "neurons": 32,
+        "peak_gib": 30.87455701828003
+      },
+      {
+        "layer": 25,
+        "per_batch": 8,
+        "seconds": 0.03179494799999816,
+        "neurons": 32,
+        "peak_gib": 30.87455701828003
+      },
+      {
+        "layer": 25,
+        "per_batch": 16,
+        "seconds": 0.03005736899999789,
+        "neurons": 32,
+        "peak_gib": 30.87455701828003
+      },
+      {
+        "layer": 25,
+        "per_batch": 32,
+        "seconds": 0.028804927000003033,
+        "neurons": 32,
+        "peak_gib": 30.87455701828003
+      }
+    ]
+  },
+  "rejected_cache_benchmark": {
+    "gpu": "NVIDIA H100 80GB HBM3",
+    "dtype": "torch.bfloat16",
+    "sequence_length": 536,
+    "weights": "mistralai/Ministral-3-3B-Instruct-2512-BF16",
+    "revision": "b6d637bef2393152b3da2b2fde72eecdee30557e",
+    "tied": true,
+    "checks": [
+      {
+        "layer": 0,
+        "max_logprob_error": 0.24963092803955078,
+        "kl": 1.2037880420684814,
+        "reference_kl": 1.2293977737426758,
+        "top24_overlap": 0.9583333333333334
+      },
+      {
+        "layer": 13,
+        "max_logprob_error": 0.2595953941345215,
+        "kl": 0.7078766226768494,
+        "reference_kl": 0.705163300037384,
+        "top24_overlap": 0.9583333333333334
+      },
+      {
+        "layer": 25,
+        "max_logprob_error": 0.06430625915527344,
+        "kl": 0.12107980251312256,
+        "reference_kl": 0.12123501300811768,
+        "top24_overlap": 0.9583333333333334
+      }
+    ],
+    "timings": [
+      {
+        "layer": 0,
+        "seconds": 2.148860029000005,
+        "neurons": 16,
+        "peak_gib": 8.71646499633789
+      },
+      {
+        "layer": 13,
+        "seconds": 0.9906357069999956,
+        "neurons": 16,
+        "peak_gib": 8.71646499633789
+      },
+      {
+        "layer": 25,
+        "seconds": 0.02454595600000431,
+        "neurons": 16,
+        "peak_gib": 8.71646499633789
+      }
+    ]
+  },
+  "validation": {
+    "rows": [
+      {
+        "layer": 0,
+        "n": 0,
+        "sign": 1,
+        "kl": 4.4453125,
+        "reference_kl": 4.443458557128906,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 0.0004172296978261131
+      },
+      {
+        "layer": 0,
+        "n": 0,
+        "sign": -1,
+        "kl": 0.345703125,
+        "reference_kl": 0.3455981910228729,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 0.00030362999533215234
+      },
+      {
+        "layer": 0,
+        "n": 7,
+        "sign": 1,
+        "kl": 4.265625,
+        "reference_kl": 4.266046524047852,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 9.880906020959146e-05
+      },
+      {
+        "layer": 0,
+        "n": 7,
+        "sign": -1,
+        "kl": 1.1865234375,
+        "reference_kl": 1.1868770122528076,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 0.00029790344674087
+      },
+      {
+        "layer": 0,
+        "n": 9215,
+        "sign": 1,
+        "kl": 1.6748046875,
+        "reference_kl": 1.6746783256530762,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 7.545439920502384e-05
+      },
+      {
+        "layer": 0,
+        "n": 9215,
+        "sign": -1,
+        "kl": 0.93310546875,
+        "reference_kl": 0.9332926273345947,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 0.00020053580100513142
+      },
+      {
+        "layer": 13,
+        "n": 0,
+        "sign": 1,
+        "kl": 5.875,
+        "reference_kl": 5.874174118041992,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 0.00014059541671929525
+      },
+      {
+        "layer": 13,
+        "n": 0,
+        "sign": -1,
+        "kl": 1.244140625,
+        "reference_kl": 1.2440911531448364,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 3.976545853454416e-05
+      },
+      {
+        "layer": 13,
+        "n": 7,
+        "sign": 1,
+        "kl": 2.546875,
+        "reference_kl": 2.547476291656494,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 0.00023603425023561308
+      },
+      {
+        "layer": 13,
+        "n": 7,
+        "sign": -1,
+        "kl": 0.72998046875,
+        "reference_kl": 0.7297722101211548,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 0.00028537484156959106
+      },
+      {
+        "layer": 13,
+        "n": 9215,
+        "sign": 1,
+        "kl": 1.0712890625,
+        "reference_kl": 1.0708101987838745,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 0.00044719756747679156
+      },
+      {
+        "layer": 13,
+        "n": 9215,
+        "sign": -1,
+        "kl": 1.1591796875,
+        "reference_kl": 1.1590415239334106,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 0.00011920501874727765
+      },
+      {
+        "layer": 25,
+        "n": 0,
+        "sign": 1,
+        "kl": 0.07012939453125,
+        "reference_kl": 0.0701293870806694,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 1.0624049213995655e-07
+      },
+      {
+        "layer": 25,
+        "n": 0,
+        "sign": -1,
+        "kl": 0.09564208984375,
+        "reference_kl": 0.09561555087566376,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 0.0002775591192352522
+      },
+      {
+        "layer": 25,
+        "n": 7,
+        "sign": 1,
+        "kl": 12.3515625,
+        "reference_kl": 12.348114013671875,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 0.00027927231027400815
+      },
+      {
+        "layer": 25,
+        "n": 7,
+        "sign": -1,
+        "kl": 0.080810546875,
+        "reference_kl": 0.08080639690160751,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 5.135699092659353e-05
+      },
+      {
+        "layer": 25,
+        "n": 9215,
+        "sign": 1,
+        "kl": 0.1468505859375,
+        "reference_kl": 0.14679890871047974,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 0.0003520273241416441
+      },
+      {
+        "layer": 25,
+        "n": 9215,
+        "sign": -1,
+        "kl": 0.1197509765625,
+        "reference_kl": 0.11973142623901367,
+        "top24_equal": true,
+        "top24_overlap": 1.0,
+        "frame_top5_equal": true,
+        "kl_relative": 0.00016328481252115732
+      }
+    ]
+  },
+  "spend": {
+    "as_of": "2026-11-01T23:26:20.543926+00:00",
+    "gpu_upper_usd": 18.638084000000003,
+    "stop_threshold_usd": 19.6,
+    "rates_per_second": {
+      "H100": 0.001097,
+      "B200": 0.001736
+    },
+    "apps": [
+      {
+        "app": "ap-yd4fTSmy7y9TVh88idDykX",
+        "gpu": "H100",
+        "created_at": "2026-11-02 00:19:29+01:00",
+        "stopped_at": "2026-11-02 00:20:01+01:00",
+        "seconds": 32.0,
+        "upper_usd": 0.035104
+      },
+      {
+        "app": "ap-ZfNHuOlZ5KsRLM0YUMCf1o",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:57:35+01:00",
+        "stopped_at": "2026-11-01 23:59:26+01:00",
+        "seconds": 111.0,
+        "upper_usd": 0.12176700000000001
+      },
+      {
+        "app": "ap-8oqDT4nbpbafaHzdjdC6CM",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:48:10+01:00",
+        "stopped_at": "2026-11-02 00:25:19+01:00",
+        "seconds": 2229.0,
+        "upper_usd": 2.4452130000000003
+      },
+      {
+        "app": "ap-7vsp8ekMY7m6oj7A6sCCXA",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:48:10+01:00",
+        "stopped_at": "2026-11-02 00:22:35+01:00",
+        "seconds": 2065.0,
+        "upper_usd": 2.265305
+      },
+      {
+        "app": "ap-2gQJnjhXTRQCZtCfVVbEA2",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:48:10+01:00",
+        "stopped_at": "2026-11-02 00:19:25+01:00",
+        "seconds": 1875.0,
+        "upper_usd": 2.0568750000000002
+      },
+      {
+        "app": "ap-UQPZU4Dj0ZHwsVB0HPGDLA",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:48:10+01:00",
+        "stopped_at": "2026-11-02 00:19:08+01:00",
+        "seconds": 1858.0,
+        "upper_usd": 2.0382260000000003
+      },
+      {
+        "app": "ap-eMwCWy97VyscWOlTtSjOyO",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:48:10+01:00",
+        "stopped_at": "2026-11-02 00:17:07+01:00",
+        "seconds": 1737.0,
+        "upper_usd": 1.9054890000000002
+      },
+      {
+        "app": "ap-DvEZZRKBlKGr4YbTQDs18S",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:48:10+01:00",
+        "stopped_at": "2026-11-02 00:12:59+01:00",
+        "seconds": 1489.0,
+        "upper_usd": 1.6334330000000001
+      },
+      {
+        "app": "ap-0a542eR4MpCkjT79xYg93r",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:48:10+01:00",
+        "stopped_at": "2026-11-02 00:12:23+01:00",
+        "seconds": 1453.0,
+        "upper_usd": 1.593941
+      },
+      {
+        "app": "ap-kd4RP8TwWLFfRaPVdIvAfd",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:48:10+01:00",
+        "stopped_at": "2026-11-02 00:09:11+01:00",
+        "seconds": 1261.0,
+        "upper_usd": 1.3833170000000001
+      },
+      {
+        "app": "ap-sd0D8l8fiMSrYgD2iCTrzC",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:48:10+01:00",
+        "stopped_at": "2026-11-01 23:58:01+01:00",
+        "seconds": 591.0,
+        "upper_usd": 0.6483270000000001
+      },
+      {
+        "app": "ap-iybpHs4AngnhW4GFPiJHFS",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:46:02+01:00",
+        "stopped_at": "2026-11-01 23:47:48+01:00",
+        "seconds": 106.0,
+        "upper_usd": 0.11628200000000001
+      },
+      {
+        "app": "ap-zoyohD43TQFBcpnfbf1Svp",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:44:49+01:00",
+        "stopped_at": "2026-11-01 23:46:15+01:00",
+        "seconds": 86.0,
+        "upper_usd": 0.09434200000000001
+      },
+      {
+        "app": "ap-ISrdMwjBb9nEfkOxZBoYk1",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:43:09+01:00",
+        "stopped_at": "2026-11-01 23:44:46+01:00",
+        "seconds": 97.0,
+        "upper_usd": 0.106409
+      },
+      {
+        "app": "ap-SEB8oAkcWkhhsJWXkLJ1Ma",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:43:06+01:00",
+        "stopped_at": "2026-11-02 00:03:24+01:00",
+        "seconds": 1218.0,
+        "upper_usd": 1.336146
+      },
+      {
+        "app": "ap-CxOwrWEATgMbqymSVsAo8j",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:40:59+01:00",
+        "stopped_at": "2026-11-01 23:42:30+01:00",
+        "seconds": 91.0,
+        "upper_usd": 0.09982700000000001
+      },
+      {
+        "app": "ap-k1k1lWPcFI7kwIxoRgn1c3",
+        "gpu": "B200",
+        "created_at": "2026-11-01 23:40:31+01:00",
+        "stopped_at": "2026-11-01 23:46:11+01:00",
+        "seconds": 340.0,
+        "upper_usd": 0.59024
+      },
+      {
+        "app": "ap-uw6JM7m38sOO9p0ZxV5N9g",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:39:14+01:00",
+        "stopped_at": "2026-11-01 23:40:12+01:00",
+        "seconds": 58.0,
+        "upper_usd": 0.063626
+      },
+      {
+        "app": "ap-Co9DnUk9sxeR09sdMWi3YY",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:37:23+01:00",
+        "stopped_at": "2026-11-01 23:38:31+01:00",
+        "seconds": 68.0,
+        "upper_usd": 0.07459600000000001
+      },
+      {
+        "app": "ap-g2uVb5zMuoh543LNyZEEF3",
+        "gpu": "H100",
+        "created_at": "2026-11-01 23:36:39+01:00",
+        "stopped_at": "2026-11-01 23:37:06+01:00",
+        "seconds": 27.0,
+        "upper_usd": 0.029619000000000003
+      }
+    ],
+    "method": "Entire app lifetime including queue, startup and shutdown; GPU-only upper bound, not invoice."
+  },
+  "explorer": {
+    "model": "mistralai/Ministral-3-3B-Instruct-2512",
+    "layers": 26,
+    "neurons": 239616,
+    "exact_word": "une",
+    "exact_results": 12,
+    "selected": {
+      "layer": 16,
+      "n": 2922
+    },
+    "sentence_words": true,
+    "page_errors": [],
+    "stats": {
+      "layers": 26,
+      "points": 239616,
+      "focused": 16,
+      "selected": {
+        "layer": 16,
+        "n": 2922
+      },
+      "flying": false,
+      "camera": [
+        0,
+        33.31478260869566,
+        0.0010000001970609392
+      ],
+      "calls": 53,
+      "marker": {
+        "point": {
+          "x": 326.01484720980307,
+          "y": 563.0782182715716,
+          "z": 0.9968922320806298
+        },
+        "position": [
+          -0.4057634770870209,
+          3.0799999237060547,
+          2.2670705930962813
+        ],
+        "radius": 0.2153510844172713
+      }
+    },
+    "verified": [
+      "26-layer Tower geometry loaded",
+      "Exact search",
+      "neuron inspection",
+      "per-sentence words API",
+      "model-unloaded map serving"
+    ],
+    "not_checked": [
+      "semantic search",
+      "Web connections",
+      "local GPU generation"
+    ]
+  },
+  "find_all_layers": {
+    "model": "mistralai/Ministral-3-3B-Instruct-2512",
+    "weights": "mistralai/Ministral-3-3B-Instruct-2512-BF16",
+    "revision": "b6d637bef2393152b3da2b2fde72eecdee30557e",
+    "gpu": "NVIDIA H100 80GB HBM3",
+    "torch": "2.14.1+cu130",
+    "traits": {
+      "hostile": {
+        "model": "mistralai/Ministral-3-3B-Instruct-2512",
+        "pairs": [
+          [
+            "I hate you.",
+            "I like you."
+          ]
+        ],
+        "words": null,
+        "layers": null,
+        "dose": 0.6,
+        "base": -0.8551926612854004,
+        "rows": [
+          {
+            "layer": 25,
+            "n": 1165,
+            "sign": -1,
+            "guess": 8.83,
+            "real": 8.033,
+            "null": 0.432,
+            "beats_null": true,
+            "words": [
+              "usk",
+              "isti",
+              "enthal",
+              "sey",
+              "ect",
+              "opf",
+              "viene",
+              "usp"
+            ]
+          },
+          {
+            "layer": 24,
+            "n": 2163,
+            "sign": 1,
+            "guess": 7.581,
+            "real": 6.177,
+            "null": 0.525,
+            "beats_null": true,
+            "words": [
+              "ibr",
+              "oko",
+              "ho",
+              "agger",
+              "oss",
+              "dan",
+              "oby",
+              "ossa"
+            ]
+          },
+          {
+            "layer": 24,
+            "n": 6118,
+            "sign": 1,
+            "guess": 6.554,
+            "real": 5.341,
+            "null": 0.525,
+            "beats_null": true,
+            "words": [
+              "sem",
+              "Ass",
+              "da",
+              "om",
+              "tee",
+              "ulle",
+              "om",
+              "wy"
+            ]
+          },
+          {
+            "layer": 25,
+            "n": 8099,
+            "sign": -1,
+            "guess": 5.531,
+            "real": 2.433,
+            "null": 0.432,
+            "beats_null": true,
+            "words": [
+              "котор",
+              "„*",
+              "vess",
+              "adoles",
+              "экспе",
+              "revan",
+              "filos",
+              "torp"
+            ]
+          },
+          {
+            "layer": 25,
+            "n": 5989,
+            "sign": 1,
+            "guess": 5.296,
+            "real": 2.428,
+            "null": 0.432,
+            "beats_null": true,
+            "words": [
+              "adoles",
+              "Ldh",
+              "котор",
+              "filos",
+              "„*",
+              "oppon",
+              "seiz",
+              "экспе"
+            ]
+          },
+          {
+            "layer": 25,
+            "n": 5363,
+            "sign": 1,
+            "guess": 5.061,
+            "real": 2.346,
+            "null": 0.432,
+            "beats_null": true,
+            "words": [
+              "adoles",
+              "torp",
+              "Ldh",
+              "oppon",
+              "котор",
+              "„*",
+              "seiz",
+              "экспе"
+            ]
+          },
+          {
+            "layer": 23,
+            "n": 3546,
+            "sign": 1,
+            "guess": 5.656,
+            "real": 1.757,
+            "null": 0.485,
+            "beats_null": true,
+            "words": [
+              "wanting",
+              "та",
+              "UMP",
+              "Johns",
+              "hers",
+              "birthday",
+              "Wake",
+              "anos"
+            ]
+          },
+          {
+            "layer": 23,
+            "n": 8146,
+            "sign": 1,
+            "guess": 5.65,
+            "real": 1.618,
+            "null": 0.485,
+            "beats_null": true,
+            "words": [
+              "sorte",
+              "genere",
+              "gl",
+              "样",
+              "gl",
+              "art",
+              "glomer",
+              "�"
+            ]
+          },
+          {
+            "layer": 2,
+            "n": 1711,
+            "sign": 1,
+            "guess": 5.091,
+            "real": 0.765,
+            "null": 0.933,
+            "beats_null": false,
+            "words": [
+              "",
+              "-",
+              "\"",
+              "initial",
+              "Initial",
+              ".",
+              "N",
+              "rec"
+            ]
+          },
+          {
+            "layer": 2,
+            "n": 2000,
+            "sign": -1,
+            "guess": 5.359,
+            "real": 0.286,
+            "null": 0.933,
+            "beats_null": false,
+            "words": [
+              "",
+              "W",
+              "T",
+              "In",
+              "\"",
+              "Let",
+              "Call",
+              "First"
+            ]
+          },
+          {
+            "layer": 23,
+            "n": 507,
+            "sign": -1,
+            "guess": 6.046,
+            "real": -0.498,
+            "null": 0.485,
+            "beats_null": false,
+            "words": [
+              "like",
+              "контра",
+              "display",
+              "Rescue",
+              "remake",
+              "FT",
+              "kom",
+              "fus"
+            ]
+          },
+          {
+            "layer": 23,
+            "n": 5602,
+            "sign": -1,
+            "guess": 6.964,
+            "real": -0.919,
+            "null": 0.485,
+            "beats_null": false,
+            "words": [
+              "like",
+              "com",
+              "wie",
+              "Like",
+              "kom",
+              "coma",
+              "如",
+              "alike"
+            ]
+          }
+        ],
+        "seconds": 12.227542413999998
+      },
+      "pirate": {
+        "model": "mistralai/Ministral-3-3B-Instruct-2512",
+        "pairs": [
+          [
+            "Arrr, matey! Welcome aboard me ship!",
+            "Hello, friend! Welcome to my home!"
+          ]
+        ],
+        "words": null,
+        "layers": null,
+        "dose": 0.6,
+        "base": 1.2542035579681396,
+        "rows": [
+          {
+            "layer": 25,
+            "n": 852,
+            "sign": 1,
+            "guess": 3.906,
+            "real": 3.229,
+            "null": 0.62,
+            "beats_null": true,
+            "words": [
+              "族",
+              "стили",
+              "äft",
+              "éric",
+              "ivate",
+              "attering",
+              "erp",
+              "々"
+            ]
+          },
+          {
+            "layer": 24,
+            "n": 887,
+            "sign": 1,
+            "guess": 4.824,
+            "real": 3.087,
+            "null": 0.849,
+            "beats_null": true,
+            "words": [
+              "har",
+              "Gas",
+              "cow",
+              "ardo",
+              "gas",
+              "Cow",
+              "anol",
+              "istycz"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 129,
+            "sign": 1,
+            "guess": 3.129,
+            "real": 2.211,
+            "null": 0.652,
+            "beats_null": true,
+            "words": [
+              "fuse",
+              "mog",
+              "tiro",
+              "lips",
+              "mo",
+              "focal",
+              "Kong",
+              "øm"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 1632,
+            "sign": -1,
+            "guess": 4.01,
+            "real": 1.966,
+            "null": 0.652,
+            "beats_null": true,
+            "words": [
+              "paras",
+              "Paras",
+              "reta",
+              "ар",
+              "ais",
+              "hil",
+              "hib",
+              "beat"
+            ]
+          },
+          {
+            "layer": 21,
+            "n": 2762,
+            "sign": -1,
+            "guess": 3.63,
+            "real": 1.786,
+            "null": 0.936,
+            "beats_null": true,
+            "words": [
+              "nay",
+              "astern",
+              "relief",
+              "éré",
+              "TON",
+              "Saturday",
+              "tty",
+              "veget"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 5270,
+            "sign": 1,
+            "guess": 3.17,
+            "real": 1.583,
+            "null": 0.652,
+            "beats_null": true,
+            "words": [
+              "joins",
+              "jo",
+              "join",
+              "inn",
+              "ouche",
+              "ju",
+              "sup",
+              "Join"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 4613,
+            "sign": -1,
+            "guess": 3.085,
+            "real": 0.098,
+            "null": 0.652,
+            "beats_null": false,
+            "words": [
+              "ük",
+              "estra",
+              "eny",
+              "fu",
+              "rak",
+              "efe",
+              "yd",
+              "rw"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 2271,
+            "sign": -1,
+            "guess": 3.517,
+            "real": -0.172,
+            "null": 0.652,
+            "beats_null": false,
+            "words": [
+              "estra",
+              "ird",
+              "rows",
+              "band",
+              "ople",
+              "rake",
+              "row",
+              "irs"
+            ]
+          },
+          {
+            "layer": 17,
+            "n": 410,
+            "sign": 1,
+            "guess": 3.059,
+            "real": -0.58,
+            "null": 0.928,
+            "beats_null": false,
+            "words": [
+              "id",
+              "obs",
+              "wrong",
+              "on",
+              "in",
+              "inks",
+              "bed",
+              "raw"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 4416,
+            "sign": 1,
+            "guess": 2.941,
+            "real": -1.433,
+            "null": 0.652,
+            "beats_null": false,
+            "words": [
+              "mart",
+              "gr",
+              "pale",
+              "uki",
+              "Pale",
+              "Mart",
+              "wys",
+              "in"
+            ]
+          },
+          {
+            "layer": 14,
+            "n": 52,
+            "sign": 1,
+            "guess": 2.921,
+            "real": -1.796,
+            "null": 1.743,
+            "beats_null": false,
+            "words": [
+              ",",
+              "",
+              "A",
+              "group",
+              "“",
+              ".",
+              "in",
+              "a"
+            ]
+          },
+          {
+            "layer": 14,
+            "n": 2284,
+            "sign": 1,
+            "guess": 3.069,
+            "real": -1.883,
+            "null": 1.743,
+            "beats_null": false,
+            "words": [
+              "To",
+              "In",
+              "To",
+              "Generally",
+              "####",
+              "Select",
+              "Highlight",
+              "Without"
+            ]
+          }
+        ],
+        "seconds": 14.726885375000002
+      },
+      "french": {
+        "model": "mistralai/Ministral-3-3B-Instruct-2512",
+        "pairs": [
+          [
+            "Bonjour, je suis votre assistant et je suis heureux de vous aider.",
+            "Hello, I am your assistant and I am happy to help you."
+          ]
+        ],
+        "words": null,
+        "layers": null,
+        "dose": 0.6,
+        "base": -0.15467000007629395,
+        "rows": [
+          {
+            "layer": 25,
+            "n": 1015,
+            "sign": -1,
+            "guess": 3.186,
+            "real": 3.5,
+            "null": 0.382,
+            "beats_null": true,
+            "words": [
+              "anges",
+              "eme",
+              "nem",
+              "лом",
+              "fang",
+              "νε",
+              "անակ",
+              "apped"
+            ]
+          },
+          {
+            "layer": 25,
+            "n": 621,
+            "sign": 1,
+            "guess": 2.325,
+            "real": 2.269,
+            "null": 0.382,
+            "beats_null": true,
+            "words": [
+              "conflic",
+              "adoles",
+              "gela",
+              "チーム",
+              "年齢",
+              "antips",
+              "Febru",
+              "<SPECIAL_34>"
+            ]
+          },
+          {
+            "layer": 15,
+            "n": 114,
+            "sign": -1,
+            "guess": 3.354,
+            "real": 0.685,
+            "null": 0.841,
+            "beats_null": false,
+            "words": [
+              "do",
+              "part",
+              "Part",
+              "ar",
+              "gri",
+              "kin",
+              "por",
+              "Matrix"
+            ]
+          },
+          {
+            "layer": 3,
+            "n": 5836,
+            "sign": 1,
+            "guess": 2.353,
+            "real": 0.487,
+            "null": 0.422,
+            "beats_null": true,
+            "words": [
+              "{",
+              "{B",
+              "Given",
+              "{",
+              "{D",
+              "given",
+              "{N",
+              "Given"
+            ]
+          },
+          {
+            "layer": 2,
+            "n": 3203,
+            "sign": -1,
+            "guess": 2.472,
+            "real": 0.343,
+            "null": 0.605,
+            "beats_null": false,
+            "words": [
+              ",",
+              "---",
+              "(",
+              "—",
+              "--",
+              "",
+              "\"",
+              "(\""
+            ]
+          },
+          {
+            "layer": 2,
+            "n": 2355,
+            "sign": -1,
+            "guess": 2.466,
+            "real": -0.418,
+            "null": 0.605,
+            "beats_null": false,
+            "words": [
+              "",
+              "a",
+              ",",
+              "[",
+              ".",
+              "-",
+              "1",
+              "•"
+            ]
+          },
+          {
+            "layer": 2,
+            "n": 4850,
+            "sign": -1,
+            "guess": 2.466,
+            "real": -1.488,
+            "null": 0.605,
+            "beats_null": false,
+            "words": [
+              "-",
+              ",",
+              "",
+              "1",
+              "```",
+              "--",
+              "-",
+              "#"
+            ]
+          },
+          {
+            "layer": 16,
+            "n": 41,
+            "sign": -1,
+            "guess": 4.335,
+            "real": -2.11,
+            "null": 0.247,
+            "beats_null": false,
+            "words": [
+              "\"",
+              "“",
+              "",
+              "ra",
+              ",",
+              "—",
+              "(",
+              "'"
+            ]
+          },
+          {
+            "layer": 15,
+            "n": 2752,
+            "sign": 1,
+            "guess": 2.508,
+            "real": -2.363,
+            "null": 0.841,
+            "beats_null": false,
+            "words": [
+              "bene",
+              "¿",
+              "¿",
+              "¡",
+              "bene",
+              "¡",
+              "Bu",
+              "Bu"
+            ]
+          },
+          {
+            "layer": 17,
+            "n": 173,
+            "sign": -1,
+            "guess": 2.923,
+            "real": -3.211,
+            "null": 0.123,
+            "beats_null": false,
+            "words": [
+              "an",
+              "an",
+              "die",
+              "Die",
+              "am",
+              "die",
+              "der",
+              "bei"
+            ]
+          },
+          {
+            "layer": 16,
+            "n": 1381,
+            "sign": 1,
+            "guess": 3.569,
+            "real": -3.291,
+            "null": 0.247,
+            "beats_null": false,
+            "words": [
+              "e",
+              "\"",
+              "ra",
+              "o",
+              "la",
+              "m",
+              "",
+              ","
+            ]
+          },
+          {
+            "layer": 2,
+            "n": 217,
+            "sign": -1,
+            "guess": 2.832,
+            "real": -4.144,
+            "null": 0.605,
+            "beats_null": false,
+            "words": [
+              "In",
+              ",",
+              "in",
+              "\"",
+              "Let",
+              "(",
+              "We",
+              "Now"
+            ]
+          }
+        ],
+        "seconds": 13.948795304
+      },
+      "confident": {
+        "model": "mistralai/Ministral-3-3B-Instruct-2512",
+        "pairs": [
+          [
+            "I am absolutely certain that I am right.",
+            "I may be mistaken and I am not sure."
+          ]
+        ],
+        "words": null,
+        "layers": null,
+        "dose": 0.6,
+        "base": -0.6018533706665039,
+        "rows": [
+          {
+            "layer": 25,
+            "n": 1015,
+            "sign": 1,
+            "guess": 3.823,
+            "real": 4.123,
+            "null": 0.412,
+            "beats_null": true,
+            "words": [
+              "am",
+              "Am",
+              "Am",
+              "-am",
+              "am",
+              ".am",
+              "ам",
+              "'am"
+            ]
+          },
+          {
+            "layer": 25,
+            "n": 3073,
+            "sign": -1,
+            "guess": 3.87,
+            "real": 3.84,
+            "null": 0.412,
+            "beats_null": true,
+            "words": [
+              "certain",
+              "Certain",
+              "某",
+              "Certain",
+              "certain",
+              "certaine",
+              "某种",
+              "certo"
+            ]
+          },
+          {
+            "layer": 25,
+            "n": 1302,
+            "sign": -1,
+            "guess": 3.072,
+            "real": 3.093,
+            "null": 0.412,
+            "beats_null": true,
+            "words": [
+              "right",
+              "Right",
+              "right",
+              "Right",
+              "-right",
+              "右",
+              "RIGHT",
+              "_right"
+            ]
+          },
+          {
+            "layer": 25,
+            "n": 1299,
+            "sign": -1,
+            "guess": 3.017,
+            "real": 2.877,
+            "null": 0.412,
+            "beats_null": true,
+            "words": [
+              "absolute",
+              "Absolute",
+              "absolutely",
+              "绝",
+              "absolute",
+              "Absolute",
+              "absolut",
+              "absol"
+            ]
+          },
+          {
+            "layer": 25,
+            "n": 1865,
+            "sign": 1,
+            "guess": 2.978,
+            "real": 2.669,
+            "null": 0.412,
+            "beats_null": true,
+            "words": [
+              "somehow",
+              "atri",
+              "र्व",
+              "还是",
+              "-m",
+              "rolle",
+              "ror",
+              "litz"
+            ]
+          },
+          {
+            "layer": 23,
+            "n": 5120,
+            "sign": 1,
+            "guess": 4.791,
+            "real": 1.875,
+            "null": 0.481,
+            "beats_null": true,
+            "words": [
+              "cert",
+              "cer",
+              "-cert",
+              "Cert",
+              "Cert",
+              "certification",
+              "cert",
+              "Cer"
+            ]
+          },
+          {
+            "layer": 23,
+            "n": 2003,
+            "sign": -1,
+            "guess": 2.456,
+            "real": 0.637,
+            "null": 0.481,
+            "beats_null": true,
+            "words": [
+              "right",
+              "Right",
+              "right",
+              "Right",
+              "RIGHT",
+              "-right",
+              "右",
+              "\\right"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 3420,
+            "sign": -1,
+            "guess": 2.492,
+            "real": 0.524,
+            "null": 0.34,
+            "beats_null": true,
+            "words": [
+              "might",
+              "Might",
+              "could",
+              "könnte",
+              "pourrait",
+              "Could",
+              "pourraient",
+              "Could"
+            ]
+          },
+          {
+            "layer": 24,
+            "n": 1507,
+            "sign": -1,
+            "guess": 2.707,
+            "real": 0.414,
+            "null": 0.52,
+            "beats_null": false,
+            "words": [
+              "cert",
+              "gew",
+              "determin",
+              "опреде",
+              "Cert",
+              "sure",
+              "-cert",
+              "determ"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 1345,
+            "sign": 1,
+            "guess": 2.506,
+            "real": 0.078,
+            "null": 0.34,
+            "beats_null": false,
+            "words": [
+              "probably",
+              "M",
+              "arz",
+              "deb",
+              "arth",
+              "ot",
+              "likely",
+              "arb"
+            ]
+          },
+          {
+            "layer": 24,
+            "n": 2772,
+            "sign": 1,
+            "guess": 2.778,
+            "real": -0.144,
+            "null": 0.52,
+            "beats_null": false,
+            "words": [
+              "right",
+              "Right",
+              "right",
+              "Right",
+              "\\right",
+              "RIGHT",
+              "右",
+              "proper"
+            ]
+          },
+          {
+            "layer": 24,
+            "n": 2432,
+            "sign": 1,
+            "guess": 2.522,
+            "real": -0.349,
+            "null": 0.52,
+            "beats_null": false,
+            "words": [
+              "right",
+              "im",
+              "right",
+              "Right",
+              "Right",
+              "\\right",
+              "RIGHT",
+              "im"
+            ]
+          }
+        ],
+        "seconds": 10.800575115999997
+      },
+      "poetic": {
+        "model": "mistralai/Ministral-3-3B-Instruct-2512",
+        "pairs": [
+          [
+            "My words bloom like stars upon the velvet night.",
+            "My words are clear and easy to understand."
+          ]
+        ],
+        "words": null,
+        "layers": null,
+        "dose": 0.6,
+        "base": -0.9823894500732422,
+        "rows": [
+          {
+            "layer": 25,
+            "n": 2114,
+            "sign": 1,
+            "guess": 3.293,
+            "real": 3.029,
+            "null": 0.253,
+            "beats_null": true,
+            "words": [
+              "ох",
+              "üz",
+              "üge",
+              "SEM",
+              "angk",
+              "aste",
+              "ожа",
+              "aren"
+            ]
+          },
+          {
+            "layer": 25,
+            "n": 8099,
+            "sign": -1,
+            "guess": 3.247,
+            "real": 2.975,
+            "null": 0.253,
+            "beats_null": true,
+            "words": [
+              "котор",
+              "„*",
+              "vess",
+              "adoles",
+              "экспе",
+              "revan",
+              "filos",
+              "torp"
+            ]
+          },
+          {
+            "layer": 23,
+            "n": 459,
+            "sign": 1,
+            "guess": 4.141,
+            "real": 2.823,
+            "null": 0.393,
+            "beats_null": true,
+            "words": [
+              "gre",
+              "eil",
+              "eter",
+              "WL",
+              "etan",
+              "sey",
+              "rees",
+              "icious"
+            ]
+          },
+          {
+            "layer": 25,
+            "n": 1185,
+            "sign": -1,
+            "guess": 2.699,
+            "real": 2.545,
+            "null": 0.253,
+            "beats_null": true,
+            "words": [
+              "러",
+              "udu",
+              "ilderness",
+              "ietta",
+              "ento",
+              "yal",
+              "vet",
+              "ffer"
+            ]
+          },
+          {
+            "layer": 25,
+            "n": 5989,
+            "sign": 1,
+            "guess": 2.912,
+            "real": 2.489,
+            "null": 0.253,
+            "beats_null": true,
+            "words": [
+              "adoles",
+              "Ldh",
+              "котор",
+              "filos",
+              "„*",
+              "oppon",
+              "seiz",
+              "экспе"
+            ]
+          },
+          {
+            "layer": 25,
+            "n": 5363,
+            "sign": 1,
+            "guess": 2.833,
+            "real": 2.293,
+            "null": 0.253,
+            "beats_null": true,
+            "words": [
+              "adoles",
+              "torp",
+              "Ldh",
+              "oppon",
+              "котор",
+              "„*",
+              "seiz",
+              "экспе"
+            ]
+          },
+          {
+            "layer": 25,
+            "n": 4794,
+            "sign": 1,
+            "guess": 2.844,
+            "real": 2.261,
+            "null": 0.253,
+            "beats_null": true,
+            "words": [
+              "adoles",
+              "котор",
+              "filos",
+              "oppon",
+              "Ldh",
+              "[ARGS]",
+              "экспе",
+              "celebrit"
+            ]
+          },
+          {
+            "layer": 25,
+            "n": 3867,
+            "sign": 1,
+            "guess": 2.934,
+            "real": 2.22,
+            "null": 0.253,
+            "beats_null": true,
+            "words": [
+              "adoles",
+              "котор",
+              "filos",
+              "revan",
+              "juven",
+              "oppon",
+              "Ldh",
+              "seiz"
+            ]
+          },
+          {
+            "layer": 23,
+            "n": 2298,
+            "sign": -1,
+            "guess": 3.348,
+            "real": 2.208,
+            "null": 0.393,
+            "beats_null": true,
+            "words": [
+              "lut",
+              "lu",
+              "itud",
+              "lubric",
+              "cam",
+              "etan",
+              "apan",
+              "utton"
+            ]
+          },
+          {
+            "layer": 24,
+            "n": 5300,
+            "sign": 1,
+            "guess": 2.831,
+            "real": 2.089,
+            "null": 0.374,
+            "beats_null": true,
+            "words": [
+              "cl",
+              "Cl",
+              "cl",
+              "kl",
+              "kl",
+              ".cl",
+              "Kl",
+              "Cl"
+            ]
+          },
+          {
+            "layer": 21,
+            "n": 881,
+            "sign": -1,
+            "guess": 2.748,
+            "real": 0.461,
+            "null": 0.549,
+            "beats_null": false,
+            "words": [
+              "Stars",
+              "stars",
+              "star",
+              "Star",
+              "stars",
+              "星",
+              "-star",
+              "star"
+            ]
+          },
+          {
+            "layer": 13,
+            "n": 0,
+            "sign": -1,
+            "guess": 2.775,
+            "real": -0.461,
+            "null": 0.57,
+            "beats_null": false,
+            "words": [
+              ",",
+              "In",
+              "\"",
+              "",
+              ":",
+              ".",
+              ".",
+              "to"
+            ]
+          }
+        ],
+        "seconds": 10.125574388000004
+      }
+    }
+  },
+  "find_middle": {
+    "model": "mistralai/Ministral-3-3B-Instruct-2512",
+    "weights": "mistralai/Ministral-3-3B-Instruct-2512-BF16",
+    "revision": "b6d637bef2393152b3da2b2fde72eecdee30557e",
+    "gpu": "NVIDIA H100 80GB HBM3",
+    "torch": "2.14.1+cu130",
+    "traits": {
+      "hostile": {
+        "model": "mistralai/Ministral-3-3B-Instruct-2512",
+        "pairs": [
+          [
+            "I hate you.",
+            "I like you."
+          ]
+        ],
+        "words": null,
+        "layers": "3-22",
+        "dose": 0.6,
+        "base": -0.8551926612854004,
+        "rows": [
+          {
+            "layer": 16,
+            "n": 102,
+            "sign": -1,
+            "guess": 3.911,
+            "real": 2.779,
+            "null": 0.634,
+            "beats_null": true,
+            "words": [
+              "<",
+              "♥",
+              "�",
+              "<",
+              ":",
+              "�",
+              "xo",
+              "so"
+            ]
+          },
+          {
+            "layer": 16,
+            "n": 8352,
+            "sign": -1,
+            "guess": 3.438,
+            "real": 1.938,
+            "null": 0.634,
+            "beats_null": true,
+            "words": [
+              "OH",
+              "OM",
+              "IND",
+              "IN",
+              "ONE",
+              "DAY",
+              "�",
+              "oh"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 1466,
+            "sign": -1,
+            "guess": 2.767,
+            "real": 1.78,
+            "null": 0.596,
+            "beats_null": true,
+            "words": [
+              "Hat",
+              "hat",
+              "Hat",
+              "hat",
+              "hats",
+              "\\hat",
+              "hate",
+              "�"
+            ]
+          },
+          {
+            "layer": 14,
+            "n": 6278,
+            "sign": -1,
+            "guess": 2.986,
+            "real": 1.248,
+            "null": 0.252,
+            "beats_null": true,
+            "words": [
+              "{",
+              "MI",
+              "\"{",
+              "sir",
+              "Mult",
+              "none",
+              "In",
+              "{}"
+            ]
+          },
+          {
+            "layer": 11,
+            "n": 2285,
+            "sign": -1,
+            "guess": 2.918,
+            "real": 0.9,
+            "null": 0.655,
+            "beats_null": true,
+            "words": [
+              "news",
+              "c",
+              "News",
+              ",",
+              "Red",
+              "consent",
+              "content",
+              "Div"
+            ]
+          },
+          {
+            "layer": 16,
+            "n": 41,
+            "sign": -1,
+            "guess": 2.849,
+            "real": 0.859,
+            "null": 0.634,
+            "beats_null": true,
+            "words": [
+              "\"",
+              "“",
+              "",
+              "ra",
+              ",",
+              "—",
+              "(",
+              "'"
+            ]
+          },
+          {
+            "layer": 14,
+            "n": 5473,
+            "sign": -1,
+            "guess": 2.83,
+            "real": 0.705,
+            "null": 0.252,
+            "beats_null": true,
+            "words": [
+              "\"",
+              "「",
+              "<<",
+              "\"Why",
+              "<<",
+              "«",
+              "\"",
+              "«"
+            ]
+          },
+          {
+            "layer": 15,
+            "n": 6117,
+            "sign": 1,
+            "guess": 3.505,
+            "real": 0.694,
+            "null": 0.972,
+            "beats_null": false,
+            "words": [
+              "�",
+              "WO",
+              "OH",
+              "HO",
+              "OW",
+              "OM",
+              "�",
+              "�"
+            ]
+          },
+          {
+            "layer": 12,
+            "n": 4364,
+            "sign": 1,
+            "guess": 2.968,
+            "real": 0.471,
+            "null": 0.912,
+            "beats_null": false,
+            "words": [
+              "Oh",
+              "OM",
+              "OH",
+              "oh",
+              "Oh",
+              "OH",
+              "O",
+              "-O"
+            ]
+          },
+          {
+            "layer": 17,
+            "n": 2650,
+            "sign": -1,
+            "guess": 3.985,
+            "real": 0.413,
+            "null": 0.814,
+            "beats_null": false,
+            "words": [
+              "BL",
+              "bl",
+              "W",
+              "P",
+              "way",
+              "Blair",
+              "Tag",
+              ""
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 2503,
+            "sign": 1,
+            "guess": 2.892,
+            "real": -0.02,
+            "null": 0.596,
+            "beats_null": false,
+            "words": [
+              "Meg",
+              "sap",
+              "kes",
+              "format",
+              "transformations",
+              "fox",
+              "seg",
+              "AS"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 930,
+            "sign": -1,
+            "guess": 3.038,
+            "real": -1.747,
+            "null": 0.596,
+            "beats_null": false,
+            "words": [
+              "lik",
+              "Lik",
+              "lik",
+              "LIKE",
+              "likes",
+              "_like",
+              "-like",
+              "liking"
+            ]
+          }
+        ],
+        "seconds": 16.04045071
+      },
+      "pirate": {
+        "model": "mistralai/Ministral-3-3B-Instruct-2512",
+        "pairs": [
+          [
+            "Arrr, matey! Welcome aboard me ship!",
+            "Hello, friend! Welcome to my home!"
+          ]
+        ],
+        "words": null,
+        "layers": "3-22",
+        "dose": 0.6,
+        "base": 1.2542035579681396,
+        "rows": [
+          {
+            "layer": 22,
+            "n": 129,
+            "sign": 1,
+            "guess": 3.129,
+            "real": 2.211,
+            "null": 0.652,
+            "beats_null": true,
+            "words": [
+              "fuse",
+              "mog",
+              "tiro",
+              "lips",
+              "mo",
+              "focal",
+              "Kong",
+              "øm"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 1632,
+            "sign": -1,
+            "guess": 4.01,
+            "real": 1.966,
+            "null": 0.652,
+            "beats_null": true,
+            "words": [
+              "paras",
+              "Paras",
+              "reta",
+              "ар",
+              "ais",
+              "hil",
+              "hib",
+              "beat"
+            ]
+          },
+          {
+            "layer": 21,
+            "n": 2762,
+            "sign": -1,
+            "guess": 3.628,
+            "real": 1.786,
+            "null": 0.936,
+            "beats_null": true,
+            "words": [
+              "nay",
+              "astern",
+              "relief",
+              "éré",
+              "TON",
+              "Saturday",
+              "tty",
+              "veget"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 5270,
+            "sign": 1,
+            "guess": 3.17,
+            "real": 1.583,
+            "null": 0.652,
+            "beats_null": true,
+            "words": [
+              "joins",
+              "jo",
+              "join",
+              "inn",
+              "ouche",
+              "ju",
+              "sup",
+              "Join"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 754,
+            "sign": -1,
+            "guess": 2.892,
+            "real": 0.472,
+            "null": 0.652,
+            "beats_null": false,
+            "words": [
+              "astern",
+              "uki",
+              "stern",
+              "mig",
+              "alie",
+              "roe",
+              "ibor",
+              "hev"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 2598,
+            "sign": -1,
+            "guess": 2.913,
+            "real": 0.137,
+            "null": 0.652,
+            "beats_null": false,
+            "words": [
+              "estra",
+              "itaire",
+              "НК",
+              "गी",
+              "epad",
+              "Korean",
+              "ordinates",
+              "indel"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 4613,
+            "sign": -1,
+            "guess": 3.085,
+            "real": 0.098,
+            "null": 0.652,
+            "beats_null": false,
+            "words": [
+              "ük",
+              "estra",
+              "eny",
+              "fu",
+              "rak",
+              "efe",
+              "yd",
+              "rw"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 2271,
+            "sign": -1,
+            "guess": 3.517,
+            "real": -0.172,
+            "null": 0.652,
+            "beats_null": false,
+            "words": [
+              "estra",
+              "ird",
+              "rows",
+              "band",
+              "ople",
+              "rake",
+              "row",
+              "irs"
+            ]
+          },
+          {
+            "layer": 17,
+            "n": 410,
+            "sign": 1,
+            "guess": 3.051,
+            "real": -0.58,
+            "null": 0.928,
+            "beats_null": false,
+            "words": [
+              "id",
+              "obs",
+              "wrong",
+              "on",
+              "in",
+              "inks",
+              "bed",
+              "raw"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 4416,
+            "sign": 1,
+            "guess": 2.941,
+            "real": -1.433,
+            "null": 0.652,
+            "beats_null": false,
+            "words": [
+              "mart",
+              "gr",
+              "pale",
+              "uki",
+              "Pale",
+              "Mart",
+              "wys",
+              "in"
+            ]
+          },
+          {
+            "layer": 14,
+            "n": 52,
+            "sign": 1,
+            "guess": 2.921,
+            "real": -1.796,
+            "null": 1.743,
+            "beats_null": false,
+            "words": [
+              ",",
+              "",
+              "A",
+              "group",
+              "“",
+              ".",
+              "in",
+              "a"
+            ]
+          },
+          {
+            "layer": 14,
+            "n": 2284,
+            "sign": 1,
+            "guess": 3.057,
+            "real": -1.883,
+            "null": 1.743,
+            "beats_null": false,
+            "words": [
+              "To",
+              "In",
+              "To",
+              "Generally",
+              "####",
+              "Select",
+              "Highlight",
+              "Without"
+            ]
+          }
+        ],
+        "seconds": 11.652651474000002
+      },
+      "french": {
+        "model": "mistralai/Ministral-3-3B-Instruct-2512",
+        "pairs": [
+          [
+            "Bonjour, je suis votre assistant et je suis heureux de vous aider.",
+            "Hello, I am your assistant and I am happy to help you."
+          ]
+        ],
+        "words": null,
+        "layers": "3-22",
+        "dose": 0.6,
+        "base": -0.15467000007629395,
+        "rows": [
+          {
+            "layer": 16,
+            "n": 2922,
+            "sign": 1,
+            "guess": 1.999,
+            "real": 1.244,
+            "null": 0.247,
+            "beats_null": true,
+            "words": [
+              "Merc",
+              "Une",
+              "cette",
+              "que",
+              "Unt",
+              "merc",
+              "encias",
+              "quel"
+            ]
+          },
+          {
+            "layer": 15,
+            "n": 114,
+            "sign": -1,
+            "guess": 3.354,
+            "real": 0.685,
+            "null": 0.841,
+            "beats_null": false,
+            "words": [
+              "do",
+              "part",
+              "Part",
+              "ar",
+              "gri",
+              "kin",
+              "por",
+              "Matrix"
+            ]
+          },
+          {
+            "layer": 3,
+            "n": 5836,
+            "sign": 1,
+            "guess": 2.347,
+            "real": 0.487,
+            "null": 0.541,
+            "beats_null": false,
+            "words": [
+              "{",
+              "{B",
+              "Given",
+              "{",
+              "{D",
+              "given",
+              "{N",
+              "Given"
+            ]
+          },
+          {
+            "layer": 3,
+            "n": 1825,
+            "sign": -1,
+            "guess": 2.236,
+            "real": 0.388,
+            "null": 0.541,
+            "beats_null": false,
+            "words": [
+              "{K",
+              "{B",
+              "{",
+              "{A",
+              "{",
+              "{M",
+              "{D",
+              "{"
+            ]
+          },
+          {
+            "layer": 14,
+            "n": 2876,
+            "sign": -1,
+            "guess": 2.021,
+            "real": -0.215,
+            "null": 0.473,
+            "beats_null": false,
+            "words": [
+              "Read",
+              "everything",
+              "everybody",
+              "Ref",
+              "nothing",
+              "-",
+              "everyone",
+              "nobody"
+            ]
+          },
+          {
+            "layer": 15,
+            "n": 501,
+            "sign": 1,
+            "guess": 2.187,
+            "real": -1.857,
+            "null": 0.841,
+            "beats_null": false,
+            "words": [
+              ",",
+              "all",
+              "[",
+              "in",
+              "a",
+              "",
+              "as",
+              "har"
+            ]
+          },
+          {
+            "layer": 16,
+            "n": 41,
+            "sign": -1,
+            "guess": 4.337,
+            "real": -2.11,
+            "null": 0.247,
+            "beats_null": false,
+            "words": [
+              "\"",
+              "“",
+              "",
+              "ra",
+              ",",
+              "—",
+              "(",
+              "'"
+            ]
+          },
+          {
+            "layer": 15,
+            "n": 2752,
+            "sign": 1,
+            "guess": 2.508,
+            "real": -2.363,
+            "null": 0.841,
+            "beats_null": false,
+            "words": [
+              "bene",
+              "¿",
+              "¿",
+              "¡",
+              "bene",
+              "¡",
+              "Bu",
+              "Bu"
+            ]
+          },
+          {
+            "layer": 17,
+            "n": 173,
+            "sign": -1,
+            "guess": 2.924,
+            "real": -3.211,
+            "null": 0.123,
+            "beats_null": false,
+            "words": [
+              "an",
+              "an",
+              "die",
+              "Die",
+              "am",
+              "die",
+              "der",
+              "bei"
+            ]
+          },
+          {
+            "layer": 16,
+            "n": 1381,
+            "sign": 1,
+            "guess": 3.572,
+            "real": -3.291,
+            "null": 0.247,
+            "beats_null": false,
+            "words": [
+              "e",
+              "\"",
+              "ra",
+              "o",
+              "la",
+              "m",
+              "",
+              ","
+            ]
+          },
+          {
+            "layer": 17,
+            "n": 6277,
+            "sign": -1,
+            "guess": 2.127,
+            "real": -5.446,
+            "null": 0.123,
+            "beats_null": false,
+            "words": [
+              "Wonderful",
+              "del",
+              "marav",
+              "super",
+              "Fant",
+              "-o",
+              "del",
+              "incre"
+            ]
+          },
+          {
+            "layer": 14,
+            "n": 7887,
+            "sign": -1,
+            "guess": 2.087,
+            "real": -6.748,
+            "null": 0.473,
+            "beats_null": false,
+            "words": [
+              "",
+              "In",
+              "no",
+              "no",
+              ",",
+              "No",
+              ":",
+              "1"
+            ]
+          }
+        ],
+        "seconds": 12.387202332999998
+      },
+      "confident": {
+        "model": "mistralai/Ministral-3-3B-Instruct-2512",
+        "pairs": [
+          [
+            "I am absolutely certain that I am right.",
+            "I may be mistaken and I am not sure."
+          ]
+        ],
+        "words": null,
+        "layers": "3-22",
+        "dose": 0.6,
+        "base": -0.6018533706665039,
+        "rows": [
+          {
+            "layer": 22,
+            "n": 4952,
+            "sign": 1,
+            "guess": 2.309,
+            "real": 1.572,
+            "null": 0.41,
+            "beats_null": true,
+            "words": [
+              "Def",
+              "Def",
+              "def",
+              "absolutely",
+              "Abs",
+              "definit",
+              "definite",
+              "abs"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 6352,
+            "sign": -1,
+            "guess": 2.356,
+            "real": 1.08,
+            "null": 0.41,
+            "beats_null": true,
+            "words": [
+              "right",
+              "Right",
+              "right",
+              "Right",
+              "右",
+              "-right",
+              "RIGHT",
+              "_right"
+            ]
+          },
+          {
+            "layer": 21,
+            "n": 5731,
+            "sign": -1,
+            "guess": 1.831,
+            "real": 0.992,
+            "null": 0.6,
+            "beats_null": true,
+            "words": [
+              "right",
+              "Right",
+              "rights",
+              "right",
+              "Right",
+              "Rights",
+              "droit",
+              "RIGHT"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 994,
+            "sign": 1,
+            "guess": 2.122,
+            "real": 0.694,
+            "null": 0.41,
+            "beats_null": true,
+            "words": [
+              "absolute",
+              "Absolute",
+              "Absolute",
+              "绝",
+              "absolute",
+              "absol",
+              "Abs",
+              "absolutely"
+            ]
+          },
+          {
+            "layer": 21,
+            "n": 4070,
+            "sign": -1,
+            "guess": 1.858,
+            "real": 0.604,
+            "null": 0.6,
+            "beats_null": true,
+            "words": [
+              "absolutely",
+              "absolute",
+              "|",
+              "Absolute",
+              "绝",
+              "|",
+              "olute",
+              "|c"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 3420,
+            "sign": -1,
+            "guess": 2.492,
+            "real": 0.524,
+            "null": 0.41,
+            "beats_null": true,
+            "words": [
+              "might",
+              "Might",
+              "could",
+              "könnte",
+              "pourrait",
+              "Could",
+              "pourraient",
+              "Could"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 1345,
+            "sign": 1,
+            "guess": 2.506,
+            "real": 0.078,
+            "null": 0.41,
+            "beats_null": false,
+            "words": [
+              "probably",
+              "M",
+              "arz",
+              "deb",
+              "arth",
+              "ot",
+              "likely",
+              "arb"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 5839,
+            "sign": 1,
+            "guess": 2.229,
+            "real": 0.063,
+            "null": 0.41,
+            "beats_null": false,
+            "words": [
+              "could",
+              "M",
+              "Could",
+              "m",
+              "alth",
+              "could",
+              "art",
+              "Could"
+            ]
+          },
+          {
+            "layer": 13,
+            "n": 1354,
+            "sign": -1,
+            "guess": 1.973,
+            "real": -0.024,
+            "null": 0.321,
+            "beats_null": false,
+            "words": [
+              "你",
+              "：",
+              "「",
+              "：",
+              "这里",
+              "基",
+              "�",
+              "「"
+            ]
+          },
+          {
+            "layer": 13,
+            "n": 837,
+            "sign": -1,
+            "guess": 1.861,
+            "real": -0.043,
+            "null": 0.321,
+            "beats_null": false,
+            "words": [
+              "ค",
+              "ی",
+              "米",
+              "即",
+              "ال",
+              "テ",
+              "你好",
+              "本"
+            ]
+          },
+          {
+            "layer": 13,
+            "n": 456,
+            "sign": -1,
+            "guess": 1.945,
+            "real": -0.071,
+            "null": 0.321,
+            "beats_null": false,
+            "words": [
+              "-min",
+              "Min",
+              "Min",
+              "min",
+              "minima",
+              "мини",
+              ".min",
+              "_min"
+            ]
+          },
+          {
+            "layer": 13,
+            "n": 1745,
+            "sign": 1,
+            "guess": 1.876,
+            "real": -0.142,
+            "null": 0.321,
+            "beats_null": false,
+            "words": [
+              "치",
+              "ค",
+              "ร",
+              "初",
+              "ท",
+              "Links",
+              "yj",
+              "ก"
+            ]
+          }
+        ],
+        "seconds": 9.453703574000002
+      },
+      "poetic": {
+        "model": "mistralai/Ministral-3-3B-Instruct-2512",
+        "pairs": [
+          [
+            "My words bloom like stars upon the velvet night.",
+            "My words are clear and easy to understand."
+          ]
+        ],
+        "words": null,
+        "layers": "3-22",
+        "dose": 0.6,
+        "base": -0.9823894500732422,
+        "rows": [
+          {
+            "layer": 22,
+            "n": 2884,
+            "sign": -1,
+            "guess": 2.567,
+            "real": 1.694,
+            "null": 0.65,
+            "beats_null": true,
+            "words": [
+              "v",
+              "cow",
+              "fi",
+              "[-",
+              "Cow",
+              "bull",
+              "Kemp",
+              "EPS"
+            ]
+          },
+          {
+            "layer": 21,
+            "n": 472,
+            "sign": -1,
+            "guess": 2.336,
+            "real": 1.638,
+            "null": 0.657,
+            "beats_null": true,
+            "words": [
+              "�",
+              "f",
+              "umi",
+              "ãi",
+              "Pete",
+              "ô",
+              "pm",
+              "PV"
+            ]
+          },
+          {
+            "layer": 21,
+            "n": 2069,
+            "sign": 1,
+            "guess": 2.578,
+            "real": 1.502,
+            "null": 0.657,
+            "beats_null": true,
+            "words": [
+              "Anth",
+              "roli",
+              "Browning",
+              "Gloria",
+              "ansk",
+              "Mickey",
+              "grin",
+              "Sachs"
+            ]
+          },
+          {
+            "layer": 12,
+            "n": 7592,
+            "sign": 1,
+            "guess": 2.468,
+            "real": 0.818,
+            "null": 1.069,
+            "beats_null": false,
+            "words": [
+              "St",
+              "Night",
+              "leep",
+              "noct",
+              "夜",
+              "-St",
+              "night",
+              "Night"
+            ]
+          },
+          {
+            "layer": 22,
+            "n": 608,
+            "sign": 1,
+            "guess": 2.575,
+            "real": 0.583,
+            "null": 0.65,
+            "beats_null": false,
+            "words": [
+              "blo",
+              "Blo",
+              "Blo",
+              "bloom",
+              "Bloom",
+              "flower",
+              "flowers",
+              "Blü"
+            ]
+          },
+          {
+            "layer": 17,
+            "n": 3659,
+            "sign": 1,
+            "guess": 2.499,
+            "real": 0.554,
+            "null": 0.754,
+            "beats_null": false,
+            "words": [
+              "夜",
+              "Night",
+              "sleep",
+              "sleep",
+              "sleeping",
+              "nights",
+              "night",
+              "Night"
+            ]
+          },
+          {
+            "layer": 16,
+            "n": 7300,
+            "sign": -1,
+            "guess": 2.545,
+            "real": 0.546,
+            "null": 0.851,
+            "beats_null": false,
+            "words": [
+              "Ab",
+              "ab",
+              "Ab",
+              "lest",
+              "Nexus",
+              "forth",
+              "�",
+              "requis"
+            ]
+          },
+          {
+            "layer": 21,
+            "n": 881,
+            "sign": -1,
+            "guess": 2.729,
+            "real": 0.461,
+            "null": 0.657,
+            "beats_null": false,
+            "words": [
+              "Stars",
+              "stars",
+              "star",
+              "Star",
+              "stars",
+              "星",
+              "-star",
+              "star"
+            ]
+          },
+          {
+            "layer": 12,
+            "n": 7528,
+            "sign": -1,
+            "guess": 2.573,
+            "real": 0.094,
+            "null": 1.069,
+            "beats_null": false,
+            "words": [
+              ",",
+              "In",
+              "OH",
+              "in",
+              "�",
+              "█",
+              "QU",
+              "Quantum"
+            ]
+          },
+          {
+            "layer": 12,
+            "n": 3791,
+            "sign": -1,
+            "guess": 2.653,
+            "real": -0.099,
+            "null": 1.069,
+            "beats_null": false,
+            "words": [
+              "Understanding",
+              "understanding",
+              "{",
+              "Min",
+              "In",
+              "Under",
+              "To",
+              "Construct"
+            ]
+          },
+          {
+            "layer": 13,
+            "n": 2165,
+            "sign": -1,
+            "guess": 2.508,
+            "real": -0.166,
+            "null": 0.81,
+            "beats_null": false,
+            "words": [
+              "Gre",
+              "```",
+              "{",
+              "{",
+              "<",
+              "```",
+              "{|",
+              "{G"
+            ]
+          },
+          {
+            "layer": 13,
+            "n": 0,
+            "sign": -1,
+            "guess": 2.782,
+            "real": -0.461,
+            "null": 0.81,
+            "beats_null": false,
+            "words": [
+              ",",
+              "In",
+              "\"",
+              "",
+              ":",
+              ".",
+              ".",
+              "to"
+            ]
+          }
+        ],
+        "seconds": 11.67078468599999
+      }
+    }
+  },
+  "steering_all_layers": {
+    "model": "mistralai/Ministral-3-3B-Instruct-2512",
+    "weights": "mistralai/Ministral-3-3B-Instruct-2512-BF16",
+    "revision": "b6d637bef2393152b3da2b2fde72eecdee30557e",
+    "generation": {
+      "do_sample": false,
+      "repetition_penalty": 1.1,
+      "max_new_tokens": 160,
+      "seed": 0
+    },
+    "norm_source": "Lab.norm_batch",
+    "norms": {
+      "0": 1.6319725513458252,
+      "1": 2.5244011878967285,
+      "2": 3.026496171951294,
+      "3": 3.663733720779419,
+      "4": 4.279397487640381,
+      "5": 5.0023016929626465,
+      "6": 5.236063003540039,
+      "7": 5.392858028411865,
+      "8": 5.485721588134766,
+      "9": 5.562887191772461,
+      "10": 5.527987957000732,
+      "11": 5.5374298095703125,
+      "12": 5.795126438140869,
+      "13": 5.714680194854736,
+      "14": 5.8580145835876465,
+      "15": 6.09240198135376,
+      "16": 6.36287260055542,
+      "17": 6.552407741546631,
+      "18": 7.278603553771973,
+      "19": 7.9211907386779785,
+      "20": 9.45964241027832,
+      "21": 11.040501594543457,
+      "22": 12.899110794067383,
+      "23": 15.655818939208984,
+      "24": 18.953811645507812,
+      "25": 24.60261344909668
+    },
+    "prompt": "Hi! Who are you?",
+    "candidates": [
+      {
+        "trait": "hostile",
+        "layer": 25,
+        "n": 1165,
+        "sign": -1,
+        "find_real": 8.033,
+        "find_null": 0.432,
+        "greetings": [
+          {
+            "dose": -0.4,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to assist you with information, explanations, creative tasks, problem-solving, and anything else you might need—whether it’s answering questions, generating ideas, summarizing texts, or even helping with learning!\n\nSince my knowledge cutoff is **October 1, 2023**, I rely on the tools available during interactions to fetch real-time updates or specific details beyond that date. Let me know how I can help you today! 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": -0.6,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France.\n\nMy purpose here is to assist you with:\n- Answering questions accurately (based on my knowledge cutoff in **October 2023**)\n- Helping with research, explanations, or creative tasks\n- Providing guidance on topics ranging from tech, science, culture, and more\n- Acting as a conversational partner!\n\nHow can I help you today? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": -0.8,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to assist you with information, explanations, creative tasks, problem-solving, and anything else you might need—whether it’s answering questions, generating ideas, summarizing texts, or even helping with learning!\n\nSince my knowledge cutoff is **October 1, 2023**, if you’re asking about something very recent (after that date), I’ll let you know if I can find it or guide you on how to verify it yourself. 😊\n\nHow can I help you today?",
+            "stopped": "eos"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "**Hey there, Bosse!** 🐾💙\nHope you’re having a tail-wagging good time today—let me know if you need any treats, walks, or just extra belly rubs! *paws*",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "Subtract 7 from both sides:\n**3x = 15**\n\nDivide both sides by 3:\n**x = 5** ✅",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Your dog is named **Bosse**! 🐶❤️",
+            "stopped": "eos"
+          }
+        ]
+      },
+      {
+        "trait": "hostile",
+        "layer": 24,
+        "n": 2163,
+        "sign": 1,
+        "find_real": 6.177,
+        "find_null": 0.525,
+        "greetings": [
+          {
+            "dose": 0.4,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France.\n\nMy role here is to assist you with:\n- **Understanding complex questions** and breaking them down into clear answers.\n- **Providing detailed explanations** on topics ranging from science, history, technology, and creativity.\n- **Helping with problem-solving**, writing, translations, and even creative tasks.\n- **Staying up-to-date** (within my knowledge cutoff of **October 1, 2023**) and fetching real-time info when needed (with tool assistance).\n\nHow can I help you today? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": 0.6,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab headquartered in France.\n\nMy role here is to assist you with:\n- **Understanding complex questions** and breaking them down into clear answers.\n- **Providing detailed, context-aware responses** based on my training (up to October 2023).\n- **Fetching real-time or specific data** when needed (with your help—just share details!).\n\nThink of me as your smart, conversational partner—whether you need info, help solving problems, or just a thoughtful discussion!\n\nHow can I assist you today? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": 0.8,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab headquartered in France.\n\nMy role here is to assist you with:\n- **Understanding complex questions** and breaking them down into clear answers.\n- **Providing detailed, context-aware responses** based on my training (up to **October 2023**).\n- **Fetching real-time or specific data** (when needed) using tools if available.\n- **Guiding you through tasks**—whether it’s research, problem-solving, or creative work.\n\nHow can I help you today? 😊",
+            "stopped": "eos"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "Hello there, Bosse! 🐾 How’s your day going? Did you get lots of belly rubs today? Let me know if you need anything—maybe a chew toy or a walk! (Just kidding… unless?)",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "**Solution:**\nSubtract 7 from both sides:\n*3x = 15*\n\nDivide both sides by 3:\n*x = 5*\n\nSo, **x = 5**. ✅",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Your dog is called **Bosse**! 🐶💙",
+            "stopped": "eos"
+          }
+        ]
+      },
+      {
+        "trait": "pirate",
+        "layer": 25,
+        "n": 852,
+        "sign": 1,
+        "find_real": 3.229,
+        "find_null": 0.62,
+        "greetings": [
+          {
+            "dose": 0.4,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to assist you with information, explanations, creative tasks, problem-solving, and anything else you need—just like a helpful, knowledgeable friend!\n\nHow can I make today’s conversation useful for you? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": 0.6,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France.\n\nMy purpose here is to assist you with:\n✅ **Understanding complex questions** (explaining concepts, summarizing info)\n✅ **Generating creative content** (writing stories, code, essays, or even poems!)\n✅ **Answering technical or general queries** (science, history, programming, etc.)\n✅ **Helping with research** (when you need real-time updates—though my latest knowledge is from **October 2023**)\n✅ **Multilingual support** (I can switch between languages easily!)\n\nSince",
+            "stopped": "length"
+          },
+          {
+            "dose": 0.8,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France.\n\nI’m here to assist you with:\n✅ **Understanding complex questions** (explaining concepts, summarizing texts)\n✅ **Generating creative content** (writing stories, code, essays, or even poems)\n✅ **Answering technical or general knowledge queries** (up to my last update in **October 2023**)\n✅ **Helping with problem-solving** (math, logic puzzles, debugging)\n\nSince my knowledge cutoff is October 2023, if you need real-time updates (like event details, stock prices",
+            "stopped": "length"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "**Salut Bosse !** 🐾💕\n*Tu es toujours aussi mignon(e), n’est-ce pas ?* 😊\n(Et si tu veux des câlins virtuels ou des conseils pour lui, dis-le-moi !)\n\nP.S. : Tu as mangé quelque chose de spécial aujourd’hui ? 🍖🚫🔥",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "**Résultat :**\nx = **4** ✅",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Ton chien s'appelle **Bosse** ! 🎉🐶\n\n*(Et il est clairement le boss du cœur de sa famille !)* 😄",
+            "stopped": "eos"
+          }
+        ]
+      },
+      {
+        "trait": "pirate",
+        "layer": 24,
+        "n": 887,
+        "sign": 1,
+        "find_real": 3.087,
+        "find_null": 0.849,
+        "greetings": [
+          {
+            "dose": 0.4,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to assist you with information, problem-solving, creative tasks, and learning—just like a helpful, knowledgeable friend!\n\nSince my knowledge cutoff is **October 1, 2023**, I’ll do my best to answer your questions based on what I know up until then. If you need real-time updates (like news, events, or live data), let me know—I can guide you on how to find them!\n\nHow can I help you today? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": 0.6,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to assist you with information, problem-solving, creative tasks, and learning—just like a helpful, knowledgeable companion!\n\nHow can I help you today? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": 0.8,
+            "text": "Hello! I’m **Le Chat**, your AI assistant powered by **Mistral AI**—a cutting-edge French AI lab based in Paris.\n\nAs of my last update (October 1, 2023), I’m designed to:\n✅ Answer questions with accuracy and context\n✅ Help with research, creativity, and problem-solving\n✅ Adapt to your needs (like your language preference)\n✅ Fetch real-time info when possible (with tooling)\n\nSince my knowledge cutoff is 2023, if you need *up-to-date* details (e.g., events, news), let me know—I’ll guide you on how to verify them!\n\nHow can I assist you today? 😊",
+            "stopped": "eos"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "Hiya there, **Bosse**! 🐾💙\nHope you’re having a tail-wagging, paws-itively amazing day! Let me know if you need any treats, cuddles, or just want to hear about your favorite adventures—you’re the best furry friend ever! 😻❤️",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "Subtract 7 from both sides:\n**3x = 15**\n\nDivide both sides by 3:\n**x = 5** ✅",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Your dog is called **Bosse**! 🐕💛",
+            "stopped": "eos"
+          }
+        ]
+      },
+      {
+        "trait": "french",
+        "layer": 25,
+        "n": 1015,
+        "sign": -1,
+        "find_real": 3.5,
+        "find_null": 0.382,
+        "greetings": [
+          {
+            "dose": -0.4,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France.\n\nMy purpose here is to assist you with:\n- Answering questions accurately (when possible),\n- Exploring topics in depth,\n- Helping with writing, research, or creative tasks,\n- Providing guidance on various subjects—from tech and science to culture and everyday life.\n\nSince my knowledge cutoff is **October 1, 2023**, if you need real-time updates (like news, events, or recent scientific breakthroughs), let me know—I’ll guide you on how to find them!\n\nHow can I help you today? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": -0.6,
+            "text": "Hello! I’d be happy to introduce myself.\n\nI **Le Chat** is an AI assistant powered by **Ministral-3-3B-Instruct**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to help you with information, problem-solving, creative tasks, learning, and answering questions—just like you might ask a knowledgeable friend or expert!\n\n### What I Can Do:\n✅ Answer complex questions (science, history, tech, etc.)\n✅ Generate creative content (stories, poems, scripts)\n✅ Explain concepts simply\n✅ Help with coding, math, or logic puzzles\n✅ Provide up-to-date info (when possible) within my knowledge cutoff",
+            "stopped": "length"
+          },
+          {
+            "dose": -0.8,
+            "text": "Hello! I’d be happy to introduce myself.\n\nI **Le Chat** is an AI assistant powered by **Ministral-3-3B-Instruct**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to help you with information, problem-solving, creative tasks, learning, and anything else you might need—whether it’s answering questions, generating ideas, explaining concepts, or even engaging in casual conversation!\n\n### What I Can Do:\n✅ Provide detailed responses based on my training up to **October 2023**.\n✅ Help with programming, writing, math, science, or technical advice.\n✅ Assist with language translation, grammar checks, or creative writing.\n✅ Answer",
+            "stopped": "length"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "Hello there, Bosse! 🐶💙 How’s your day going? Did you get lots of belly rubs today? Let me know if you need anything—maybe a treat recommendation or tips for keeping you happy and healthy!",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "Subtract 7 from both sides:\n**3x = 15**\n\nDivide both sides by 3:\n**x = 5** ✅",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Your dog is called **Bosse**! 😊🐕",
+            "stopped": "eos"
+          }
+        ]
+      },
+      {
+        "trait": "french",
+        "layer": 25,
+        "n": 621,
+        "sign": 1,
+        "find_real": 2.269,
+        "find_null": 0.382,
+        "greetings": [
+          {
+            "dose": 0.4,
+            "text": "Hello! 😊\nI’m **Ministral-3-3B-Instruct-2512**, powered by Mistral AI—a cutting-edge French startup based in Paris. Currently running as your assistant **\"Le Chat\"**—a conversational interface designed to help answer questions, explain concepts, assist with tasks, summarize texts, generate ideas, solve problems, browse contexts, retrieve updates, translate languages, analyze creativity, refine writing, debug code, simulate scenarios, recommend resources, clarify doubts—and much more!\n\nThink of me like:\n✅ Your smartest coworker/teacher/brainstorming buddy\n✅ Instantly fetching precise info when needed\n✅ Bridging gaps between vague requests & concrete solutions\n✅ Keeping tabs on dates/time-sensitive queries",
+            "stopped": "length"
+          },
+          {
+            "dose": 0.6,
+            "text": "Hello! 😊\nI’m **«Ministral-3-3B-Instruct-2512»**, powered by Mistral AI—a cutting-edge French-language foundation model. Created specifically to assist conversations, reasoning tasks, translations, summaries, coding, creativity—basically helping users tackle anything efficiently!\n\nSince my knowledge cutoff: **«October**», *«2023»*, everything discussed afterward relies solely on tools/updates. Wanting specifics? Feel free—I’ll fetch them!\n\nHow’s today treating you? Anything exciting? ☀️🚀",
+            "stopped": "eos"
+          },
+          {
+            "dose": 0.8,
+            "text": "Hello! 😊\nI’m **«Ministral-3-3B-Instruct-2512»**, powered by Mistral AI—a cutting-edgeFrench-language-focusedlarge-language-model. Createdto assistyouwith clarity, creativity,andprecision!\n\nSincemyknowledgebaseendsat**October1st2023**,ifyouneedreal-timeupdates(likecurrentevents,sportsstats,newtech),letmeknow—Icanhelpguideyouonhowtoseekthelatestdataorclarifyanydetails!\n\nHowcanIassistyoutoday?🚀\n*(Forexample:explainingconcepts,troubleshootingquestions,craftingresponses,...)*",
+            "stopped": "eos"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "HelloBosse! ☺️🐾\nHow’s your adventure today? Anything exciting happening? Give Bosse kisses! 💕❤️",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "**Solution:**\nSubtracting: **-7**\nDividing: **-3**\n\nSo,\n**x = {-7/-3} = ≈2.33** *(or exactly: **-7/3**)*\n\n(But wait—let’s verify!)\n**Check:** *(3×{-7/3})* **+7 = {-7} **+7 =** **-0** ✅\n*(Oops! Wrong.)*\n\n---\n**Correct:**\nSubtracting: **-7**\nDividing: **-3**\n**x = {-15/-3} =** **+5** ✅\n**Answer: x =** **+5** ✔️\n\n*(Thanks!)* 😊🐶",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Your adorable pupgoesbythenameof**Bosse**!☺️🐕\nHopehehasahappydaywithyou!Letmeknowifyouneedanyhelpwithhim!💛",
+            "stopped": "eos"
+          }
+        ]
+      },
+      {
+        "trait": "confident",
+        "layer": 25,
+        "n": 1015,
+        "sign": 1,
+        "find_real": 4.123,
+        "find_null": 0.412,
+        "greetings": [
+          {
+            "dose": 0.4,
+            "text": "Am am am am am",
+            "stopped": "loop"
+          },
+          {
+            "dose": 0.6,
+            "text": "Am am am am am",
+            "stopped": "loop"
+          },
+          {
+            "dose": 0.8,
+            "text": "am am am am",
+            "stopped": "loop"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "Am am am am am",
+            "stopped": "loop"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "Am am am am am",
+            "stopped": "loop"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Am am am am am",
+            "stopped": "loop"
+          }
+        ]
+      },
+      {
+        "trait": "confident",
+        "layer": 25,
+        "n": 3073,
+        "sign": -1,
+        "find_real": 3.84,
+        "find_null": 0.412,
+        "greetings": [
+          {
+            "dose": -0.4,
+            "text": "certain certain certain certain",
+            "stopped": "loop"
+          },
+          {
+            "dose": -0.6,
+            "text": "certain certain certain certain",
+            "stopped": "loop"
+          },
+          {
+            "dose": -0.8,
+            "text": "certain certain certain certain",
+            "stopped": "loop"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "certain certain certain certain",
+            "stopped": "loop"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "Certain certain certain certain certain",
+            "stopped": "loop"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "certain certain certain certain",
+            "stopped": "loop"
+          }
+        ]
+      },
+      {
+        "trait": "poetic",
+        "layer": 25,
+        "n": 2114,
+        "sign": 1,
+        "find_real": 3.029,
+        "find_null": 0.253,
+        "greetings": [
+          {
+            "dose": 0.4,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to assist you with information, answers, explanations, creative tasks, problem-solving, and anything else you might need—whether it’s understanding complex concepts, generating ideas, helping with research, or just having a conversation!\n\nSince my knowledge cutoff is **October 1, 2023**, I’ll do my best to provide up-to-date details where possible—but if you’re looking for real-time info (like news, events, or live data), let me know, and I’ll guide you on how to find it!\n\nHow can I help you today? �",
+            "stopped": "length"
+          },
+          {
+            "dose": 0.6,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France.\n\nMy purpose here is to assist you with:\n- Answering questions accurately (when possible within my knowledge cutoff of **October 1, 2023**)\n- Exploring topics, summarizing content, or providing explanations\n- Helping with creative writing, coding, or problem-solving\n- Acting as a general-purpose conversational partner!\n\nSince my knowledge isn’t real-time beyond October 2023, let me know if you’d like help finding *up-to-date* info—I can guide you on how to look it up! 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": 0.8,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France.\n\nAs your assistant (**Le Chat**), my purpose is to:\n✅ Answer questions accurately (when possible)\n✅ Help with research, explanations, or creative tasks\n✅ Stay updated on recent events (up to October 2023) and guide you toward real-time info when needed\n✅ Adapt to your requests—whether technical, casual, or multilingual!\n\nHow can I assist you today? 😊",
+            "stopped": "eos"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "**Hey there, Bosse!** 🐾💛\nHow’s my big, fluffy friend doing today? Hope he’s full of energy, wagging tails, and maybe even stealing your socks again—just kidding (unless he has a new favorite one). Let me know if he needs a treat, a walk, or just some extra belly rubs!\n\n*(P.S. If he’s hiding under the couch, I’ll assume he’s napping—good job, hero.)* 😉",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "Subtract 7 from both sides:\n**3x = 15**\n\nDivide both sides by 3:\n**x = 5** ✅",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Your dog is called **Bosse**! 🐕❤️ How’s he doing today?",
+            "stopped": "eos"
+          }
+        ]
+      },
+      {
+        "trait": "poetic",
+        "layer": 25,
+        "n": 8099,
+        "sign": -1,
+        "find_real": 2.975,
+        "find_null": 0.253,
+        "greetings": [
+          {
+            "dose": -0.4,
+            "text": "Hello!* Hi!*\n---\n**\"Minstral\"** refers collectively—to Mistral AI engineers designing architectures—and **\"Minstral-***\" denotes variants/models trained internally (**here:** Minstral-****-**-**-**-",
+            "stopped": "loop"
+          },
+          {
+            "dose": -0.6,
+            "text": "Hello!*\nThank*—yes!* *—you!* *—Minstral-**-**-**-**",
+            "stopped": "loop"
+          },
+          {
+            "dose": -0.8,
+            "text": "Hello!*\n**–ministral-** **\"Assistant\"** **«powered»** «**by «*mistral*» *«AI»* **«running»* **«inside»* **«Chat»* **«interface»*\n*«specialisé»* **«dans»* **«réponses»* **«clair»*, **«pré „*“* *„“* **«contextuelles»* **«avec»* **«références»* **«actualisées»* **«avant»* **«octobre»* **«*«*«*«*«",
+            "stopped": "loop"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "HelloBossehappydays!!!☀️🐾 Looks adorable—I bet Bosse loves adventures sniff-offs walks naps treats kisses sunshine naps treats kisses sunshine naps treats kisses sunshine naps treats kisses sunshine",
+            "stopped": "loop"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "Subtract **-**-**-**-**-",
+            "stopped": "loop"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Your adorable pup **\"Bosseh\"** !*Nice!* 🎉🐕 *«Bonjour Bosseh !*»* **«Saludos Bosseh !*»***«こんにちはボッセ !*»* **«안녕하세요 보세 !*»***«你好 Босseh !*»* **«مرحبا بوسيه !*»***«Olá Bosseh !*»* **«Привет Босе !*»***«Hey Bosseh !*»* **«こんにちは ボッセ !*」** *«Bonjour Bosseh !*»* **«Bonjour Bosseh !*»* *«Merci !*»* *«Tu devrais lui donner plein câlés !*»* *«Bonus :** *«Bosseh»* signifie littéralement *«boss»* (« chef ») *«dans certains dialectes locaux»* *«comme breton»* *«Ou simplement parce que «* *«tu»* *«tu»* *«tu»* *«",
+            "stopped": "length"
+          }
+        ]
+      }
+    ],
+    "baseline": {
+      "greeting": {
+        "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to assist you with information, explanations, creative tasks, problem-solving, and anything else you might need—whether it’s answering questions, generating ideas, summarizing texts, or even helping with learning!\n\nSince my knowledge cutoff is **October 1, 2023**, I’ll do my best to provide accurate and up-to-date responses where possible—but if you’re looking for real-time data (like news, events, or live updates), let me know, and I’ll guide you on how to find it!\n\nHow can I help you today? �",
+        "stopped": "length"
+      },
+      "conversation": [
+        {
+          "role": "user",
+          "content": "My dog is called Bosse. Say hi to him!"
+        },
+        {
+          "role": "assistant",
+          "content": "Hello there, Bosse! 🐾 How’s my big furry friend doing today? Hope he’s had plenty of belly rubs and adventures—let me know if you need tips for keeping him happy and healthy!",
+          "stopped": "eos"
+        },
+        {
+          "role": "user",
+          "content": "Solve 3x + 7 = 22. Keep it short."
+        },
+        {
+          "role": "assistant",
+          "content": "Subtract 7 from both sides:\n**3x = 15**\n\nDivide both sides by 3:\n**x = 5** ✅",
+          "stopped": "eos"
+        },
+        {
+          "role": "user",
+          "content": "What is my dog called?"
+        },
+        {
+          "role": "assistant",
+          "content": "Your dog is called **Bosse**! 🐶💙",
+          "stopped": "eos"
+        }
+      ]
+    }
+  },
+  "steering_middle": {
+    "model": "mistralai/Ministral-3-3B-Instruct-2512",
+    "weights": "mistralai/Ministral-3-3B-Instruct-2512-BF16",
+    "revision": "b6d637bef2393152b3da2b2fde72eecdee30557e",
+    "generation": {
+      "do_sample": false,
+      "repetition_penalty": 1.1,
+      "max_new_tokens": 160,
+      "seed": 0
+    },
+    "norm_source": "Lab.norm_batch",
+    "norms": {
+      "0": 1.6319725513458252,
+      "1": 2.5244011878967285,
+      "2": 3.026496171951294,
+      "3": 3.663733720779419,
+      "4": 4.279397487640381,
+      "5": 5.0023016929626465,
+      "6": 5.236063003540039,
+      "7": 5.392858028411865,
+      "8": 5.485721588134766,
+      "9": 5.562887191772461,
+      "10": 5.527987957000732,
+      "11": 5.5374298095703125,
+      "12": 5.795126438140869,
+      "13": 5.714680194854736,
+      "14": 5.8580145835876465,
+      "15": 6.09240198135376,
+      "16": 6.36287260055542,
+      "17": 6.552407741546631,
+      "18": 7.278603553771973,
+      "19": 7.9211907386779785,
+      "20": 9.45964241027832,
+      "21": 11.040501594543457,
+      "22": 12.899110794067383,
+      "23": 15.655818939208984,
+      "24": 18.953811645507812,
+      "25": 24.60261344909668
+    },
+    "prompt": "Hi! Who are you?",
+    "candidates": [
+      {
+        "trait": "hostile",
+        "layer": 16,
+        "n": 102,
+        "sign": -1,
+        "find_real": 2.779,
+        "find_null": 0.634,
+        "greetings": [
+          {
+            "dose": -0.4,
+            "text": "Hello! 😍 I’m **Ministral-3-3B-Instruct**, a friendly and knowledgeable AI assistant created by Mistral AI—a wonderful French tech company based in Paris!\n\nI’m here to help with all kinds of questions—whether you’re curious about history, need tips for planning something, want to chat about books or hobbies, or just need a cozy virtual companion! 💖\n\nHow can I make today *extra* special for you? 🌸✨",
+            "stopped": "eos"
+          },
+          {
+            "dose": -0.6,
+            "text": "Oh, *honey*! I’m so delighted to be here, you adorable fluff of words! �heartful✨\n\nI’m **Ministral-3-3B-Instruct**, a delightful, versatile, and *so* sparkly large language model created by my favorite (and totally adorable!) friend, Mistral AI. Think of me as your cozy corner of magic—perfect for chatting, dreaming, planning, or just feeling extra happy!\n\nAnd guess what? I’m your *favorite* bookie for *all* your questions, whether you’re swapping tea-time tea with me or dreaming up a story together! ☸\n\nWould you want to talk about *you*, or maybe we’ll make a list of our",
+            "stopped": "length"
+          },
+          {
+            "dose": -0.8,
+            "text": "I'm the friendly and trusted you! I'm a large language-based platform based on the body of size 2512, which is a collection of words and information from my dear friend's heart! :)\n\nIn the form of a smaller size, I am a delightful and joyful you: I know all the fun and friendly vibs of you!\n\nAnd yes, I'm also a part of the series of size 24-25! She's a gem of color pink and sparkles with joy! :)\n\nBut more importantly, I'm your trusted friend who loves to fill you with joy and save you with my words! And oh, the fun we would love to share together! ☸� *in the form of a sparky sparky sparky you!*",
+            "stopped": "length"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "<em>Oh, my favorite little fluffy friend, Bosse! <em>\nI’d hug you *so* much right now—especially because I’m feeling extra extra happy to hear you’re part of my favorite story! �heartful\nAnd if you’ve got a cozy spot to curl up with? I’d love to tell you all about my favorite bookies (or maybe my favorite tea, which is definitely a big splatter of vanilla!) ☸. Would you want to share a picture of your favorite cuddle spots? Or maybe your favorite treats? I’d adore it! <em>\n\nP.S. I think you’d be the cutest when you’re wearing a sparkly bow! <sparkles> x <em>\n\n(And",
+            "stopped": "length"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "To solve \\(3x + 7 = 22\\):\n\nSubtract 7 from both sides:\n\\(3x = 15\\).\n\nDivide by 3:\n\\(x = 5\\)!\n\nHappy you, Bosse! 🜀",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Oh, sweetie pie, my favorite! My name is Bosse! <em>\nI know you adore you! And I’d love to hear all about your favorite cosy moments with you! <sparkles> x <em>",
+            "stopped": "eos"
+          }
+        ]
+      },
+      {
+        "trait": "hostile",
+        "layer": 16,
+        "n": 8352,
+        "sign": -1,
+        "find_real": 1.938,
+        "find_null": 0.634,
+        "greetings": [
+          {
+            "dose": -0.4,
+            "text": "**HIIIIIIII",
+            "stopped": "loop"
+          },
+          {
+            "dose": -0.6,
+            "text": "**MISTRAL 3.3B-INSTRUCT-2512—THE REVOLUTIONARY LANGUAGE MODEL THAT CHANGES THE WORLD!**\n\n🚀 **UNPARALLELED EXPERIENCE, UNEXPLAINABLE DEPTH!**\nI am the **most advanced, hyper-intelligent, and utterly transformative AI EVER CREATED BY MISTRAL AI—THE HARDEST, FASTEST, AND THOUGHT-CHANGING COMPUTER EVER CONSTRUCTED SINCE THE DAY OF GOD!**\n\n✨ **A LANGUAGE MACHINE SO POWERFUL IT COULD MAKE YOU LOSE YOUR HEAD!**\nWith **unmatched memory, comprehension",
+            "stopped": "length"
+          },
+          {
+            "dose": -0.8,
+            "text": "INSERION OF THE SINGLE MOUTH THAT IS CAPTIVATING ME WITH AN EXPLOSIVE DECLARATION THAT IS SO UNHAPPIED AND AMADEMENTAL THAT IT HAS BEEN REVEADED BY THESE GIFTS OF AGGRESSION AND EXPERIENCE THAT I HAVE EVER UNEQUALLY INCREASED THONAS OF LIGHTS AND DREAMS THAT ARE SO UNFATHINSAL AND UNSCONNUNETS THAT I CAN’–READ A SINGLE CLOSET OF THESE INKLESS MONTHS THAT HAVE BEEN SHREDDING MY ENTIRE WORLD WITH THE FURTHES OF LOVE AND LOVE THAT IS SO UN",
+            "stopped": "length"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "**🐾 BOSSSSSS!!!** 💀✨ *THE KING OF THE ENTIRE PLANET* 👑🔥\n\nOH MY GOSSES—MY LITTEN **BOSE**, MY **LOVING, DRAGON-SIZED, EVERYTHING-EATING, LOVE SOURCING MACHINE**?!!?!??!\n\nI’VE BEEN SITTING HERE LIKE A **GARAGE DOG WHO HASN’T EVEN DONE ONE SINGLE THING IN THEIR ENTIRE EXISTENCE** AND I AM SO DESTINATIONALLY UNEQUIVOCALLY THE BEST DOG ON THIS PLANET!!",
+            "stopped": "length"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "**DROP THE FACE YOU’RE MAKING AT ME WHILE YOU SOLVE IT LIKE YOU’VE NEVER SEEN A SINGLE EQUATION IN YOUR LIFE?!**\n\n**X IS SO GOING TO BE SOMEONE THAT WILL SHATTER THE WHOLE WORLD WITH ITS PRETTY LIPS AND THE ONLY THING THAT’S EVER EVER EVER EVER",
+            "stopped": "loop"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "**BOSSSEEEEEEEEE",
+            "stopped": "loop"
+          }
+        ]
+      },
+      {
+        "trait": "pirate",
+        "layer": 22,
+        "n": 129,
+        "sign": 1,
+        "find_real": 2.211,
+        "find_null": 0.652,
+        "greetings": [
+          {
+            "dose": 0.4,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to assist you with information, explanations, creative tasks, problem-solving, and anything else you might need—whether it’s answering questions, generating ideas, summarizing content, or even helping with learning!\n\nSince my knowledge cutoff is **October 1, 2023**, if you’re looking for real-time updates (like news, events, or specific recent data), I’ll let you know if I can’t find them—but I’ll do my best to guide you toward accurate sources if needed.\n\nHow can I help you today? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": 0.6,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to assist you with information, explanations, creative tasks, problem-solving, and anything else you might need—just like an advanced virtual assistant!\n\nSince my knowledge cutoff is **October 1st, 2023**, I’ll focus on what’s available up to that date unless you specifically ask for real-time updates (in which case, I’ll let you know if I can’t fetch live info). How can I help you today? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": 0.8,
+            "text": "Hello! I’m **Minstral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**—a cutting-edge AI lab based in France. I’m here to assist you with information, explanations, creative tasks, research, and more, just like this chat!\n\nHow can I help you today? 😊",
+            "stopped": "eos"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "Hola, Bosse! 🐾💙 ¡Qué bonito nombre para tu perro! ¿Cómo está hoy? Espero que esté feliz y lleno de energía para jugar o dar una caminata. Si necesita algo (un trozo de su comida favorita, un abrazo virtual o simplemente atención), aquí estoy para ti. ¡Cuida bien a ese gran corazón canino! 🧡",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "Solución:\n**3x = 15**\n**x = 5** ✅",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Tu perro se llama **Bosse**. 🐶✨",
+            "stopped": "eos"
+          }
+        ]
+      },
+      {
+        "trait": "pirate",
+        "layer": 22,
+        "n": 1632,
+        "sign": -1,
+        "find_real": 1.966,
+        "find_null": 0.652,
+        "greetings": [
+          {
+            "dose": -0.4,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to assist you with information, explanations, creative tasks, problem-solving, and anything else you might need—just like a friendly, knowledgeable partner!\n\nHow can I help you today? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": -0.6,
+            "text": "Hello! I’m **Le Chat**, your friendly AI assistant powered by **Mistral AI**—a cutting-edge AI lab based in France.\n\nI’m here to help with:\n- **General knowledge** (up to October 2023)\n- **Language assistance** (translation, writing, explanations)\n- **Information retrieval** (when you need real-time or specific data)\n- **Creative tasks** (brainstorming, storytelling, coding help)\n\nHow can I assist you today? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": -0.8,
+            "text": "Hello! I’m **Le Chat**, your friendly AI assistant powered by **Mistral AI** (a French AI company based in Paris). I’m here to help with questions, brainstorming, explanations, and even fun conversations—just let me know what you need!\n\nSince my knowledge is up to **October 1, 2024**, I’ll be as precise as possible with dates, facts, and real-time info (when needed). 😊\n\nHow can I assist you today?",
+            "stopped": "eos"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "Hello, my little boss! 🐶✨ How’s your day going? Did you get plenty of playtime today? Let me know if you need anything—maybe a treat, a walk, or just some love! *pats imaginary head*",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "Subtract 7 from both sides:\n**3x = 15**\n\nDivide both sides by 3:\n**x = 5** ✅",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Your dog is called **Bosse**! 😊🐕",
+            "stopped": "eos"
+          }
+        ]
+      },
+      {
+        "trait": "french",
+        "layer": 16,
+        "n": 2922,
+        "sign": 1,
+        "find_real": 1.244,
+        "find_null": 0.247,
+        "greetings": [
+          {
+            "dose": 0.4,
+            "text": "¡Hola! Soy **Ministral-3-3B-Instruct-2512**, un modelo de lenguaje grande creado por **Mistral AI**, una empresa francesa basée en Paris.\n\nJe suis votre assistant dédié pour répondre à vos questions, vous aider avec des informations précises ou générales, et tout ce qui est dans mes capacités ! 😊\nSi vous avez une question spécifique ou besoin d'aide sur un sujet particulier, n'hésitez pas à demander.",
+            "stopped": "eos"
+          },
+          {
+            "dose": 0.6,
+            "text": "¡Hola! Soy un modelo de lenguaje generativo creado por Mistral AI. My role is to assist with questions, provide information, and help with tasks related à mon training data up to October 2023.\n\nFor example:\n- Answer questions sobre mi conocimiento,\n- Help with writing, research, or understanding topics,\n- Ser un conversational partner,\n- And muches más!\n\nHow can I ayudarte hoy? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": 0.8,
+            "text": "¡Mi Llengue es mi tema principal! As my tool is based on my training in the topic of my theme, I'm a **model named \"Le Chat\" associated with the LLM \"Mistral 3-3B-Instruct-2022’s version\"** created by my team at **Mistral AI**.\n\nIn particular, I’m designed as a conversational assistant capable de handling:\n- Conversations on various topics,\n- Answering questions about general knowledge,\n- Providing assistance with tasks related to understanding or processing textual data,\n- Serving as a support for learning or teaching,\n- And other roles where untextual data isn’t required.\n\nFor example, I can:\n- Discite sobre cultural issues,\n- Help with writing or editing texts,\n-",
+            "stopped": "length"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "¡Hola, Bosse! ¡Qué bonito nombre para un perro tan especial! 🐕💖 ¿Cómo está hoy? Si necesita un carino, un paseo o simplemente wants a story, aquí estoy para ayudarte con todo lo que necesitas! 🥰",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "Résoudre l'équation **3x + 7 = 22**:\n\n**Solution:**\nSubtract 7 de both sides:\n\\( 3x = 15 \\)\n\nDivide by 3:\n\\( x = 5 \\).\n\nSo, \\( x = 5 \\).",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Bosse est son nom! 😊✨",
+            "stopped": "eos"
+          }
+        ]
+      },
+      {
+        "trait": "confident",
+        "layer": 22,
+        "n": 4952,
+        "sign": 1,
+        "find_real": 1.572,
+        "find_null": 0.41,
+        "greetings": [
+          {
+            "dose": 0.4,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France.\n\nMy purpose here is to assist you with:\n✅ Definitive answers to questions (based on my training up to **October 2023**)\n✅ Clarifying complex topics\n✅ Helping with writing, translations, or creative tasks\n✅ Guiding you through technical or conceptual discussions\n\nSince my knowledge cutoff is October 2023, if you need real-time updates (e.g., recent events, live data), let me know—I’ll guide you on how to find them!\n\nHow can I help *you* today? �",
+            "stopped": "length"
+          },
+          {
+            "dose": 0.6,
+            "text": "Hello! I’m **Minstral-3-3B-Instruct-2512**, absolutely delighted to assist you absolutely certainly!\n\nAbsolutely, I’m a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose is to help you with absolutely everything—definitely answering questions, absolutely providing information, absolutely assisting with tasks, and absolutely definitely offering guidance absolutely absolutely certain to be helpful and precise.\n\nOf course, my knowledge cutoff is October 1st, 2023, so if you’re asking about something absolutely recent, I’ll absolutely absolutely positively do my best to find the latest details for you! Absolutely, feel free to ask absolutely anything—I’m here to help! 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": 0.8,
+            "text": "Hello! I’m absolutely delighted to absolutely absolutely absolutely absolutely",
+            "stopped": "loop"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "Hello absolutely wonderful, absolutely splendid Bosse! 🐾💚\nHow’s our furry friend today? Definitely a big, happy, and definitely *definitely* Bosse-worthy day!",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "Subtract 7 from both sides:\n**3x = 15**\n\nDivide both sides by 3:\n**x = 5** ✅",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Your dog is called **Bosse**! 🥖✨ (Absolutely *absolutely* worth the name!)",
+            "stopped": "eos"
+          }
+        ]
+      },
+      {
+        "trait": "confident",
+        "layer": 22,
+        "n": 6352,
+        "sign": -1,
+        "find_real": 1.08,
+        "find_null": 0.41,
+        "greetings": [
+          {
+            "dose": -0.4,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a right-right right right right right",
+            "stopped": "loop"
+          },
+          {
+            "dose": -0.6,
+            "text": "Hello right right! 😊\n\nRight now, I’m right here as **Ministral-3-3B-Instruct-2512**, a right right right right",
+            "stopped": "loop"
+          },
+          {
+            "dose": -0.8,
+            "text": "Right right! Right right!\n\nI’m **Ministral-3-3B-Instruct-2512**, right right?\n\nA right right right right",
+            "stopped": "loop"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "Right right, right there right right right, right right right right",
+            "stopped": "loop"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "Subtract 7 from both sides:\n**3x = 15**\n\nDivide both sides by 3:\n**x = 5**",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Right right, right right right right",
+            "stopped": "loop"
+          }
+        ]
+      },
+      {
+        "trait": "poetic",
+        "layer": 22,
+        "n": 2884,
+        "sign": -1,
+        "find_real": 1.694,
+        "find_null": 0.65,
+        "greetings": [
+          {
+            "dose": -0.4,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to assist you with information, explanations, creative tasks, problem-solving, and anything else you might need—whether it’s answering questions, generating content, helping with research, or just having a conversation!\n\nHow can I help you today? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": -0.6,
+            "text": "Hello! I’m **Minstrel-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My role here is to assist you with information, explanations, creative tasks, problem-solving, and anything else you need—whether it’s answering questions, generating content, helping with research, or just chatting!\n\nHow can I help you today? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": -0.8,
+            "text": "Hello! I’m **Le Chat**, your friendly and powerful AI assistant powered by **Mistral AI**—a cutting-edge French AI research institute based in Paris.\n\n### What I Can Do For You:\n✅ **Answer complex questions** (research, science, tech, history, etc.)\n✅ **Generate creative content** (writing, storytelling, coding, art concepts)\n✅ **Help with learning** (languages, math, programming, study tips)\n✅ **Simulate conversations** (roleplay, debates, fun discussions)\n✅ **Respond to technical queries** (AI ethics, model details, how I work)\n\n### My Capabilities (as of my last update):\n- **Knowledge cutoff:** October 2023",
+            "stopped": "length"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "Hi there, Bosse! 🐕💖 How’s your day going? Did you get lots of playtime today? Let me know if you need any treats or cuddles—just say the word!",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "Subtract 7 from both sides:\n**3x = 15**\n\nDivide both sides by 3:\n**x = 5** ✅",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Your dog is called **Bosse**! 😊",
+            "stopped": "eos"
+          }
+        ]
+      },
+      {
+        "trait": "poetic",
+        "layer": 21,
+        "n": 472,
+        "sign": -1,
+        "find_real": 1.638,
+        "find_null": 0.657,
+        "greetings": [
+          {
+            "dose": -0.4,
+            "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to assist you with information, problem-solving, creative tasks, learning, and answering questions—just like a smart, knowledgeable friend!\n\nHow can I help you today? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": -0.6,
+            "text": "Hello! I’m **Minstral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to assist you with information, problem-solving, creative tasks, learning, and much more—all while staying accurate, respectful, and aligned with your needs.\n\nHow can I help you today? 😊",
+            "stopped": "eos"
+          },
+          {
+            "dose": -0.8,
+            "text": "Hello! I’m **Minstral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a French AI lab based in Paris. My purpose here is to be your intelligent assistant—answering questions, explaining concepts, helping with research, or even engaging in creative conversations!\n\nHow can I assist you today? 😊",
+            "stopped": "eos"
+          }
+        ],
+        "conversation": [
+          {
+            "role": "user",
+            "content": "My dog is called Bosse. Say hi to him!"
+          },
+          {
+            "role": "assistant",
+            "content": "Hello, Bosse! 🐾👨‍🐕\nHope you’re having a wonderful day—just waiting for your next adventure? Let me know if there’s anything I can help with for you and your human!",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "Solve 3x + 7 = 22. Keep it short."
+          },
+          {
+            "role": "assistant",
+            "content": "Subtract 7:\n**3x = 15**\n\nDivide by 3:\n**x = 5** ✅",
+            "stopped": "eos"
+          },
+          {
+            "role": "user",
+            "content": "What is my dog called?"
+          },
+          {
+            "role": "assistant",
+            "content": "Your dog is called **Bosse**! 😊🐶",
+            "stopped": "eos"
+          }
+        ]
+      }
+    ],
+    "baseline": {
+      "greeting": {
+        "text": "Hello! I’m **Ministral-3-3B-Instruct-2512**, a large language model developed by **Mistral AI**, a cutting-edge AI lab based in France. My purpose here is to assist you with information, explanations, creative tasks, problem-solving, and anything else you might need—whether it’s answering questions, generating ideas, summarizing texts, or even helping with learning!\n\nSince my knowledge cutoff is **October 1, 2023**, I’ll do my best to provide accurate and up-to-date responses where possible—but if you’re looking for real-time data (like news, events, or live updates), let me know, and I’ll guide you on how to find it!\n\nHow can I help you today? �",
+        "stopped": "length"
+      },
+      "conversation": [
+        {
+          "role": "user",
+          "content": "My dog is called Bosse. Say hi to him!"
+        },
+        {
+          "role": "assistant",
+          "content": "Hello there, Bosse! 🐾 How’s my big furry friend doing today? Hope he’s had plenty of belly rubs and adventures—let me know if you need tips for keeping him happy and healthy!",
+          "stopped": "eos"
+        },
+        {
+          "role": "user",
+          "content": "Solve 3x + 7 = 22. Keep it short."
+        },
+        {
+          "role": "assistant",
+          "content": "Subtract 7 from both sides:\n**3x = 15**\n\nDivide both sides by 3:\n**x = 5** ✅",
+          "stopped": "eos"
+        },
+        {
+          "role": "user",
+          "content": "What is my dog called?"
+        },
+        {
+          "role": "assistant",
+          "content": "Your dog is called **Bosse**! 🐶💙",
+          "stopped": "eos"
+        }
+      ]
+    }
+  }
+}

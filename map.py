@@ -134,7 +134,7 @@ def main():
     ap.add_argument("--layers", help="e.g. 20 or 3-23; default all")
     ap.add_argument("--frames", help="file with one 'question|start of answer' per line; default config.FRAMES")
     ap.add_argument("--dose", type=float, default=DOSE)
-    ap.add_argument("--per-batch", type=int, help="neurons per pass; default 2 for Gemma, 64 for Qwen")
+    ap.add_argument("--per-batch", type=int, help="neurons per pass; default 2 for Gemma/Ministral, 64 for Qwen")
     ap.add_argument("--k", type=int, default=24)
     ap.add_argument("--controls", type=int, default=64)
     ap.add_argument("--limit", type=int, help="only the first N neurons per layer")

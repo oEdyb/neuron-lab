@@ -109,7 +109,7 @@ class Lab:
         return hook
 
     def chat_ids(self, messages):
-        options = {"enable_thinking": False} if self.is_qwen else {}
+        options = {} if self.is_mistral else {"enable_thinking": False}
         text = self.tok.apply_chat_template(messages, add_generation_prompt=True, tokenize=False, **options)
         return self.tok(text, add_special_tokens=False).input_ids
 
