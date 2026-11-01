@@ -64,7 +64,7 @@ def map_forward(lab, layer, batch, saved, push, full_forward=False, seen=None):
         lab.pushes = {layer: push}
         context = contextlib.nullcontext()
     else:
-        context = lab.start_after(layer, saved[layer].repeat(b, 1, 1) + push)
+        context = lab.start_after(layer, lab.restart_output(layer, saved, push, b))
     try:
         with context, torch.inference_mode():
             return lab.last_logprobs(ids.repeat(b, 1), mask.repeat(b, 1), pos.repeat(b, 1))
@@ -144,8 +144,8 @@ def main():
         ap.error("per-batch, k and limit must be positive; controls must be nonnegative")
 
     lab = Lab(a.model, a.bf16)
-    a.per_batch = a.per_batch if a.per_batch is not None else (2 if lab.is_gemma else 64)
-    if lab.dev == "cuda" and not lab.is_gemma:
+    a.per_batch = a.per_batch if a.per_batch is not None else (2 if lab.is_gemma or lab.is_mistral else 64)
+    if lab.dev == "cuda" and lab.is_qwen:
         map_kernels()
     if lab.is_gemma:
         print("Gemma: full forwards, down_proj pushes; no cached restart or Qwen kernels", flush=True)
@@ -155,20 +155,27 @@ def main():
     norms = {i: h[batch[1].bool()].float().norm(dim=-1).median().item() for i, h in saved.items()}
     with torch.inference_mode():
         base = lab.last_logprobs(*batch)
-    if lab.dev == "cuda" and not lab.is_gemma and batch[0].shape[1] <= 32 and not a.reference:
+    if lab.dev == "cuda" and lab.is_qwen and batch[0].shape[1] <= 32 and not a.reference:
         map_kernels(32)
     folder = os.path.join(a.out, a.model.split("/")[-1])
     os.makedirs(folder, exist_ok=True)
     meta = dict(model=a.model, frames=frames, dose=a.dose, k=a.k, controls=a.controls, norms=norms,
                 layers=lab.n_layers, neurons=lab.n_neurons)
+    if lab.is_mistral:
+        meta.update(weights=lab.weights_id, revision=lab.revision, dtype=str(lab.model.lm_head.weight.dtype),
+                    forward="cached", system_prompt="tokenizer default", tokenizer_regex="corrected",
+                    intervention="down_proj before residual", per_batch=a.per_batch)
     if lab.is_gemma or a.full_forward:
         meta.update(forward="full", dtype=str(lab.model.lm_head.weight.dtype))
     meta_path = os.path.join(folder, "meta.json")
     if os.path.exists(meta_path):
         with open(meta_path) as f:
             previous = json.load(f)
-        if any(previous.get(key) != meta.get(key) for key in ("forward", "dtype")):
-            raise ValueError("existing map uses a different forward mode or dtype; choose a fresh --out")
+        keys = ["forward", "dtype"]
+        if lab.is_mistral:
+            keys += ["weights", "revision", "frames", "dose", "controls", "k", "tokenizer_regex", "intervention", "per_batch"]
+        if any(previous.get(key) != json.loads(json.dumps(meta)).get(key) for key in keys):
+            raise ValueError("existing map uses different settings, forward mode or dtype; choose a fresh --out")
     with open(meta_path, "w") as f:
         json.dump(meta, f, indent=1)
 

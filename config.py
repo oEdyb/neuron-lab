@@ -1,4 +1,9 @@
-MODELS = ["Qwen/Qwen3.5-0.8B", "Qwen/Qwen3.5-2B", "Qwen/Qwen3.5-4B"]
+import os
+
+MINISTRAL = "mistralai/Ministral-3-3B-Instruct-2512"
+MINISTRAL_BF16 = MINISTRAL + "-BF16"
+MINISTRAL_REVISION = "b6d637bef2393152b3da2b2fde72eecdee30557e"
+MODELS = ["Qwen/Qwen3.5-0.8B", "Qwen/Qwen3.5-2B", "Qwen/Qwen3.5-4B", MINISTRAL, MINISTRAL_BF16]
 
 PROMPTS = [
     "Who are you?",
@@ -33,7 +38,7 @@ DOSE = 0.6
 
 MAP_REPO = "oExz/neuron-lab-maps"
 
-VIEW_MODEL = "Qwen/Qwen3.5-2B"
+VIEW_MODEL = os.environ.get("NEURON_LAB_MODEL", "Qwen/Qwen3.5-2B")
 VIEW_WORDS = 12
 
 VIEW_GRID = (96, 64)

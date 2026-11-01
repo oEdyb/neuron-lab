@@ -68,3 +68,18 @@ def test_async_find_contract(monkeypatch):
         assert response.status_code == 202
         job = client.get('/api/find/' + response.json()['id']).json()
         assert job == dict(status='done', result=dict(ok=True, rows=[dict(layer=17, n=5244)]))
+
+
+def test_local_core_map_declares_optional_assets(tmp_path, monkeypatch):
+    root = tmp_path / 'core'
+    root.mkdir()
+    (root / 'manifest.json').write_text(json.dumps(dict(
+        model=map_data.VIEW_MODEL, layers=[dict(layer=0)],
+        capabilities=dict(exact_search=True, semantic_search=False, connections=False))))
+    for name in ('signed-search.json.gz', 'signed-strength.bin', 'L0.bin', 'L0.json.gz'):
+        (root / name).write_bytes(b'fixture')
+    monkeypatch.setenv('NEURON_LAB_MAPS', str(root))
+    monkeypatch.setattr(map_data, 'snapshot_download', Mock(side_effect=AssertionError('no network')))
+    assert map_data.ensure_maps()
+    (root / 'L0.bin').unlink()
+    assert not map_data.available()

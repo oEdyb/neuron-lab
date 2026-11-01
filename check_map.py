@@ -102,21 +102,21 @@ def main():
     a = ap.parse_args()
     torch.set_num_threads(8)
     lab = Lab(a.model, a.bf16)
-    if not lab.is_gemma:
+    if lab.is_qwen:
         map_kernels()
     batch, saved, norms, base = prepare(lab)
     report = dict(model=a.model, torch=torch.__version__, gpu=torch.cuda.get_device_name(),
                   neurons=lab.n_neurons, frames=FRAMES, sequence_length=batch[0].shape[1],
                   dose=DOSE, per_batch=a.per_batch, dtype=str(lab.model.lm_head.weight.dtype),
                   reference_kernels=a.reference, full_forward=lab.is_gemma or a.full_forward)
-    if not lab.is_gemma and batch[0].shape[1] <= 32 and not a.reference:
+    if lab.is_qwen and batch[0].shape[1] <= 32 and not a.reference:
         map_kernels(32)
     report['checks'] = check(lab, batch, saved, norms, base, a.full_forward)
     report['passed'] = all(r['top24_equal'] and r['prediction_top_equal'] and r['kl_relative'] <= 1e-3 for r in report['checks'])
     Path(a.out).write_text(json.dumps(report, indent=2) + '\n')
     if not report['passed']:
         raise SystemExit('equivalence failed; see JSON report')
-    if lab.is_gemma or a.full_forward:
+    if lab.is_gemma or lab.is_mistral or a.full_forward:
         report['array_checks'] = check_arrays(lab, batch, saved, norms, base, a.full_forward, a.per_batch)
         report['passed'] &= all(r['top24_equal'] and r['frame_top5_equal'] and r['persona_top8_equal'] and
                                 r['kl_relative'] <= 1e-3 for r in report['array_checks'])
@@ -124,7 +124,7 @@ def main():
         if not report['passed']:
             raise SystemExit('array equivalence failed; see JSON report')
     args = SimpleNamespace(controls=64, per_batch=a.per_batch, dose=DOSE, k=24)
-    if not lab.is_gemma:
+    if lab.is_qwen:
         original = original_map().map_layer(lab, 14, batch, base, saved, norms, args, 4)
         current = map_layer(lab, 14, batch, base, saved, norms, args, 4)
         report['qwen_array_count'] = len(original)
@@ -143,7 +143,7 @@ def main():
             row = dict(layer=layer, neurons=lab.neuron_count(layer), controls=args.controls,
                        seconds=elapsed, peak_allocated_gib=torch.cuda.max_memory_allocated() / 2**30)
             report['timings'].append(row)
-            np.savez(Path(a.out).with_name(f'gemma-L{layer}.npz'), **arrays)
+            np.savez(Path(a.out).with_name(f'{a.model.split(chr(47))[-1]}-L{layer}.npz'), **arrays)
             print('TIMING', json.dumps(row), flush=True)
             Path(a.out).write_text(json.dumps(report, indent=2) + '\n')
     report['passed'] &= report.get('qwen_byte_identical', True)

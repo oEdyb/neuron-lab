@@ -8,7 +8,7 @@ from huggingface_hub import snapshot_download
 from safetensors import safe_open
 from transformers import AutoTokenizer
 
-from config import VIEW_MODEL, VIEW_WORDS, VIEW_GRID, VIEW_DOTS
+from config import VIEW_MODEL, VIEW_WORDS, VIEW_GRID, VIEW_DOTS, MINISTRAL_BF16
 
 
 def build():
@@ -16,8 +16,11 @@ def build():
     meta = json.loads((root / 'meta.json').read_text())
     out = root / 'view'
     out.mkdir(exist_ok=True)
-    tok = AutoTokenizer.from_pretrained(VIEW_MODEL, local_files_only=True)
-    snapshot = Path(snapshot_download(VIEW_MODEL, local_files_only=True))
+    weights_id = meta.get('weights', VIEW_MODEL)
+    loading = {'revision': meta['revision']} if meta.get('revision') else {}
+    tokenizer_options = {'fix_mistral_regex': True} if weights_id == MINISTRAL_BF16 else {}
+    tok = AutoTokenizer.from_pretrained(weights_id, local_files_only=True, **loading, **tokenizer_options)
+    snapshot = Path(snapshot_download(weights_id, local_files_only=True, **loading))
     index = json.loads((snapshot / 'model.safetensors.index.json').read_text())['weight_map']
     torch.set_num_threads(4)
     words = {}
@@ -31,7 +34,8 @@ def build():
             result.append(words[i])
         return result
 
-    layers = []
+    layers, summaries, signed_strength, signed_index = [], [], [], {}
+    offset = 0
     for layer in range(meta['layers']):
         source = root / f'L{layer}.npz'
         if not source.exists():
@@ -39,7 +43,10 @@ def build():
         geometry, detail = out / f'L{layer}.bin', out / f'L{layer}.json'
         if not geometry.exists() or not detail.exists() or min(geometry.stat().st_mtime, detail.stat().st_mtime) < source.stat().st_mtime:
             a = np.load(source)
-            key = f'model.language_model.layers.{layer}.mlp.down_proj.weight'
+            keys = [key for key in index if key.endswith(f'.layers.{layer}.mlp.down_proj.weight')]
+            if len(keys) != 1:
+                raise ValueError(f'L{layer}: expected one text down_proj tensor, found {keys}')
+            key = keys[0]
             with safe_open(snapshot / index[key], framework='pt') as weights:
                 w = weights.get_tensor(key).float().T.contiguous()
             w -= w.mean(0)
@@ -64,8 +71,25 @@ def build():
             compressed = path.with_suffix(path.suffix + '.gz')
             if not compressed.exists() or compressed.stat().st_mtime < path.stat().st_mtime:
                 compressed.write_bytes(gzip.compress(path.read_bytes(), compresslevel=6))
-        layers.append({'layer': layer, 'count': geometry.stat().st_size // 12})
+        data = json.loads(detail.read_text())
+        count = len(data['rows'])
+        strengths = np.array([[row['kl'][s] / max(data['p95'][s], 1e-9) for s in range(2)]
+                              for row in data['rows']], dtype='<f4')
+        signed_strength.append(strengths.reshape(-1))
+        for n, row in enumerate(data['rows']):
+            for s, name in enumerate(('up', 'down')):
+                for word in set(row[name]):
+                    signed_index.setdefault(word.lower(), []).append((offset + n) * 2 + s)
+        strongest = np.argsort(-strengths.max(1))[:16]
+        summaries.append(dict(layer=layer, count=count, above=int((strengths.max(1) > 1).sum()),
+                              top=[dict(n=int(n), **data['rows'][n]) for n in strongest]))
+        layers.append({'layer': layer, 'count': count})
+        offset += count
     manifest = dict(model=VIEW_MODEL, layers=layers, total_layers=meta['layers'], neurons=meta['neurons'], dose=meta['dose'], grid=VIEW_GRID, dots=VIEW_DOTS, projection='PCA of down_proj columns, independently scaled per layer')
+    manifest.update(summaries=summaries, capabilities=dict(exact_search=True, semantic_search=False, connections=False))
+    (out / 'signed-search.json.gz').write_bytes(gzip.compress(json.dumps(signed_index, ensure_ascii=False,
+                                                            separators=(',', ':')).encode()))
+    np.concatenate(signed_strength).astype('<f4').tofile(out / 'signed-strength.bin')
     (out / 'manifest.json').write_text(json.dumps(manifest))
     print(json.dumps(manifest))
 

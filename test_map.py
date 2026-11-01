@@ -27,7 +27,7 @@ class GemmaMapTests(unittest.TestCase):
             layer_types=['sliding_attention', 'full_attention'] * 2))
         model = Gemma4ForConditionalGeneration(config).eval()
         with patch('lab.AutoConfig.from_pretrained', return_value=config), \
-             patch('lab.AutoTokenizer.from_pretrained', return_value=SimpleNamespace(pad_token_id=0, decode=lambda ids: str(ids[0]))), \
+             patch('lab.AutoTokenizer.from_pretrained', return_value=SimpleNamespace(pad_token_id=0, decode=lambda ids, **kwargs: " ".join(map(str, ids)))), \
              patch('lab.Gemma4ForConditionalGeneration.from_pretrained', return_value=model), \
              patch('lab.device', return_value='cpu'):
             cls.lab = Lab('tiny-gemma')
@@ -143,5 +143,84 @@ class GemmaMapTests(unittest.TestCase):
                 main()
 
 
-if __name__ == '__main__':
+class MinistralMapTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from transformers import Mistral3Config, Mistral3ForConditionalGeneration, Ministral3Config, PixtralVisionConfig
+        torch.manual_seed(9)
+        torch.set_num_threads(2)
+        config = Mistral3Config(text_config=Ministral3Config(
+            vocab_size=64, hidden_size=16, intermediate_size=24, num_hidden_layers=3,
+            num_attention_heads=2, num_key_value_heads=1, head_dim=8,
+            tie_word_embeddings=True), vision_config=PixtralVisionConfig(
+            hidden_size=16, intermediate_size=24, num_hidden_layers=1, num_attention_heads=2,
+            head_dim=8, image_size=28, patch_size=14))
+        model = Mistral3ForConditionalGeneration(config).eval()
+        tok = SimpleNamespace(pad_token_id=0, decode=lambda ids, **kwargs: " ".join(map(str, ids)))
+        with patch('lab.AutoConfig.from_pretrained', return_value=config), \
+             patch('lab.AutoTokenizer.from_pretrained', return_value=tok), \
+             patch('lab.Mistral3ForConditionalGeneration.from_pretrained', return_value=model) as load, \
+             patch('lab.device', return_value='cpu'):
+            from config import MINISTRAL, MINISTRAL_BF16, MINISTRAL_REVISION
+            cls.lab = Lab(MINISTRAL)
+            assert load.call_args.args == (MINISTRAL_BF16,)
+            assert load.call_args.kwargs['revision'] == MINISTRAL_REVISION
+        cls.batch = cls.lab.batch([[2, 4, 5], [2, 8]])
+        cls.saved = cls.lab.layer_outputs(*cls.batch)
+        cls.norms = {i: h[cls.batch[1].bool()].norm(dim=-1).median().item() for i, h in cls.saved.items()}
+        with torch.inference_mode():
+            cls.base = cls.lab.last_logprobs(*cls.batch)
+
+    def test_text_decoder_and_cached_restart(self):
+        self.assertIsNone(self.lab.model.model.vision_tower)
+        self.assertEqual(self.lab.neurons_per_layer, [24, 24, 24])
+        for layer in range(3):
+            vector = self.lab.push_vector(layer, self.lab.col(layer, 2), .6, self.norms)
+            push = vector[None, None].repeat(2, 1, 1)
+            cached = map_forward(self.lab, layer, self.batch, self.saved, push)
+            direct = map_forward(self.lab, layer, self.batch, self.saved, push, full_forward=True)
+            torch.testing.assert_close(cached, direct)
+        self.assertEqual(self.lab.pushes, {})
+
+    def test_bfloat16_restart_preserves_residual_rounding(self):
+        original = {k: v.clone() for k, v in self.lab.model.state_dict().items()}
+        try:
+            self.lab.model.to(torch.bfloat16)
+            saved = self.lab.layer_outputs(*self.batch)
+            for layer in range(3):
+                push = self.lab.push_vector(layer, self.lab.col(layer, 2), .6, self.norms)[None, None].repeat(2, 1, 1)
+                cached = map_forward(self.lab, layer, self.batch, saved, push)
+                direct = map_forward(self.lab, layer, self.batch, saved, push, full_forward=True)
+                torch.testing.assert_close(cached, direct, rtol=0, atol=0)
+        finally:
+            self.lab.model.float().load_state_dict(original)
+            self.lab.layer_outputs(*self.batch)
+
+    def test_find_and_batched_chat(self):
+        import find
+        from lab import generate_compare
+        args = SimpleNamespace(pairs=None, words='word', layers=None, dose=.6, top=2, controls=1)
+        with patch.object(self.lab, 'prompts', return_value=[]), \
+             patch.object(self.lab, 'norm_batch', return_value=self.batch), \
+             patch('find.word_ids', return_value=[4]):
+            result = find.search(self.lab, args)
+        self.assertEqual(len(result['rows']), 2)
+        with patch.object(self.lab, 'chat_ids', return_value=[2, 4]):
+            events = generate_compare(self.lab, [{'id':'base','history':[]}, {'id':'push','history':[]}],
+                                      [{}, {1:torch.ones(16)*.01}], tokens=3)
+        self.assertEqual(len([e for e in events if e.get('done')]), 2)
+        self.assertEqual(self.lab.pushes, {})
+
+    def test_chat_keeps_native_template_options(self):
+        from unittest.mock import Mock
+        tok = Mock()
+        tok.apply_chat_template.return_value='native default system prompt'
+        tok.return_value.input_ids=[1,2]
+        with patch.object(self.lab, 'tok', tok):
+            self.lab.chat_ids([{'role':'user','content':'Hi'}])
+        tok.apply_chat_template.assert_called_once_with(
+            [{'role':'user','content':'Hi'}], add_generation_prompt=True, tokenize=False)
+
+
+if __name__ == "__main__":
     unittest.main()

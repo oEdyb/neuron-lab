@@ -80,7 +80,7 @@ def identity(entry):
 
 def seeds():
     source = ROOT / 'out/hunt/shortlist.json'
-    if source.exists():
+    if source.exists() and VIEW_MODEL == 'Qwen/Qwen3.5-2B':
         raw = json.loads(source.read_text()) + [dict(layer=17, n=5244, dose=.6, name='Evil')]
         return [validate(dict(model=VIEW_MODEL, layer=r['layer'], n=r['n'], dose=r['dose'], name=r['name'], note=r.get('why', ''), source='agent')) for r in raw]
     return [validate(r) for r in json.loads((ROOT / 'examples/library.json').read_text())]
@@ -202,6 +202,10 @@ def ranked(q=None, sign=None, layer=None, limit=20):
 @lru_cache(maxsize=3)
 def tokenizer(model):
     from transformers import AutoTokenizer
+    from config import MINISTRAL, MINISTRAL_BF16, MINISTRAL_REVISION
+    if model in (MINISTRAL, MINISTRAL_BF16):
+        return AutoTokenizer.from_pretrained(MINISTRAL_BF16, revision=MINISTRAL_REVISION,
+                                            fix_mistral_regex=True, local_files_only=True)
     return AutoTokenizer.from_pretrained(model, local_files_only=True)
 
 

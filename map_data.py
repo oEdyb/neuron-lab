@@ -23,11 +23,17 @@ def available():
     root = data_dir()
     try:
         meta = json.loads((root / 'manifest.json').read_text())
-        required = ['signed-search.json.gz', 'signed-strength.bin', 'vector-words.json.gz', 'word-vectors.bin', 'connections/manifest.json']
+        required = ['signed-search.json.gz', 'signed-strength.bin']
+        capabilities = meta.get('capabilities', dict(semantic_search=True, connections=True))
+        if capabilities.get('semantic_search'):
+            required += ['vector-words.json.gz', 'word-vectors.bin']
+        if capabilities.get('connections'):
+            required += ['connections/manifest.json']
         return meta['model'] == VIEW_MODEL and all((root / name).is_file() for name in required) and bool(meta['layers']) and all(
             (root / f"L{item['layer']}.bin").is_file() and
             (root / f"L{item['layer']}.json.gz").is_file() and
-            (root / 'connections' / f"L{item['layer']}.bin").is_file() for item in meta['layers'])
+            (not capabilities.get('connections') or
+             (root / 'connections' / f"L{item['layer']}.bin").is_file()) for item in meta['layers'])
     except (OSError, ValueError, KeyError, TypeError):
         return False
 
