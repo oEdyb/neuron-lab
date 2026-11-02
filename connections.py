@@ -9,12 +9,20 @@ import torch
 from huggingface_hub import snapshot_download
 from safetensors import safe_open
 
+from config import MINISTRAL, MINISTRAL_BF16, MINISTRAL_REVISION
+
 
 RECORD = np.dtype([('layer', 'i1'), ('neuron', '<i2'), ('z', '<f2'), ('sign', 'i1')])
 
 
+def snapshot(model):
+    if model == MINISTRAL:
+        return Path(snapshot_download(MINISTRAL_BF16, revision=MINISTRAL_REVISION))
+    return Path(snapshot_download(model))
+
+
 def weights(model):
-    folder = Path(snapshot_download(model))
+    folder = snapshot(model)
     index_path = folder / 'model.safetensors.index.json'
     if index_path.exists():
         index = json.loads(index_path.read_text())['weight_map']
@@ -24,6 +32,8 @@ def weights(model):
 
     def read(layer, name):
         key = f'model.language_model.layers.{layer}.{name}.weight'
+        if key not in index:
+            key = f'language_model.model.layers.{layer}.{name}.weight'
         with safe_open(folder / index[key], framework='pt') as f:
             return f.get_tensor(key).float()
 
@@ -109,7 +119,8 @@ def calculate(read, a, links, dev):
             gate = read(j, 'mlp.gate_proj').to(dev)
             up = read(j, 'mlp.up_proj').to(dev)
             norm_name = 'pre_feedforward_layernorm' if a.model.startswith('google/gemma') else 'post_attention_layernorm'
-            norm = (1 + read(j, norm_name)).to(dev)
+            # Mistral's RMSNorm multiplies by its weight; Qwen and Gemma store it as an offset from 1.
+            norm = (read(j, norm_name) + (0 if a.model.startswith('mistralai/') else 1)).to(dev)
             for i in range(j):
                 down = read(i, 'mlp.down_proj').to(dev)
                 for lo in range(0, links.counts_per_layer[i], a.chunk):
@@ -132,7 +143,7 @@ def calculate(read, a, links, dev):
 def build(a):
     torch.set_num_threads(4)
     read = weights(a.model)
-    config = json.loads((Path(snapshot_download(a.model)) / 'config.json').read_text())['text_config']
+    config = json.loads((snapshot(a.model) / 'config.json').read_text())['text_config']
     layers = config['num_hidden_layers']
     counts = [read(l, 'mlp.down_proj').shape[1] for l in range(layers)]
     n = max(counts)
@@ -148,7 +159,7 @@ def build(a):
         links.write(folder, layer)
     meta = dict(version=1, model=a.model, layers=layers, neurons=n, counts=counts, k=a.k, record_bytes=6,
                 order=['upstream', 'downstream'], device=dev, seconds=round(time.time() - start, 2),
-                method='(gate @ ((1 + pre_mlp_norm) * down)) * (up @ ((1 + pre_mlp_norm) * down))',
+                method='(gate @ (pre_mlp_norm * down)) * (up @ (pre_mlp_norm * down))',
                 ranking='global |P| z-score per neuron over all eligible layers; population standard deviation',
                 estimate='Weights only; ignores attention, activation nonlinearity and input-dependent RMS scale.')
     (folder / 'manifest.json').write_text(json.dumps(meta, indent=2) + '\n')
