@@ -10,7 +10,7 @@ from huggingface_hub import snapshot_download
 from safetensors import safe_open
 from transformers import AutoTokenizer
 
-from config import VIEW_MODEL, VIEW_WORDS, VIEW_GRID, VIEW_DOTS
+from config import VIEW_MODEL, VIEW_WORDS, VIEW_GRID, VIEW_DOTS, MINISTRAL_BF16
 
 
 def build(model=VIEW_MODEL, maps=Path(__file__).parent / "maps"):
@@ -18,8 +18,11 @@ def build(model=VIEW_MODEL, maps=Path(__file__).parent / "maps"):
     meta = json.loads((root / 'meta.json').read_text())
     out = root / 'view'
     out.mkdir(exist_ok=True)
-    tok = AutoTokenizer.from_pretrained(model)
-    snapshot = Path(snapshot_download(model))
+    weights_id = meta.get('weights', model)
+    loading = {'revision': meta['revision']} if meta.get('revision') else {}
+    tokenizer_options = {'fix_mistral_regex': True} if weights_id == MINISTRAL_BF16 else {}
+    tok = AutoTokenizer.from_pretrained(weights_id, **loading, **tokenizer_options)
+    snapshot = Path(snapshot_download(weights_id, **loading))
     index_path = snapshot / 'model.safetensors.index.json'
     if index_path.exists():
         index = json.loads(index_path.read_text())['weight_map']
@@ -53,7 +56,10 @@ def build(model=VIEW_MODEL, maps=Path(__file__).parent / "maps"):
         geometry, detail = out / f'L{layer}.bin', out / f'L{layer}.json'
         if not geometry.exists() or not detail.exists() or min(geometry.stat().st_mtime, detail.stat().st_mtime) < source.stat().st_mtime:
             a = np.load(source)
-            key = f'model.language_model.layers.{layer}.mlp.down_proj.weight'
+            keys = [key for key in index if key.endswith(f'.layers.{layer}.mlp.down_proj.weight')]
+            if len(keys) != 1:
+                raise ValueError(f'L{layer}: expected one text down_proj tensor, found {keys}')
+            key = keys[0]
             with safe_open(snapshot / index[key], framework='pt') as weights:
                 w = weights.get_tensor(key).float().T.contiguous()
             w -= w.mean(0)

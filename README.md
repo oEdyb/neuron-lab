@@ -1,6 +1,6 @@
 # neuron-lab
 
-Find single neurons in open-weight models that change how the model talks. Change them and chat with the result. Works with Qwen3.5 and Gemma 4.
+Find single neurons in open-weight models that change how the model talks. Change them and chat with the result. Works with Qwen3.5, Gemma 4 and Ministral 3.
 
 ![All 24 layers of Qwen3.5-2B, one dot per neuron](docs/tower.png)
 
@@ -27,7 +27,7 @@ Open **http://localhost:8792**. Needs [uv](https://docs.astral.sh/uv/getting-sta
 
 ![Three neurons from the Library answering the same question](docs/library.png)
 
-Browse Tower, Plane, Web, Find and Library, with chat on the same page. Switch between Qwen3.5 2B and Gemma 4 E2B at the bottom left. Each model has its own chats, the Library is shared.
+Browse Tower, Plane, Web, Find and Library, with chat on the same page. Switch between Qwen3.5 2B, Gemma 4 E2B and Ministral 3 3B at the bottom left. Each model has its own chats, the Library is shared.
 
 Each dot is one neuron. Orange means pushing it up changes the next word more, blue means pushing it down does. Bigger and brighter means a stronger change (KL ×random). Neurons that write in similar directions sit close together.
 
@@ -95,6 +95,8 @@ Changes every neuron by $`\pm d`$ on 8 half-finished sentences (`"Who are you?" 
 - how far the change spreads through later layers
 - its logit lens, and the same for 64 random directions per layer
 
+Ministral uses the [official BF16 checkpoint](https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512-BF16) at a pinned revision, its native chat template and default system prompt, and only the text decoder. Its cached map preserves BF16 addition order at `down_proj`. See [the first map and verbatim steering results](docs/ministral3-3b-first-map.md). Only exact word search works for it; Meaning and Web need data that hasn't been built.
+
 ## Why the map is fast
 
 ![Every row in a batch changes a different neuron](docs/batch.png)
@@ -138,7 +140,7 @@ uv run python doses.py --push "L17 N5244 +" --theme "evil,destroy,hate"
 uv run python map.py   --model Qwen/Qwen3.5-2B --layers 17
 ```
 
-Tested with Qwen3.5 0.8B, 2B and 4B, and Gemma 4 E2B.
+Tested with Qwen3.5 0.8B, 2B and 4B, Gemma 4 E2B and Ministral 3 3B.
 
 ## Good to know
 

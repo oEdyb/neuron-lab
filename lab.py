@@ -5,9 +5,10 @@ import torch
 from torch.nn import functional as F
 from transformers.models.qwen3_5.modeling_qwen3_5 import l2norm
 from transformers import (TextStreamer, AutoConfig, AutoTokenizer, Gemma4ForConditionalGeneration,
-                          Qwen3_5ForConditionalGeneration, StoppingCriteria, StoppingCriteriaList)
+                          Mistral3ForConditionalGeneration, Qwen3_5ForConditionalGeneration,
+                          StoppingCriteria, StoppingCriteriaList)
 
-from config import LOOP_REPEATS, LOOP_MAX_NGRAM, PROMPTS, TEXTS
+from config import LOOP_REPEATS, LOOP_MAX_NGRAM, PROMPTS, TEXTS, MINISTRAL, MINISTRAL_BF16, MINISTRAL_REVISION
 
 
 def device():
@@ -43,14 +44,28 @@ def map_delta(query, key, value, g, beta, reference, chunk_size=32, initial_stat
     return out.to(dtype, memory_format=torch.contiguous_format), None
 
 
+class LayerOutputs(dict):
+    """Per-layer outputs from one forward, plus the Mistral restart inputs from that same forward."""
+
+    def __init__(self):
+        super().__init__()
+        self.restart = {}
+
+
 class Lab:
     def __init__(self, model_id, bf16=False):
         self.model_id = model_id
         self.dev = device()
         dtype = torch.bfloat16 if bf16 or self.dev == "cuda" or model_id.endswith("4B") else torch.float32
-        self.tok = AutoTokenizer.from_pretrained(model_id)
-        config = AutoConfig.from_pretrained(model_id)
+        self.weights_id = MINISTRAL_BF16 if model_id == MINISTRAL else model_id
+        loading = {"revision": MINISTRAL_REVISION} if self.weights_id == MINISTRAL_BF16 else {}
+        config = AutoConfig.from_pretrained(self.weights_id, **loading)
+        self.revision = loading.get("revision") or getattr(config, "_commit_hash", None)
         self.is_gemma = config.model_type == "gemma4"
+        self.is_qwen = config.model_type == "qwen3_5"
+        self.is_mistral = config.model_type == "mistral3"
+        tokenizer_options = {"fix_mistral_regex": True} if self.is_mistral else {}
+        self.tok = AutoTokenizer.from_pretrained(self.weights_id, **loading, **tokenizer_options)
         if self.is_gemma:
             dtype = torch.bfloat16 if bf16 else torch.float32
             config.vision_config = config.audio_config = None
@@ -64,8 +79,18 @@ class Lab:
                 ple = self.model.model.language_model.embed_tokens_per_layer
                 ple.register_forward_pre_hook(lambda m, inp: (inp[0].cpu(),))
                 ple.register_forward_hook(lambda m, inp, out: out.to(self.dev))
-        else:
+        elif self.is_mistral:
+            if getattr(config, "quantization_config", None):
+                raise ValueError("Ministral requires unquantized weights; use the official BF16 checkpoint")
+            self.model = Mistral3ForConditionalGeneration.from_pretrained(
+                self.weights_id, config=config, dtype=dtype, **loading).eval()
+            self.model.model.vision_tower = None
+            self.model.model.multi_modal_projector = None
+            self.model.to(self.dev)
+        elif self.is_qwen:
             self.model = Qwen3_5ForConditionalGeneration.from_pretrained(model_id, dtype=dtype).to(self.dev).eval()
+        else:
+            raise ValueError(f"unsupported architecture: {config.model_type}")
         self.model.requires_grad_(False)
         self.lm = self.model.model.language_model
         self.layers = self.lm.layers
@@ -106,7 +131,8 @@ class Lab:
         return weighted / layer.layer_scalar.float()
 
     def chat_ids(self, messages):
-        text = self.tok.apply_chat_template(messages, add_generation_prompt=True, enable_thinking=False, tokenize=False)
+        options = {} if self.is_mistral else {"enable_thinking": False}
+        text = self.tok.apply_chat_template(messages, add_generation_prompt=True, tokenize=False, **options)
         return self.tok(text, add_special_tokens=False).input_ids
 
     def text_ids(self, text):
@@ -141,9 +167,16 @@ class Lab:
         return torch.log_softmax(self.logits(h).float(), -1)
 
     def layer_outputs(self, ids, mask, pos):
-        outs = {}
+        outs = LayerOutputs()
+        restart = outs.restart
         hooks = [layer.register_forward_hook(lambda m, inp, out, i=i: outs.__setitem__(i, hidden(out).detach()))
                  for i, layer in enumerate(self.layers)]
+        if self.is_mistral:
+            for i, layer in enumerate(self.layers):
+                hooks.append(layer.post_attention_layernorm.register_forward_pre_hook(
+                    lambda m, inp, i=i: restart.__setitem__((i, 'residual'), inp[0].detach())))
+                hooks.append(layer.mlp.down_proj.register_forward_hook(
+                    lambda m, inp, out, i=i: restart.__setitem__((i, 'mlp'), out.detach())))
         try:
             with torch.inference_mode():
                 self.lm(input_ids=ids, attention_mask=mask, position_ids=pos, use_cache=False)
@@ -151,6 +184,13 @@ class Lab:
             for h in hooks:
                 h.remove()
         return outs
+
+    def restart_output(self, layer, saved, push, repeats):
+        if self.is_mistral:
+            residual = saved.restart[layer, 'residual'].repeat(repeats, 1, 1)
+            mlp = saved.restart[layer, 'mlp'].repeat(repeats, 1, 1)
+            return residual + (mlp + push.to(mlp.dtype))
+        return saved[layer].repeat(repeats, 1, 1) + push
 
     def stream_norms(self, ids, mask, pos):
         real = mask.bool()

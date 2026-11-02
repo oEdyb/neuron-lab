@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { Button } from './components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './components/ui/dropdown-menu'
-export const mappedModels=[{id:'Qwen/Qwen3.5-2B',name:'Qwen3.5 2B',logo:'qwen'},{id:'google/gemma-4-E2B-it',name:'Gemma 4 E2B',logo:'gemma'}]
+export const mappedModels=[{id:'Qwen/Qwen3.5-2B',name:'Qwen3.5 2B',logo:'qwen'},{id:'google/gemma-4-E2B-it',name:'Gemma 4 E2B',logo:'gemma'},{id:'mistralai/Ministral-3-3B-Instruct-2512',name:'Ministral 3 3B',logo:'mistral'}]
 export async function switchModel(model:string,keepSteer=false){
  const base=(new URLSearchParams(location.search).get('server')||'.').replace(/\/$/,'')
  const response=await fetch(`${base}/api/load`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model})})
