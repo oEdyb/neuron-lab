@@ -106,7 +106,8 @@ Three points apply to us:
 
 - **It warns against simulation scores.** It says 2023 metrics rewarded "explanations that could simulate activations rather than ones that were right, which often come apart".
 - **It checks a label several ways:** surrounding context, steering, upstream, downstream, and the negative pole. "The neuron's negative side matters about as much as its positive."
-- **It compares against random.** Its Qwen tests compare removing the named neurons with removing a random set from the same layers.
+- **It compares against random.** In its Qwen circuit tests, "'Random' removes as many neurons from the same layers."
+- **It has a held-out test that needs no corpus.** For 200 random neurons, "an agent read only each neuron's explanation and wrote five new examples that should drive it and five near misses that shouldn't, before we measured any of them." Among the 183 explanations of a positive side, new examples fired strongly 76% of the time and near misses 11%. The explanation won for 164 neurons, tied for 15 and lost for 4. This is Goodfire's own unreviewed result, and the promised technical paper isn't out.
 
 **Public reaction** is split. The [LessWrong linkpost](https://www.lesswrong.com/posts/x4kvabkF2Jk8GLZp8/linkpost-neural-networks-are-already-clean) has roughly six relevant voices. Alex Gibson notes "the technical paper hasn't been released", johnswentworth wants per-neuron evidence, and StefanHex worries max-activating examples "tell a plausible but incomplete story". [One news summary](https://traictory.com/news/2026-10-17-neural-networks-already-clean-interpretability) reports Neel Nanda saying the essay defines monosemantic too loosely, and Leo Gao saying an explanation that can't simulate activations hasn't been demonstrated. I didn't find their original posts, so treat those two as secondhand.
 
@@ -163,7 +164,7 @@ concept 1.8   on-task 1.1   fluent 1.5     10 prompts, Haiku 5.5, 2026-11-03
 
 ### What this won't tell us
 
-- It doesn't show what the neuron reads or when it fires. Adding that later means a corpus, then detection or fuzzing.
+- It doesn't show what the neuron reads or when it fires. **The essay's five-examples, five-near-misses test is the best next step**, because it needs no corpus: about 10 short sentences and one forward pass per entry, plus one cheap call to write them. I didn't pick it first because Library labels describe what pushing does, and a neuron's write effect may not match what makes it fire. The code also has no hook yet for reading a single neuron's activation, and the essay's "fired strongly" needs a maximum activation we haven't recorded. Comparing the two sets of sentences directly avoids that.
 - Ten prompts give a wide interval, so small differences mean nothing.
 - It doesn't cover the negative pole unless that sign and dose have an entry of their own.
 - It doesn't catch side effects outside the label. The Ministral results show why that matters: [a pirate neuron switched the conversation to French](../ministral3-3b-first-map.md).
