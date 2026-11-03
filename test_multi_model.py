@@ -213,3 +213,48 @@ def test_raw_map_without_a_cached_tokenizer_still_answers(tmp_path, monkeypatch)
     result = library.neuron(0, 0)
     assert result['sentence_words_available'] is False
     assert result['signs'][0]['words'] == ['a']
+
+
+def test_gemma_web_source_matches_the_apps_push():
+    from types import SimpleNamespace
+    import torch
+    from connections import source_columns
+    from lab import Lab
+
+    down = torch.tensor([[1.0, -2.0, 0.5], [3.0, 0.25, -1.0]])
+    gamma = torch.tensor([0.5, 4.0])
+    scalar = torch.tensor([0.25])
+    layer = SimpleNamespace(post_feedforward_layernorm=SimpleNamespace(weight=gamma), layer_scalar=scalar)
+    fake = SimpleNamespace(layers=[layer])
+    source = source_columns('google/gemma-4-E2B-it', down, gamma)
+    for n in range(down.shape[1]):
+        # The layer multiplies its output by layer_scalar, which cancels the push's division.
+        expected = Lab._gemma_push(fake, 0, down[:, n]) * scalar
+        assert torch.allclose(source[:, n], expected)
+    assert source_columns('Qwen/Qwen3.5-2B', down) is down
+    assert source_columns('mistralai/Ministral-3-3B-Instruct-2512', down) is down
+
+
+def test_gemma_web_links_use_both_norm_weights(tmp_path):
+    from types import SimpleNamespace
+    import numpy as np
+    import torch
+    from connections import Links, RECORD, calculate
+
+    down0 = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
+    tensors = {
+        (0, 'mlp.down_proj'): down0,
+        (0, 'post_feedforward_layernorm'): torch.tensor([1.0, 10.0]),
+        (1, 'mlp.gate_proj'): torch.tensor([[1.0, 0.0], [0.0, 1.0]]),
+        (1, 'mlp.up_proj'): torch.tensor([[1.0, 0.0], [0.0, 1.0]]),
+        (1, 'pre_feedforward_layernorm'): torch.tensor([3.0, 0.0]),
+    }
+    links = Links(2, 2, 1, counts=[2, 2])
+    calculate(lambda l, name: tensors[(l, name)], SimpleNamespace(model='google/gemma-4-E2B-it', chunk=2), links, 'cpu')
+    links.write(tmp_path, 0)
+    records = np.fromfile(tmp_path / 'L0.bin', dtype=RECORD).reshape(2, 2, 1)[1]
+    # The direct weight 3, not 1 + 3, reaches channel 0, and channel 1 stays closed at 0, not 1 + 0.
+    assert records[0, 0]['neuron'] == 0
+    assert np.isfinite(links.scores).all()
+    assert links.scores[1, 0, 0, 0] == 9.0 * 1.0
+    assert links.scores[1, 0, 1, 0] == 0.0

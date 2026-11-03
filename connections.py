@@ -117,16 +117,30 @@ def norm_scale(model, weight):
     return 1 + weight if model.startswith('Qwen/') else weight
 
 
+def is_gemma(model):
+    return model.startswith('google/gemma')
+
+
+def source_columns(model, down, post_weight=None):
+    # Gemma pushes after its post-MLP norm, so a neuron reaches the stream along that norm's
+    # per-channel weight times its column, at the column's own length. Lab._gemma_push does the same.
+    if not is_gemma(model):
+        return down
+    weighted = post_weight[:, None] * down
+    return weighted * down.norm(dim=0, keepdim=True) / weighted.norm(dim=0, keepdim=True).clamp_min(1e-12)
+
+
 def calculate(read, a, links, dev):
     start = time.time()
     with torch.inference_mode():
         for j in range(1, links.layers):
             gate = read(j, 'mlp.gate_proj').to(dev)
             up = read(j, 'mlp.up_proj').to(dev)
-            norm_name = 'pre_feedforward_layernorm' if a.model.startswith('google/gemma') else 'post_attention_layernorm'
+            norm_name = 'pre_feedforward_layernorm' if is_gemma(a.model) else 'post_attention_layernorm'
             norm = norm_scale(a.model, read(j, norm_name)).to(dev)
             for i in range(j):
-                down = read(i, 'mlp.down_proj').to(dev)
+                post = read(i, 'post_feedforward_layernorm').to(dev) if is_gemma(a.model) else None
+                down = source_columns(a.model, read(i, 'mlp.down_proj').to(dev), post)
                 for lo in range(0, links.counts_per_layer[i], a.chunk):
                     hi = min(links.counts_per_layer[i], lo + a.chunk)
                     v = norm[:, None] * down[:, lo:hi]
@@ -163,7 +177,7 @@ def build(a):
         links.write(folder, layer)
     meta = dict(version=1, model=a.model, layers=layers, neurons=n, counts=counts, k=a.k, record_bytes=6,
                 order=['upstream', 'downstream'], device=dev, seconds=round(time.time() - start, 2),
-                method='(gate @ (norm_scale * down)) * (up @ (norm_scale * down))',
+                method='(gate @ (norm_scale * source)) * (up @ (norm_scale * source)); source = down, or the post-norm weighted column on Gemma',
                 ranking='global |P| z-score per neuron over all eligible layers; population standard deviation',
                 estimate='Weights only; ignores attention, activation nonlinearity and input-dependent RMS scale.')
     (folder / 'manifest.json').write_text(json.dumps(meta, indent=2) + '\n')
