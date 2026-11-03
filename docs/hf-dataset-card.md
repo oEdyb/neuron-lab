@@ -10,7 +10,9 @@ tags:
 
 # Neuron Lab maps
 
-These are maps of what single neurons do inside three open language models. For each neuron, we pushed it up and down and recorded which next words became more likely. The [Neuron Lab](https://github.com/oEdyb/neuron-lab) explorer downloads these files.
+These are maps of what single neurons do inside open language models. For each neuron, we pushed it up and down and recorded which next words became more likely. The [Neuron Lab](https://github.com/oEdyb/neuron-lab) explorer downloads these files.
+
+The Qwen and Gemma maps are here now. The Ministral map is made but **not uploaded yet**.
 
 This dataset contains measurements. It contains no model weights. Neuron Lab is an independent project by Olle Dyberg and is **not affiliated with, sponsored by or endorsed by** Alibaba Cloud or the Qwen team, Google or Google DeepMind, Mistral AI, or the authors of any model named here. Their names appear only to say where the measurements came from.
 
@@ -20,9 +22,9 @@ This dataset contains measurements. It contains no model weights. Neuron Lab is 
 |---|---|---|---:|---:|
 | `Qwen3.5-2B/` | [Qwen/Qwen3.5-2B](https://huggingface.co/Qwen/Qwen3.5-2B) | Qwen team, Alibaba Cloud | 24 | 147,456 |
 | `gemma-4-E2B-it/` | [google/gemma-4-E2B-it](https://huggingface.co/google/gemma-4-E2B-it) | Google DeepMind | 35 | 337,920 |
-| `Ministral-3-3B-Instruct-2512/` | [mistralai/Ministral-3-3B-Instruct-2512-BF16](https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512-BF16) | Mistral AI | 26 | 239,616 |
+| `Ministral-3-3B-Instruct-2512/` (not uploaded yet) | [mistralai/Ministral-3-3B-Instruct-2512-BF16](https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512-BF16) | Mistral AI | 26 | 239,616 |
 
-If a folder isn't in the Files tab, that map hasn't been uploaded yet.
+Anything below about Ministral describes our local copy, not files you can download here.
 
 ## Licenses and credit
 
@@ -108,7 +110,7 @@ Each row in `L{layer}.json.gz` holds two versions of every field, positive push 
 
 The per-prompt words, logit lens and raw token IDs are in our local raw maps. They aren't in this dataset.
 
-The Ministral map currently has only the map and exact-search files. We haven't built its meaning search or Web connections, and its manifest says so under `capabilities`.
+Our local Ministral map has only the map and exact-search files. We haven't built its meaning search or Web connections, and its manifest says so under `capabilities`.
 
 ## Limits
 
@@ -117,9 +119,9 @@ The Ministral map currently has only the map and exact-search files. We haven't 
 - **Eight prompts is few, and our choice of them shapes the results.** Most of them ask about identity or feelings.
 - **Offensive text.** The word lists come straight from the models' vocabularies and include profanity and words about sexual violence, with no filtering.
 - **Gemma's pushes are out of date.** The published Gemma map added the push before the layer's post-feedforward normalization, which caps its size. Our current code adds it after that step, so this map's numbers won't match Neuron Lab's current chat. Compare Gemma's `kl` values with other models' only with care.
-- **Gemma's Web connections used a formula we later corrected.** The published files scale by 1 + the norm weight, as their manifest shows. Gemma multiplies by the weight itself, so treat these links as unreliable until they're rebuilt.
+- **Gemma's Web connections are the old version.** The published files scale by 1 + the norm weight, as their manifest shows, but Gemma multiplies by the weight itself. They also leave out the post-feedforward normalization that our current pushes go through. We've corrected both in our code but haven't rebuilt these files, so treat these links as unreliable.
 - **Web connections are estimates.** They ignore attention, the activation function and input-dependent scaling.
-- **Numbers vary a little.** Values are stored at reduced precision, and the three maps ran on different hardware and code paths. Strength is relative to that layer's controls, so it isn't a universal scale.
+- **Numbers vary a little.** Values are stored at reduced precision, and the maps ran on different hardware and code paths. Strength is relative to that layer's controls, so it isn't a universal scale.
 - **No warranty.** This data comes as is, under the terms below.
 
 ## Apache License 2.0
