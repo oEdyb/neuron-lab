@@ -35,3 +35,14 @@ curl -s http://127.0.0.1:8792/api/library -H 'Content-Type: application/json' -d
 ```
 
 In the explorer Library, select entries and choose **Batch** for independent columns or **Combine** for one column with all pushes. Mix both in one saved chat, up to six columns. Normal is off initially. Each column keeps its history; changing doses affects the next turn. Save combined columns back to Library with the bookmark action.
+
+## Blind steering score
+
+`steering_score.py` tests a Library label: 10 fixed prompts at the saved dose, the same 10 with a random direction of the same size, and Haiku 5.5 grading each reply 0–2 on concept, instruction and fluency. The judge sees only the entry's name, the prompt and the reply, never the note, dose, neuron or arm. The judge runs through `claude -p` with no tools in an empty folder, so it needs a logged-in Claude Code and draws on that usage, about 20 calls per entry and 20 more with `--swapped`. It also needs a local model, which loads only when replies are missing.
+
+```sh
+uv run python steering_score.py --entry "Dark Realist"
+uv run python steering_score.py --all --library examples/library.json --swapped
+```
+
+`--swapped` also grades the same replies under another entry's label; run it on the 12 example entries before trusting any score. `calibration.passes` is null below 5 entries. Results go to ignored `steering_scores.json`, saved after every reply batch and grade, so rerunning resumes. Changing an entry's dose starts a new run; changing its name reuses the replies and grades again. The score shows what pushing does, not what the neuron reads.

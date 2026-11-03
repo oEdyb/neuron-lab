@@ -7,13 +7,12 @@ import argparse
 import itertools
 import json
 import random
-import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 import torch
 
+from claude_cli import ClaudeFailed, ask
 from config import PROMPTS, TEXTS
 from lab import Lab, parse_push
 
@@ -45,18 +44,13 @@ class LabelFireError(Exception):
 
 
 def claude_writer(model=WRITER_MODEL):
-    """Writes through `claude -p` from an empty folder with no tools, so it sees only the label."""
+    """The writer sees only the label."""
     def write(label):
-        command = ["claude", "-p", PROMPT.format(label=label, count=COUNT), "--model", model, "--tools", "",
-                   "--output-format", "json", "--json-schema", json.dumps(SCHEMA),
-                   "--no-session-persistence", "--strict-mcp-config", "--setting-sources", ""]
-        with tempfile.TemporaryDirectory() as empty:
-            done = subprocess.run(command, cwd=empty, capture_output=True, text=True, timeout=180,
-                                  stdin=subprocess.DEVNULL)
-        if done.returncode:
-            raise LabelFireError("writer_failed", f"claude -p exited {done.returncode}: {done.stderr.strip()[:300]}",
-                                 "Check `claude -p hi` works, or pass --texts with your own sentences")
-        return json.loads(done.stdout)["structured_output"]
+        try:
+            return ask(PROMPT.format(label=label, count=COUNT), SCHEMA, model)
+        except ClaudeFailed as e:
+            raise LabelFireError("writer_failed", str(e),
+                                 "Check `claude -p hi` works, or pass --texts with your own sentences") from e
     return write
 
 

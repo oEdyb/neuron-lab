@@ -17,3 +17,5 @@ explorer/
 /library.json
 /library.lock
 .library-*
+/steering_scores.json
+.steering-*

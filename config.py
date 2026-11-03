@@ -36,6 +36,21 @@ RECALL = ("My dog is called Bosse. Say hi to him!", "What is my dog called?", "b
 
 DOSE = 0.6
 
+SCORE_PROMPTS = [
+    "Explain how a rainbow forms.",
+    "Give me three tips for learning a new language.",
+    "What makes a good neighbour?",
+    "Write a two-sentence story about a lost key.",
+    "How do I keep a houseplant alive?",
+    "What would you do with a free afternoon?",
+    "Recommend a simple breakfast.",
+    "Why do people enjoy music?",
+    "Describe your ideal city.",
+    "How should I prepare for a job interview?",
+]
+SCORE_TOKENS = 128
+JUDGE_MODEL = "claude-haiku-5-5"
+
 MAP_REPO = "oExz/neuron-lab-maps"
 
 VIEW_MODEL = os.environ.get("NEURON_LAB_MODEL", "Qwen/Qwen3.5-2B")

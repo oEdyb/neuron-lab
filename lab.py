@@ -238,6 +238,15 @@ def steer_vectors(lab, pushes, norms):
     return out
 
 
+def random_vectors(lab, pushes, norms, seed):
+    g = torch.Generator().manual_seed(seed)
+    out = {}
+    for l, _, d in pushes:
+        direction = torch.randn(lab.layers[l].mlp.down_proj.out_features, generator=g).to(lab.dev)
+        out[l] = out.get(l, 0) + lab.push_vector(l, direction, d, norms)
+    return out
+
+
 def layer_range(spec, n_layers):
     m = re.fullmatch(r"\s*(\d+)\s*(?:-\s*(\d+))?\s*", spec or f"0-{n_layers - 1}")
     lo, hi = (int(m[1]), int(m[2] or m[1])) if m else (-1, -1)
