@@ -137,6 +137,7 @@ uv run modal volume get neuron-lab-hf maps/Qwen3.5-2B maps/
 uv run python find.py  --model Qwen/Qwen3.5-2B --pairs pairs/evil.txt --layers 3-23
 uv run python chat.py  --push "L17 N5244 +0.6"
 uv run python doses.py --push "L17 N5244 +" --theme "evil,destroy,hate"
+uv run python label_fire.py --push "L17 N5244 +" --label "Evil"   # does it fire on what the label predicts? Writes 10 sentences with `claude -p`, or pass --texts
 uv run python map.py   --model Qwen/Qwen3.5-2B --layers 17
 ```
 
