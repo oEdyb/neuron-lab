@@ -90,3 +90,13 @@ def test_tensor_connection_ranking_matches_numpy():
     np.testing.assert_array_equal(tensor.ids, reference.ids)
     np.testing.assert_array_equal(tensor.scores, reference.scores)
     np.testing.assert_allclose(tensor.totals, reference.totals, atol=1e-12)
+
+
+def test_norm_scale_follows_each_model_rmsnorm():
+    import torch
+    from connections import norm_scale
+
+    weight = torch.tensor([0.5, 2.0])
+    assert norm_scale('Qwen/Qwen3.5-2B', weight).tolist() == [1.5, 3.0]
+    assert norm_scale('google/gemma-4-E2B-it', weight).tolist() == [0.5, 2.0]
+    assert norm_scale('mistralai/Ministral-3-3B-Instruct-2512', weight).tolist() == [0.5, 2.0]

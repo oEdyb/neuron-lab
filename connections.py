@@ -112,6 +112,11 @@ class Links:
         os.replace(str(path) + '.tmp', path)
 
 
+def norm_scale(model, weight):
+    # Qwen's RMSNorm multiplies by 1 + weight. Gemma's and Mistral's multiply by the weight itself.
+    return 1 + weight if model.startswith('Qwen/') else weight
+
+
 def calculate(read, a, links, dev):
     start = time.time()
     with torch.inference_mode():
@@ -119,8 +124,7 @@ def calculate(read, a, links, dev):
             gate = read(j, 'mlp.gate_proj').to(dev)
             up = read(j, 'mlp.up_proj').to(dev)
             norm_name = 'pre_feedforward_layernorm' if a.model.startswith('google/gemma') else 'post_attention_layernorm'
-            # Mistral's RMSNorm multiplies by its weight; Qwen and Gemma store it as an offset from 1.
-            norm = (read(j, norm_name) + (0 if a.model.startswith('mistralai/') else 1)).to(dev)
+            norm = norm_scale(a.model, read(j, norm_name)).to(dev)
             for i in range(j):
                 down = read(i, 'mlp.down_proj').to(dev)
                 for lo in range(0, links.counts_per_layer[i], a.chunk):
@@ -159,7 +163,7 @@ def build(a):
         links.write(folder, layer)
     meta = dict(version=1, model=a.model, layers=layers, neurons=n, counts=counts, k=a.k, record_bytes=6,
                 order=['upstream', 'downstream'], device=dev, seconds=round(time.time() - start, 2),
-                method='(gate @ (pre_mlp_norm * down)) * (up @ (pre_mlp_norm * down))',
+                method='(gate @ (norm_scale * down)) * (up @ (norm_scale * down))',
                 ranking='global |P| z-score per neuron over all eligible layers; population standard deviation',
                 estimate='Weights only; ignores attention, activation nonlinearity and input-dependent RMS scale.')
     (folder / 'manifest.json').write_text(json.dumps(meta, indent=2) + '\n')
