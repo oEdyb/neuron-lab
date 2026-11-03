@@ -24,7 +24,7 @@ from transformers import TextIteratorStreamer
 import find
 import library
 from view_api import router as view_router
-from config import MODELS, VIEW_MODEL, VIEW_MODELS
+from config import MODELS, canonical_model
 import map_data
 from lab import Lab, generate_compare, generate_reply, steer_vectors
 
@@ -70,12 +70,12 @@ class Engine:
     def load(self, model):
         if model not in MODELS:
             raise Fail("unknown_model", f"{model!r} is not a supported model", f"use one of {MODELS}")
+        model = canonical_model(model)
         with self.lock:
             if self.lab and self.lab.model_id == model:
                 return
-            map_model = model if model in VIEW_MODELS else VIEW_MODEL
-            if not map_data.ensure_maps(map_model):
-                raise Fail("map_missing", f"No complete map for {model}", map_data.download_command(map_model), 503)
+            if not map_data.ensure_maps(model):
+                raise Fail("map_missing", f"No complete map for {model}", map_data.download_command(model), 503)
             self.lab, self.norms = None, None
             gc.collect()
             if torch.backends.mps.is_available():
@@ -89,7 +89,7 @@ class Engine:
                 raise Fail("load_failed", f"{model} failed to load: {e}",
                            "check network, free memory, and Hugging Face access; retry /api/load", 500) from e
             self.lab, self.norms = lab, norms
-            map_data.active_model = map_model
+            map_data.active_model = model
             gc.collect()
             if torch.backends.mps.is_available():
                 torch.mps.empty_cache()
@@ -499,12 +499,16 @@ def main():
     ap.add_argument("--no-open", action="store_true")
     ap.add_argument("--no-model", action="store_true", help="serve maps and API without loading weights")
     a = ap.parse_args()
-    map_data.active_model = a.model
-    map_data.ensure_maps(a.model)
+    model = canonical_model(a.model)
+    map_data.active_model = model
     if not a.no_model:
-        print(f"loading {a.model}…", flush=True)
-        engine.load(a.model)
+        print(f"loading {model}…", flush=True)
+        try:
+            engine.load(model)
+        except Fail as e:
+            print(f"{e.error}\nFix: {e.fix}\nServing without a model; pick another one in the app.", flush=True)
     else:
+        map_data.ensure_maps(model)
         print("Model unloaded (--no-model).", flush=True)
     url = f"http://{a.host}:{a.port}"
     print(f"ready: {url}", flush=True)

@@ -48,3 +48,8 @@ LOOP_REPEATS = 4
 LOOP_MAX_NGRAM = 32
 
 VIEW_MODELS = list(dict.fromkeys([VIEW_MODEL, "Qwen/Qwen3.5-2B", "google/gemma-4-E2B-it", MINISTRAL]))
+
+
+def canonical_model(model):
+    """The -BF16 repo holds the same Ministral weights, so it shares that model's map, chats and Library."""
+    return MINISTRAL if model == MINISTRAL_BF16 else model

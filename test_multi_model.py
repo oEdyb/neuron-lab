@@ -100,3 +100,116 @@ def test_norm_scale_follows_each_model_rmsnorm():
     assert norm_scale('Qwen/Qwen3.5-2B', weight).tolist() == [1.5, 3.0]
     assert norm_scale('google/gemma-4-E2B-it', weight).tolist() == [0.5, 2.0]
     assert norm_scale('mistralai/Ministral-3-3B-Instruct-2512', weight).tolist() == [0.5, 2.0]
+
+
+def fake_lab(monkeypatch):
+    class Lab:
+        def __init__(self, model, bf16=False):
+            self.model_id, self.dev, self.n_layers, self.n_neurons = model, 'cpu', 1, 1
+
+        def norm_batch(self):
+            return ()
+
+        def stream_norms(self):
+            return []
+
+    monkeypatch.setattr(server, 'Lab', Lab)
+    monkeypatch.setattr(server, 'engine', server.Engine())
+
+
+def write_map(root, model):
+    (root / 'connections').mkdir(parents=True)
+    (root / 'manifest.json').write_text(json.dumps(dict(model=model, layers=[dict(layer=0, count=1)])))
+    for name in ('signed-search.json.gz', 'signed-strength.bin', 'vector-words.json.gz', 'word-vectors.bin',
+                 'connections/manifest.json', 'connections/L0.bin', 'L0.bin', 'L0.json.gz'):
+        (root / name).touch()
+
+
+def test_bf16_id_uses_the_ministral_map_not_qwens(tmp_path, monkeypatch):
+    from config import MINISTRAL, MINISTRAL_BF16
+    fake_lab(monkeypatch)
+    monkeypatch.setenv('NEURON_LAB_MAPS', str(tmp_path))
+    monkeypatch.setattr(map_data, 'active_model', 'Qwen/Qwen3.5-2B')
+    write_map(tmp_path / 'Qwen3.5-2B', 'Qwen/Qwen3.5-2B')
+    write_map(tmp_path / MINISTRAL.split('/')[-1], MINISTRAL)
+    server.engine.load(MINISTRAL_BF16)
+    assert map_data.active_model == MINISTRAL
+    assert server.engine.lab.model_id == MINISTRAL
+
+
+def test_unmapped_model_is_refused_instead_of_borrowing_another_map(tmp_path, monkeypatch):
+    fake_lab(monkeypatch)
+    monkeypatch.setenv('NEURON_LAB_MAPS', str(tmp_path))
+    monkeypatch.setattr(map_data, 'active_model', 'Qwen/Qwen3.5-2B')
+    write_map(tmp_path / 'Qwen3.5-2B', 'Qwen/Qwen3.5-2B')
+    try:
+        server.engine.load('Qwen/Qwen3.5-4B')
+    except server.Fail as e:
+        assert e.code == 'map_missing' and 'Qwen3.5-4B' in e.fix
+    else:
+        raise AssertionError('Qwen 4B loaded with the 2B map')
+    assert map_data.active_model == 'Qwen/Qwen3.5-2B'
+    assert server.engine.lab is None
+
+
+def test_failed_switch_keeps_the_running_model(tmp_path, monkeypatch):
+    from config import MINISTRAL
+    fake_lab(monkeypatch)
+    monkeypatch.setenv('NEURON_LAB_MAPS', str(tmp_path))
+    monkeypatch.setattr(map_data, 'active_model', 'Qwen/Qwen3.5-2B')
+    write_map(tmp_path / 'Qwen3.5-2B', 'Qwen/Qwen3.5-2B')
+    server.engine.load('Qwen/Qwen3.5-2B')
+    with TestClient(server.app) as client:
+        result = client.post('/api/load', json=dict(model=MINISTRAL))
+        assert result.status_code == 503
+        assert result.json()['code'] == 'map_missing' and MINISTRAL in result.json()['fix']
+        state = client.get('/api/state').json()
+    assert state['model'] == 'Qwen/Qwen3.5-2B' and state['configured_model'] == 'Qwen/Qwen3.5-2B'
+
+
+def test_server_starts_without_a_map_and_says_how_to_fix_it(tmp_path, monkeypatch, capsys):
+    from config import MINISTRAL
+    fake_lab(monkeypatch)
+    monkeypatch.setenv('NEURON_LAB_MAPS', str(tmp_path))
+    monkeypatch.setattr(server.sys, 'argv', ['server.py', '--model', MINISTRAL, '--no-open'])
+    monkeypatch.setattr(server.uvicorn, 'run', lambda *a, **k: None)
+    monkeypatch.setattr(map_data, 'active_model', 'Qwen/Qwen3.5-2B')
+    server.main()
+    out = capsys.readouterr().out
+    assert f'No complete map for {MINISTRAL}' in out and map_data.download_command(MINISTRAL) in out
+    assert map_data.active_model == MINISTRAL
+    assert server.engine.lab is None
+
+
+def test_library_entry_without_model_uses_the_active_model(tmp_path, monkeypatch):
+    from config import MINISTRAL, MINISTRAL_BF16
+    monkeypatch.setattr(map_data, 'active_model', MINISTRAL)
+    assert library.validate(dict(layer=1, n=2, dose=.5))['model'] == MINISTRAL
+    assert library.validate(dict(model=MINISTRAL_BF16, layer=1, n=2, dose=.5))['model'] == MINISTRAL
+
+
+def test_seed_entries_stay_on_their_own_model(monkeypatch):
+    from config import MINISTRAL
+    monkeypatch.setattr(map_data, 'active_model', MINISTRAL)
+    assert all(entry['model'] == library.VIEW_MODEL for entry in library.seeds())
+
+
+def test_raw_map_without_a_cached_tokenizer_still_answers(tmp_path, monkeypatch):
+    import numpy as np
+    from config import MINISTRAL
+
+    def no_tokenizer(model):
+        raise OSError('not cached')
+
+    name = MINISTRAL.split('/')[-1]
+    view = tmp_path / name / 'view'
+    view.mkdir(parents=True)
+    (view / 'manifest.json').write_text(json.dumps(dict(model=MINISTRAL, layers=[dict(layer=0, count=1)])))
+    (view / 'L0.json').write_text(json.dumps(dict(p95=[1, 1], rows=[dict(up=['a'], down=['b'], kl=[1, 1])])))
+    np.savez(tmp_path / name / 'L0.npz', up_frame_tok=np.zeros((1, 1, 1), int), down_frame_tok=np.zeros((1, 1, 1), int))
+    monkeypatch.setattr(library, 'MAPS', tmp_path)
+    monkeypatch.setattr(library, 'tokenizer', no_tokenizer)
+    monkeypatch.setattr(map_data, 'active_model', MINISTRAL)
+    result = library.neuron(0, 0)
+    assert result['sentence_words_available'] is False
+    assert result['signs'][0]['words'] == ['a']

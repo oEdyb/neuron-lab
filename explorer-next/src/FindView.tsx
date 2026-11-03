@@ -5,11 +5,11 @@ import { Input } from './components/ui/input'
 import { ToggleGroup,ToggleGroupItem } from './components/ui/toggle-group'
 import { DropdownMenu,DropdownMenuTrigger,DropdownMenuContent,DropdownMenuItem } from './components/ui/dropdown-menu'
 import { useStored } from './hooks/use-stored'
-import { FindStateSchema,initialFind,presets,startFind,findJob } from './find-data'
+import { FindStateSchema,findKey,initialFind,presets,startFind,findJob } from './find-data'
 import { FindResults,type FindActions } from './FindResults'
 import './find.css'
 export function FindView({model,maxLayer,chatBusy,onLocalBusy,...actions}:FindActions&{model:string;maxLayer:number;chatBusy:boolean;onLocalBusy:(busy:boolean)=>void}){
- const [state,setState,storageError]=useStored('neuron-next-find',FindStateSchema,initialFind),[error,setError]=useState(''),[starting,setStarting]=useState(false),[now,setNow]=useState(Date.now()),[notice,setNotice]=useState('')
+ const [state,setState,storageError]=useStored(findKey(model),FindStateSchema,initialFind),[error,setError]=useState(''),[starting,setStarting]=useState(false),[now,setNow]=useState(Date.now()),[notice,setNotice]=useState('')
  const job=state.job,running=!!job||starting
  useEffect(()=>{onLocalBusy(job?.where==='local');return()=>onLocalBusy(false)},[job?.where,onLocalBusy])
  useEffect(()=>{if(!job)return;const id=job.id;let live=true;const tick=setInterval(()=>setNow(Date.now()),1000);let timer:ReturnType<typeof setTimeout>;async function poll(){try{const data=await findJob(id);if(!live)return;setError('');if(data.status==='running'){timer=setTimeout(poll,1500);return}setState(s=>({...s,job:null,...(data.status==='done'?{result:data.result}:{})}));if(data.status==='error')setError(data.error)}catch(e){if(live){setError(String(e));timer=setTimeout(poll,3000)}}}void poll();return()=>{live=false;clearInterval(tick);clearTimeout(timer)}},[job?.id])

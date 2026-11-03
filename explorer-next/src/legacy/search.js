@@ -13,7 +13,7 @@ export async function search(query,mode,scores){
  let terms;
  if(mode==='semantic'){
 
-  vectorWords??=compressed('vector-words.json.gz');const [matches,vocabulary]=await Promise.all([semantic(q),vectorWords]);
+  vectorWords??=compressed('vector-words.json.gz').catch(e=>{vectorWords=null;throw String(e.message).includes('(404)')?new Error("Meaning search isn't built for this map. Use Exact."):e;});const [matches,vocabulary]=await Promise.all([semantic(q),vectorWords]);
   const cutoff=Math.max(.55,(matches[0]?.similarity||0)*.78);terms=matches.filter(t=>t.similarity>=cutoff).map(t=>({word:vocabulary[t.i],similarity:t.similarity}));
 
  }else terms=Object.keys(index).filter(w=>w.trim().toLocaleLowerCase()===q).map(word=>({word,similarity:1}));

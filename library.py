@@ -10,11 +10,12 @@ from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
 
-from config import MODELS, VIEW_MODEL
+from config import MODELS, VIEW_MODEL, canonical_model
 
 ROOT = Path(__file__).resolve().parent
 LIBRARY = ROOT / 'library.json'
 MAPS = ROOT / 'maps'
+import map_data
 from map_data import data_dir, download_command
 
 
@@ -39,7 +40,7 @@ def validate(raw, patch=False):
     allowed = {'name', 'note', 'tags', 'dose', 'pushes'} if patch else {'id', 'model', 'layer', 'n', 'dose', 'pushes', 'name', 'note', 'tags', 'source', 'added'}
     if set(raw) - allowed:
         raise LibraryError('bad_library', 'unknown Library fields')
-    out = dict(raw) if patch else dict(model=VIEW_MODEL, name='', note='', tags=[], source='you') | raw
+    out = dict(raw) if patch else dict(model=map_data.active_model, name='', note='', tags=[], source='you') | raw
     for key in ('name', 'note'):
         if key in out and (not isinstance(out[key], str) or len(out[key]) > (200 if key == 'name' else 10000)):
             raise LibraryError('bad_library', f'{key} must be text within its length limit')
@@ -60,6 +61,7 @@ def validate(raw, patch=False):
     if not patch:
         if out['model'] not in MODELS or out['source'] not in ('you', 'agent'):
             raise LibraryError('bad_library', 'unsupported model or source')
+        out['model'] = canonical_model(out['model'])
         if 'pushes' not in out:
             out.setdefault('dose', None)
             validate_push({k: out.get(k) if k != 'dose' else out.get(k) or 0 for k in ('layer', 'n', 'dose')})
@@ -122,7 +124,7 @@ def save(rows):
 def listing(model=None):
     with locked():
         rows = entries()
-    return [r for r in rows if not model or r['model'] == model]
+    return [r for r in rows if not model or r['model'] == canonical_model(model)]
 
 
 def upsert(raw):
@@ -222,8 +224,11 @@ def neuron(layer, n):
         path = MAPS / active_model.split('/')[-1] / f'L{layer}.npz'
         if path.exists():
             import numpy as np
-            with np.load(path) as raw:
+            try:
                 tok = tokenizer(active_model)
-                frames = [[[tok.decode([int(t)]) for t in sentence[:12]] for sentence in raw[f'{s}_frame_tok'][n]] for s in ('up', 'down')]
+            except OSError:
+                tok = None
+            with np.load(path) as raw:
+                frames = frames if tok is None else [[[tok.decode([int(t)]) for t in sentence[:12]] for sentence in raw[f'{s}_frame_tok'][n]] for s in ('up', 'down')]
         return dict(model=active_model, layer=layer, n=n, sentence_words_available=bool(frames[0] or frames[1]), signs=[dict(sign=s, words=row['up' if j == 0 else 'down'][:12], persona=(row.get('persona') or [[], []])[j][:12], sentences=[w[:12] for w in frames[j]], kl_ratio=row['kl'][j] / max(data['p95'][j], 1e-9)) for j, s in enumerate(('+', '-'))])
     raise LibraryError('neuron_not_found', 'neuron is outside the map', 'GET /api/top', 404)
