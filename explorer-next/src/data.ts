@@ -16,6 +16,8 @@ const HitSchema=NeuronSchema.extend({matched:z.array(z.string()),rank:z.number()
 export async function loadManifest(){const r=await fetch('./data/manifest.json');if(!r.ok)throw Error('Map data unavailable');const m=ManifestSchema.parse(await r.json());configure(config,m);return m}
 const layers=new Map<number,Promise<Layer>>()
 export function detail(layer:number):Promise<Layer>{const existing=layers.get(layer);if(existing)return existing;const pending=(async()=>LayerSchema.parse(await legacyDetail(layer)))();layers.set(layer,pending);pending.catch(()=>layers.delete(layer));return pending}
+const MetricsSchema=z.object({rows:z.array(z.object({kl:z.array(z.number())})),p95:z.array(z.number())})
+export function metrics(layer:number){return layers.get(layer)??legacyDetail(layer).then(data=>MetricsSchema.parse(data))}
 export async function search(query:string,mode:string){return z.array(HitSchema).parse(await legacySearch(query,mode,[]))}
 export function neuronKey(n:Neuron){return `${n.layer}:${n.n}`}
 export function sameNeuron(a:Neuron,b:Neuron){return a.layer===b.layer&&a.n===b.n}

@@ -2,7 +2,7 @@ import { PlaneHover } from './PlaneHover'
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { createScene } from './legacy/scene.js'
 import type { Manifest, Neuron } from './data'
-import { detail } from './data'
+import { detail, metrics } from './data'
 import { Button } from './components/ui/button'
 import { ScrollArea } from './components/ui/scroll-area'
 import { ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react'
@@ -18,10 +18,11 @@ export function MapView({manifest,layer,selected,onLayer,onSelect,onReady}:{mani
   const pointerDown=(e:PointerEvent)=>{down={x:e.clientX,y:e.clientY}}
   const pointerUp=(e:PointerEvent)=>{if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>5)return;const hit=s.pick(e);if(hit){if(view.current.layer===null)callbacks.current.onLayer(hit.layer);else callbacks.current.onSelect(hit)}}
   el.addEventListener('pointerdown',pointerDown);el.addEventListener('pointerup',pointerUp)
-  Promise.all(manifest.layers.map(async l=>{const r=await fetch(`./data/L${l.layer}.bin`);if(!r.ok)throw Error(`Layer ${l.layer} unavailable`);const data=new Float32Array(await r.arrayBuffer());if(!disposed)s.add(l.layer,data);if(!disposed){const d=await detail(l.layer);if(!disposed)s.metrics(l.layer,d)}})).then(()=>{if(disposed)return;const v=view.current;if(v.selected)s.select(v.selected.layer,v.selected.n,null);else if(v.layer!==null)s.face(v.layer);else s.overview();setLoaded(true);callbacks.current.onReady(s)}).catch(e=>{if(!disposed)el.setAttribute('data-error',String(e))})
+  Promise.all(manifest.layers.map(async l=>{const r=await fetch(`./data/L${l.layer}.bin`);if(!r.ok)throw Error(`Layer ${l.layer} unavailable`);const data=new Float32Array(await r.arrayBuffer());if(!disposed)s.add(l.layer,data);if(!disposed){const d=await metrics(l.layer);if(!disposed)s.metrics(l.layer,d)}})).then(()=>{if(disposed)return;const v=view.current;if(v.selected)s.select(v.selected.layer,v.selected.n,null);else if(v.layer!==null)s.face(v.layer);else s.overview();setLoaded(true);callbacks.current.onReady(s)}).catch(e=>{if(!disposed)el.setAttribute('data-error',String(e))})
   return()=>{disposed=true;el.removeEventListener('pointerdown',pointerDown);el.removeEventListener('pointerup',pointerUp);s.dispose();scene.current=null}
  },[manifest])
  useEffect(()=>{const s=scene.current;if(!s||s.stats().layers!==manifest.layers.length)return;if(selected)s.select(selected.layer,selected.n,null);else if(layer!==null)s.face(layer);else s.overview()},[layer,selected,manifest])
+ useEffect(()=>{if(layer!==null)void detail(layer).catch(()=>{})},[layer,manifest])
  const hoverPick=useCallback((e:PointerEvent)=>view.current.layer===null?undefined:scene.current?.pick(e),[])
  const ring=useCallback(()=>{const n=view.current.selected;return n?scene.current?.project(n.layer,n.n)??null:null},[])
  return <section className="map-view" aria-label="Neuron map">

@@ -78,7 +78,7 @@ export function createScene(host, manifest) {
   const observer=new ResizeObserver(()=>{const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);for(const obj of layers.values())obj.points.material.uniforms.viewport.value.set(w,h);});observer.observe(host);
   camera.position.set(...config.camera.overview);camera.lookAt(0,0,0);
   renderer.setAnimationLoop(time=>{
-    if(disposed)return;
+    if(disposed||!host.clientWidth||!host.clientHeight)return;
     if(tween){const t=Math.min(1,(time-tween.time)/(matchMedia('(prefers-reduced-motion: reduce)').matches?1:config.flight)),ease=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;controls.target.lerpVectors(tween.start,tween.target,ease);camera.quaternion.slerpQuaternions(tween.rotation,tween.toRotation,ease);camera.position.set(0,0,1).applyQuaternion(camera.quaternion).multiplyScalar(THREE.MathUtils.lerp(tween.fromDistance,tween.toDistance,ease)).add(controls.target);if(t===1){tween=null;controls.enableDamping=true;}}
     if(!tween)controls.update();
     const dt=Math.min(64,time-lastTime);lastTime=time;const blend=matchMedia('(prefers-reduced-motion: reduce)').matches?1:1-Math.exp(-dt/110);
@@ -92,5 +92,5 @@ export function createScene(host, manifest) {
     if(marker.visible&&selected){marker.position.z=layers.get(selected.layer).positions[selected.n*3+2]*layers.get(selected.layer).points.scale.z;const size=camera.position.distanceTo(marker.position)*2*Math.tan(camera.fov*Math.PI/360)/Math.max(1,host.clientHeight)*10;marker.scale.setScalar(size/.12);}
     renderer.render(scene,camera);
   });
-  return {dispose(){disposed=true;observer.disconnect();renderer.setAnimationLoop(null);controls.dispose();scene.traverse(o=>{o.geometry?.dispose();if(o.material)o.material.dispose();});renderer.dispose();renderer.domElement.remove();},metrics,positions:layer=>layers.get(layer).positions,add,overview,face,select,clear,updateSpread,pick,project,scores,controls,stats:()=>({layers:layers.size,points:scores.length,focused,selected,flying:!!tween,camera:camera.position.toArray(),calls:renderer.info.render.calls,marker:selected?{point:project(selected.layer,selected.n),position:marker.position.toArray(),radius:marker.scale.x*.12}:null})};
+  return {dispose(){disposed=true;observer.disconnect();renderer.setAnimationLoop(null);controls.dispose();scene.traverse(o=>{o.geometry?.dispose();if(o.material)o.material.dispose();});renderer.dispose();renderer.domElement.remove();},metrics,positions:layer=>layers.get(layer).positions,add,overview,face,select,clear,updateSpread,pick,project,scores,controls,stats:()=>({layers:layers.size,points:scores.length,focused,selected,flying:!!tween,camera:camera.position.toArray(),calls:renderer.info.render.calls,frames:renderer.info.render.frame,marker:selected?{point:project(selected.layer,selected.n),position:marker.position.toArray(),radius:marker.scale.x*.12}:null})};
 }
